@@ -21,9 +21,3 @@ logging:
     org.hibernate.orm.jdbc.bind: INFO
     org.hibernate.orm.jdbc.extract: INFO
     org.springframework.transaction.interceptor: INFO
-custom:
-#  tempDirPath: /gen/temp
-#  site:
-#    baseUrl: https://gamedragons.bi3a.app
-#  genFile:
-#    dirPath: /gen

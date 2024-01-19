@@ -1,4 +1,4 @@
-package com.bitharmony.comma.global;
+package com.bitharmony.comma.global.init;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
