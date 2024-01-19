@@ -1,0 +1,13 @@
+spring:
+  output:
+    ansi:
+      enabled: always
+  datasource:
+    url: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+custom:
+#  tempDirPath: c:/gamedragons/gamedragons_test/temp
+#  genFile:
+#    dirPath: c:/gamedragons/demo_test
