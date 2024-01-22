@@ -2,7 +2,7 @@ name: work-1
 on:
   push:
     branches:
-      - cd_cd
+      - ci_cd
 jobs:
   hello1:
     runs-on: ubuntu-latest
