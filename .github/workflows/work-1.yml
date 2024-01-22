@@ -3,11 +3,11 @@ on:
   push:
     branches:
       - cd_cd
-  jobs:
-    hello1:
-      runs-on: ubuntu-latest
-    steps:
-      - name: sayHi
-        run: echo "Hi"
-      - name: sayMyName
-        run: echo "${{ github.actor }}"
+jobs:
+  hello1:
+    runs-on: ubuntu-latest
+  steps:
+    - name: sayHi
+      run: echo "Hi"
+    - name: sayMyName
+      run: echo "${{ github.actor }}"
