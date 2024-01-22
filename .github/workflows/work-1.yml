@@ -7,11 +7,20 @@ jobs:
   hello1:
     runs-on: ubuntu-latest
     steps:
-      - name: sayHi
-        run: echo "Hi"
-      - name: sayMyName
-        run: echo "${{ github.actor }}"
       - uses: actions/checkout@v4
-      - uses: mathieudutour/github-tag-action@v6.1
+      - name: Create Tag
+        id: create_tag
+        uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.TOKEN }}
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          tag_name: ${{ steps.create_tag.outputs.new_tag }}
+          release_name: Release ${{ steps.create_tag.outputs.new_tag }}
+          body: ${{ steps.create_tag.outputs.changelog }}
+          draft: false
+          prerelease: false
