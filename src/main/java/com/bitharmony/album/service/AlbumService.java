@@ -27,8 +27,9 @@ public class AlbumService {
 
 		//앨범 생성
 		Album album = request.toEntity();
-		albumRepository.save(album);
 
 		//앨범 저장
+		albumRepository.save(album);
+		//리턴?
 	}
 }
