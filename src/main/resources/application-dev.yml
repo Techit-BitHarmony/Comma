@@ -1,10 +1,8 @@
 server:
   port: 8090
 spring:
-  profiles:
-    include: custom
   datasource:
-    url: jdbc:mysql://localhost:3306/comma_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306
     username: ${custom.dev-mysql-username}
     password: ${custom.dev-mysql-password}
     driver-class-name: com.mysql.cj.jdbc.Driver
