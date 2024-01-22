@@ -20,8 +20,8 @@ public class AlbumController {
 	 * 앨범 등록
 	 */
 	@GetMapping(value = "/create")
-	public String Create(@RequestBody @Valid AlbumCreateRequest request) {
-		//서비스
-		return "album/create";
+	public String create(@RequestBody @Valid AlbumCreateRequest request) {
+		albumService.create(request);
+		return "redirect:/";
 	}
 }
