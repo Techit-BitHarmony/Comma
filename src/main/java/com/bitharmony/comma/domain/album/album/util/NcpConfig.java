@@ -12,6 +12,10 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
 @Configuration
 public class NcpConfig {
+	/**
+	 * NCP S3 설정 주의사항
+	 * application.yml에 설정한 access-key, secret-key, region, endPoint를 NCP S3 설정에 맞게 변경해야함
+	 */
 	@Value("${cloud.aws.credentials.access-key}")
 	private String accessKey;
 

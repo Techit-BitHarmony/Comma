@@ -13,7 +13,7 @@
 
 <form method="post" enctype="multipart/form-data">
     <label>Album Name</label>
-    <input type="text" name="albumName"> <br>
+    <input type="text" name="albumname"> <br>
 
     <label>Genre</label>
     <select name="genre">
@@ -30,17 +30,21 @@
     <label>Music Img File</label>
     <input type="file" id="musicImageFile" name="musicImageFile"> <br>
 
+    <input type="hidden" name="license" value="false">
     <label>License</label>
-    <input type="checkbox" id="license" name="license"> <br>
+    <input type="checkbox" id="license" name="license" value="false"> <br>
 
     <label id="licenseDescriptionLabel">License Description</label>
     <textarea id="licenseDescription" name="licenseDescription"></textarea> <br>
 
+    <input type="hidden" name="permit" value="false">
     <label>Permit</label>
-    <input type="checkbox" id="permit" name="permit"> <br>
+    <input type="checkbox" id="permit" name="permit" value="false"> <br>
 
+    <input type="hidden" name="price" value="0">
     <label id="priceLabel">Price</label>
-    <input type="number" id="price" name="price"> <br>
+    <input type="number" id="price" name="price" min="0"> <br>
+
     <input type="submit" value="Submit">
 </form>
 

@@ -2,10 +2,15 @@ package com.bitharmony.comma.domain.album.album.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.bitharmony.comma.domain.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.domain.album.album.service.AlbumService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -20,11 +25,12 @@ public class AlbumController {
 		return "domain/album/album_form";
 	}
 
-	// @GetMapping(value = "/create")
-	// public String create(@RequestBody @Valid AlbumCreateRequest request) {
-	// 	albumService.create(request);
-	// 	return "redirect:/";
-	// }
+	@PostMapping("/release")
+	public String releaseAlbum(@Valid AlbumCreateRequest request,
+		@RequestParam("musicImageFile") MultipartFile musicImageFile) {
+		albumService.release(request,musicImageFile);
+		return "domain/album/album_detail";
+	}
 
 	// @PostMapping("/uploadAlbumImg")
 	// public String uploadAlbumImg(@ModelAttribute )

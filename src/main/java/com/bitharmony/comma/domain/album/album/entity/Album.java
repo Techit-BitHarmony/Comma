@@ -35,7 +35,7 @@ public class Album {
 	@Column(nullable = false, length = 20)
 	private String genre;
 
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "boolean default false")
 	private boolean license;
 
 	@Column(nullable = false, columnDefinition = "TEXT")
@@ -47,10 +47,10 @@ public class Album {
 	@Column(columnDefinition = "TEXT")
 	private String imagePath;
 
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "boolean default false")
 	private boolean permit;
 
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "int default 0")
 	private int price;
 
 	@OneToMany(fetch = FetchType.LAZY)
