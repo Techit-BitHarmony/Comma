@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.domain.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.domain.album.album.service.AlbumService;
+import com.bitharmony.comma.domain.album.file.service.FileService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +28,10 @@ public class AlbumController {
 
 	@PostMapping("/release")
 	public String releaseAlbum(@Valid AlbumCreateRequest request,
-		@RequestParam("musicImageFile") MultipartFile musicImageFile) {
-		albumService.release(request,musicImageFile);
+		@RequestParam("musicImageFile")MultipartFile multipartFile) {
+
+		albumService.release(request,multipartFile);
+		//return ResponseEntity.ok(e)
 		return "domain/album/album_detail";
 	}
 

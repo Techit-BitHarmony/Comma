@@ -1,4 +1,4 @@
-package com.bitharmony.comma.domain.album.album.util;
+package com.bitharmony.comma.domain.album.file.util;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

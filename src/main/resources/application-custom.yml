@@ -14,4 +14,4 @@ cloud:
       endpoint: https://kr.object.ncloudstorage.com
       bucket: musicstorage
 file:
-  path: C:/workspace/upload/
+  path: albumimage
