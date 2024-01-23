@@ -1,6 +1,8 @@
-package com.bitharmony.album.entity;
+package com.bitharmony.comma.domain.album.album.entity;
 
 import java.util.List;
+
+import com.bitharmony.comma.domain.album.albumLike.entity.AlbumLike;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,4 +55,8 @@ public class Album {
 
 	@OneToMany(fetch = FetchType.LAZY)
 	private List<AlbumLike> albumLike;
+
+	public void updateImageUrl(String url) {
+		this.imagePath = url;
+	}
 }

@@ -1,10 +1,10 @@
-package com.bitharmony.album.service;
+package com.bitharmony.comma.domain.album.album.service;
 
 import org.springframework.stereotype.Service;
 
-import com.bitharmony.album.dto.AlbumCreateRequest;
-import com.bitharmony.album.entity.Album;
-import com.bitharmony.album.repository.AlbumRepository;
+import com.bitharmony.comma.domain.album.album.dto.AlbumCreateRequest;
+import com.bitharmony.comma.domain.album.album.entity.Album;
+import com.bitharmony.comma.domain.album.album.repository.AlbumRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

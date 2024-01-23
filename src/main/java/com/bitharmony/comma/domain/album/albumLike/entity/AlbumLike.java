@@ -1,8 +1,5 @@
-package com.bitharmony.album.entity;
+package com.bitharmony.comma.domain.album.albumLike.entity;
 
-import java.time.LocalDateTime;
-
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,13 +13,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class StreamingCount {
+public class AlbumLike {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
-	private Long streamingDailyCount;
-
-	@Column(name = "streaming_date", nullable = false)
-	private LocalDateTime streamingDate;
+	// @JoinColumn(name = "album_id")
+	// private Long albumId;
+	//
+	// @JoinColumn(name = "member_id")
+	// private Long memberId;
 }
