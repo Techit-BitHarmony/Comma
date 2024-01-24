@@ -1,7 +1,10 @@
 package com.bitharmony.comma.domain.album.album.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.domain.album.album.dto.AlbumCreateRequest;
@@ -10,7 +13,6 @@ import com.bitharmony.comma.domain.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.domain.album.file.dto.FileResponse;
 import com.bitharmony.comma.domain.album.file.service.FileService;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,7 +25,7 @@ public class AlbumService {
 	private String uploadFolder;
 
 	@Transactional
-	public void release(AlbumCreateRequest request, MultipartFile imgFile) {
+	public FileResponse release(AlbumCreateRequest request, MultipartFile imgFile) {
 		//멤버 조회
 		//멤버가 없으면 에러
 
@@ -37,12 +39,26 @@ public class AlbumService {
 		Album album = request.toEntity();
 
 		//이미지
+		FileResponse imgResponse = null;
 		if (imgFile != null) {
-			FileResponse imgResponse = fileService.uploadFile(imgFile, uploadFolder);
+			imgResponse = fileService.uploadFile(imgFile, uploadFolder);
 			album.updateImageUrl(imgResponse.uploadFileUrl());
 		}
 
 		albumRepository.save(album);
-		//리턴?
+
+		// FileResponse 객체 반환
+		return imgResponse;
 	}
+
+	public Optional<Album> getAlbumById(long id) {
+		return albumRepository.findById(id);
+	}
+
+	// public Album edit(AlbumEditRequest request, MultipartFile multipartFile, Album album) {
+	//
+	// 	album.setTitle(request.getNewTitle());
+	// 	album.setDescription(request.getNewDescription());
+	// 	return albumRepository.save(album);
+	// }
 }
