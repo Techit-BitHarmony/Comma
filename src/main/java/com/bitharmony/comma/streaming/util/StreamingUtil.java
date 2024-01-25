@@ -11,8 +11,10 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class StreamingUtil {
     private final AmazonS3 amazonS3;
@@ -39,7 +41,7 @@ public class StreamingUtil {
         LocalDateTime expiration = LocalDateTime.now().plusMinutes(15);
 
         Date from = Date.from(expiration.atZone(ZoneId.systemDefault()).toInstant());
-        return amazonS3.generatePresignedUrl(bucketName, name, from, HttpMethod.PUT);
+        return amazonS3.generatePresignedUrl(bucketName, path + name, from, HttpMethod.PUT);
     }
 
 }
