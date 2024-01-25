@@ -1,5 +1,6 @@
 package com.bitharmony.comma.domain.credit.charge.controller;
 
+import com.bitharmony.comma.domain.credit.charge.dto.ChargeCreateRequest;
 import com.bitharmony.comma.domain.credit.charge.dto.ChargeCreateResponse;
 import com.bitharmony.comma.domain.credit.charge.dto.ChargeGetResponse;
 import com.bitharmony.comma.domain.credit.charge.entity.Charge;
@@ -9,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -29,6 +28,16 @@ public class ChargeController {
         }  catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/charges")
+    public ResponseEntity<ChargeCreateResponse> createCharge(
+            @RequestBody ChargeCreateRequest chargeCreateRequest){
+
+        Charge charge = this.chargeService.createCharge(chargeCreateRequest.chargeAmount());
+        ChargeCreateResponse chargeCreateResponse = new ChargeCreateResponse(charge);
+
+        return new ResponseEntity<>(chargeCreateResponse, HttpStatus.CREATED);
     }
 
 

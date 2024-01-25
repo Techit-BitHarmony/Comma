@@ -25,4 +25,15 @@ public class ChargeService {
         return charge.get();
     }
 
+    public Charge createCharge(long chargeAmount){
+        Charge charge = new Charge().builder()
+                .chargeAmount(chargeAmount)
+                .createDate(LocalDateTime.now())
+                .build();
+        this.chargeRepository.save(charge);
+
+        return charge;
+    }
+
+
 }

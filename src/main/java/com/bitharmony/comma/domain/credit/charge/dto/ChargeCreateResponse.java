@@ -8,16 +8,13 @@ import java.time.LocalDateTime;
 @Builder
 public record ChargeCreateResponse(
         long chargeAmount,
-        LocalDateTime createDate,
-        String paymentKey,
-        LocalDateTime payDate
+        LocalDateTime createDate
 
 ) {
     public ChargeCreateResponse(Charge charge) {
+
         this(
                 charge.getChargeAmount(),
-                charge.getCreateDate(),
-                charge.getPaymentKey(),
-                charge.getPayDate());
+                charge.getCreateDate());
     }
 }
