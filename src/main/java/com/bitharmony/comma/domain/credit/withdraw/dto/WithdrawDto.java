@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record WithdrawDto(
+        long id,
         String bankName,
         String bankAccountNo,
         long withdrawAmount,
@@ -16,6 +17,7 @@ public record WithdrawDto(
 ) {
     public WithdrawDto(Withdraw withdraw){
         this(
+                withdraw.getId(),
                 withdraw.getBankName(),
                 withdraw.getBankAccountNo(),
                 withdraw.getWithdrawAmount(),
