@@ -13,5 +13,9 @@ cloud:
     s3:
       endpoint: https://kr.object.ncloudstorage.com
       bucket: musicstorage
-file:
-  path: albumimage
+ncp:
+  object-storage:
+    img-folder: albumimage
+  image-optimizer:
+    cdn: https://kv6d2rdb2209.edge.naverncp.com/GSctnLFiOr
+    query-string: ?type=f&w=300&h=300&ttype=jpg

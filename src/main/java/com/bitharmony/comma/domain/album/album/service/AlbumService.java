@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.domain.album.album.dto.AlbumCreateRequest;
+import com.bitharmony.comma.domain.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.domain.album.album.entity.Album;
 import com.bitharmony.comma.domain.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.domain.album.file.dto.FileResponse;
@@ -21,11 +22,11 @@ public class AlbumService {
 	private final AlbumRepository albumRepository;
 	private final FileService fileService;
 
-	@Value("${file.path}")
+	@Value("${ncp.object-storage.img-folder}")
 	private String uploadFolder;
 
 	@Transactional
-	public FileResponse release(AlbumCreateRequest request, MultipartFile imgFile) {
+	public AlbumResponse release(AlbumCreateRequest request, MultipartFile imgFile) {
 		//멤버 조회
 		//멤버가 없으면 에러
 
@@ -47,8 +48,17 @@ public class AlbumService {
 
 		albumRepository.save(album);
 
-		// FileResponse 객체 반환
-		return imgResponse;
+		// // FileResponse 객체 반환
+		// return imgResponse;
+		return AlbumResponse.builder()
+			.albumname(album.getAlbumname())
+			.genre(album.getGenre())
+			.license(album.isLicense())
+			.licenseDescription(album.getLicenseDescription())
+			.imgPath(fileService.getAlbumImageUrl(album.getImagePath()))
+			.permit(album.isPermit())
+			.price(album.getPrice())
+			.build();
 	}
 
 	public Optional<Album> getAlbumById(long id) {

@@ -25,12 +25,21 @@ public class FileService {
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucketName;
 
+	@Value("${ncp.image-optimizer.cdn}")
+	private String cdnUrl;
+
+	@Value("${ncp.image-optimizer.query-string}")
+	private String cdnQueryString;
+
 	public String getUuidFileName(String fileName) {
 		String ext = fileName.substring(fileName.indexOf(".") + 1);
 		return UUID.randomUUID().toString() + "." + ext;
 	}
 
-	//NOTICE: filePath의 맨 앞에 /는 안붙여도됨. ex) history/images
+	/**
+	 *NOTICE: filePath의 맨 앞에 /는 안붙여도됨. ex) history/images
+	 *ncp object storage에 파일 업로드
+	 */
 	public FileResponse uploadFile(MultipartFile multipartFile, String filePath) {
 		String originalFileName = multipartFile.getOriginalFilename();
 		String uploadFileName = getUuidFileName(originalFileName);
@@ -49,7 +58,7 @@ public class FileService {
 					CannedAccessControlList.PublicRead));
 
 			// S3에 업로드한 폴더 및 파일 URL
-			uploadFileUrl = "https://kr.object.ncloudstorage.com/" + bucketName + "/" + keyName;
+			uploadFileUrl = bucketName + "/" + keyName;
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -61,5 +70,25 @@ public class FileService {
 			.uploadFilePath(filePath)
 			.uploadFileUrl(uploadFileUrl)
 			.build();
+	}
+
+	/**
+	 * ncp image optimizer 사용 cdn url을 통해서 변환된 이미지 가져오기
+	 */
+	public String getAlbumImageUrl(String filepath) {
+		String replacedFilePath = filepath.replace(bucketName,"");
+
+		//이미지 URL검증 필요시
+		// try {
+		// 	// 이미지 URL을 검증하는 코드를 추가합니다.
+		// 	// 이 부분은 실제 이미지 URL을 검증하는 로직에 따라 달라집니다.
+		// 	validateImageUrl(optimizedImageUrl);
+		// } catch (FileNotFoundException e) {
+		// 	// 적절한 에러 메시지를 설정하거나 다른 조치를 취합니다.
+		// 	System.out.println("The requested image does not exist: " + optimizedImageUrl);
+		// 	return null; // 또는 적절한 에러 응답을 반환합니다.
+		// }
+
+		return cdnUrl + replacedFilePath + cdnQueryString;
 	}
 }

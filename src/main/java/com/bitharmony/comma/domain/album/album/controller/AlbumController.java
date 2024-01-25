@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.domain.album.album.dto.AlbumCreateRequest;
+import com.bitharmony.comma.domain.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.domain.album.album.service.AlbumService;
-import com.bitharmony.comma.domain.album.file.dto.FileResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +29,11 @@ public class AlbumController {
 	}
 
 	@PostMapping("/release")
-	public ResponseEntity<FileResponse> releaseAlbum(@Valid AlbumCreateRequest request,
+	public ResponseEntity<AlbumResponse> releaseAlbum(@Valid AlbumCreateRequest request,
 		@RequestParam("musicImageFile") MultipartFile multipartFile) {
 
-		FileResponse fileResponse = albumService.release(request, multipartFile);
-		return new ResponseEntity<>(fileResponse, HttpStatus.CREATED);
+		AlbumResponse albumResponse = albumService.release(request, multipartFile);
+		return new ResponseEntity<>(albumResponse, HttpStatus.CREATED);
 	}
 
 	// @GetMapping("/{id}")
@@ -42,7 +42,7 @@ public class AlbumController {
 	// ) {
 	// 	Album album = albumService.getAlbumById(id).orElseThrow(RuntimeException::new);
 	// }
-
+	//
 	// @PutMapping("/{id}")
 	// public ResponseEntity<Album> editAlbum(@PathVariable long id, @Valid AlbumEditRequest request,
 	// 	@RequestParam("musicImageFile") MultipartFile multipartFile) {
