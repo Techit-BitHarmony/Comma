@@ -37,4 +37,13 @@ public class CreditLogController {
 
         return new ResponseEntity<>(creditLogGetListResponse, HttpStatus.OK);
     }
+
+
+//    // 멤버 기능 추가시 구현 예정
+//    @GetMapping("/creditLogs/member/{memberId}")
+//    public ResponseEntity<CreditLogGetListByMemberIdResponse> getCreditLogsByMemberId(
+//            @PathVariable long memberId
+//    ){
+//    }
+
 }

@@ -2,6 +2,7 @@ package com.bitharmony.comma.domain.credit.charge.controller;
 
 import com.bitharmony.comma.domain.credit.charge.dto.ChargeCreateRequest;
 import com.bitharmony.comma.domain.credit.charge.dto.ChargeCreateResponse;
+import com.bitharmony.comma.domain.credit.charge.dto.ChargeGetListResponse;
 import com.bitharmony.comma.domain.credit.charge.dto.ChargeGetResponse;
 import com.bitharmony.comma.domain.credit.charge.entity.Charge;
 import com.bitharmony.comma.domain.credit.charge.service.ChargeService;
@@ -24,6 +25,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -46,6 +48,15 @@ public class ChargeController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/charges")
+    public ResponseEntity<ChargeGetListResponse> getChargeList() {
+        List<Charge> charges = this.chargeService.getChargeList();
+        ChargeGetListResponse chargeGetListResponse = ChargeGetListResponse.toDtoList(charges);
+
+        return new ResponseEntity<>(chargeGetListResponse, HttpStatus.OK); 
+    }
+
 
 
     @GetMapping("/charge_form")
