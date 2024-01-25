@@ -49,7 +49,8 @@ public class AlbumController {
 	@GetMapping("/{id}")
 	public ResponseEntity<AlbumResponse> getAlbum(@PathVariable long id) {
 		Album album = albumService.getAlbumById(id).orElseThrow(RuntimeException::new);
-		return new ResponseEntity<>(HttpStatus.OK);
+		AlbumResponse dto = albumToResponseDto(album);
+		return new ResponseEntity<>(dto, HttpStatus.OK);
 	}
 
 	@PutMapping("/{id}")
