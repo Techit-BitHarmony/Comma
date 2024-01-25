@@ -49,6 +49,14 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Setup MySQL
+        uses: samin/mysql-action@v1
+        with:
+          character set server: 'utf8'
+          mysql database: 'testDb'
+          mysql user: 'root'
+          mysql password: ''
+
       - name: 레지스트리 로그인
         uses: docker/login-action@v2
         with:
