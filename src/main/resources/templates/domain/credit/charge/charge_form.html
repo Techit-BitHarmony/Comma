@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>Charge Form</title>
+</head>
+<body>
+
+<form id="chargeForm">
+    <label for="chargeAmount">충전 금액</label>
+    <input type="text" id="chargeAmount" name="chargeAmount" value="10000">
+    <button type="submit">충전하기</button>
+</form>
+
+<script>
+    document.getElementById('chargeForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // 기본 제출 동작을 중지
+
+        // 폼 데이터 가져오기
+        const formData = new FormData(this);
+
+        // FormData를 JSON 형태로 변환
+        const formDataJSON = {};
+        formData.forEach((value, key) => {
+            formDataJSON[key] = value;
+        });
+
+        // JSON 데이터를 서버로 전송
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formDataJSON)
+        };
+
+        // Fetch를 사용하여 서버로 데이터 전송
+        fetch('/credit/charges', requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Server response:', data);
+                window.location.href = `/credit/charges/pay/${data.chargeId}`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+</script>
+
+</body>
+</html>

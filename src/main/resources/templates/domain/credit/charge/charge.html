@@ -1,0 +1,58 @@
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+
+    <script src="https://js.tosspayments.com/v1/payment-widget"></script>
+
+    <script th:inline="javascript">
+        const chargerUsername = 'parktoss'
+        const chargeCode = /*[[ ${charge.code} ]]*/ null;
+        const chargeAmount = /*[[ ${charge.chargeAmount} ]]*/ null;
+        const toss_clientKey = /*[[ ${@environment.getProperty('custom.tossPayments.widget.clientKey')} ]]*/ null;
+    </script>
+
+</head>
+<body>
+
+<!-- 결제 UI, 이용약관 UI 영역 -->
+<div id="payment-method"></div>
+<div id="agreement"></div>
+<!-- 결제하기 버튼 -->
+<button id="payment-button">결제하기</button>
+
+<script>
+    const button = document.getElementById("payment-button");
+
+    // 구매자의 고유 아이디를 불러와서 customerKey로 설정하세요.
+    // 이메일・전화번호와 같이 유추가 가능한 값은 안전하지 않습니다.
+    const widgetClientKey = toss_clientKey;
+    const customerKey = chargerUsername;
+    const paymentWidget = PaymentWidget(widgetClientKey, customerKey); // 회원 결제
+    // const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS) // 비회원 결제
+
+    const paymentMethodWidget = paymentWidget.renderPaymentMethods(
+        "#payment-method",
+        { value: chargeAmount },
+        { variantKey: "DEFAULT" }
+    );
+
+    paymentWidget.renderAgreement(
+        "#agreement",
+        { variantKey: "AGREEMENT" }
+    );
+
+
+    button.addEventListener("click", function () {
+        // 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
+        // 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
+        paymentWidget.requestPayment({
+            orderId: chargeCode,
+            orderName: "크레딧 충전",
+            successUrl: window.location.origin + "/credit/success",
+            failUrl: window.location.origin + "/credit/fail",
+        });
+    });
+</script>
+</body>
+</html>
+
