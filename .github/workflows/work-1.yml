@@ -52,7 +52,6 @@ jobs:
       - name: Setup MySQL
         uses: mirromutth/mysql-action@v1.1
         with:
-          character set server: 'utf8'
           mysql root password: ${{ secrets.MYSQL_PASSWORD }} # Required if "mysql user" is empty, default is empty. The root superuser password
 
       - name: 레지스트리 로그인
