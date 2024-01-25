@@ -2,6 +2,7 @@ package com.bitharmony.comma.domain.album.album.entity;
 
 import java.util.List;
 
+import com.bitharmony.comma.domain.album.album.dto.AlbumEditRequest;
 import com.bitharmony.comma.domain.album.albumLike.entity.AlbumLike;
 
 import jakarta.persistence.Column;
@@ -58,5 +59,15 @@ public class Album {
 
 	public void updateImageUrl(String url) {
 		this.imagePath = url;
+	}
+
+	public void update(AlbumEditRequest request) {
+		this.albumname = request.albumname();
+		this.genre = request.genre();
+		this.license = request.license();
+		this.licenseDescription = request.licenseDescription();
+		this.imagePath = request.filePath();
+		this.permit = request.permit();
+		this.price = request.price();
 	}
 }
