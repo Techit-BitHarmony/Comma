@@ -53,6 +53,8 @@ public class ChargeController {
         return "domain/credit/charge/charge_form";
     }
 
+
+    // Response의 chargeId 값으로 "/charge/pay/{id}"로 리다이렉트하여 결제 진행
     @PostMapping("/charges")
     public ResponseEntity<ChargeCreateResponse> createCharge(
             @RequestBody ChargeCreateRequest chargeCreateRequest){
@@ -70,7 +72,7 @@ public class ChargeController {
 
         return "/domain/credit/charge/charge";
     }
-    
+
     @GetMapping("/success")
     public String showSuccess() {
         return "domain/credit/charge/success";
