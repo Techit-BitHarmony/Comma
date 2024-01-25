@@ -50,11 +50,10 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup MySQL
-        uses: samin/mysql-action@v1
+        uses: mirromutth/mysql-action@v1.1
         with:
-          container port: 3306
           character set server: 'utf8'
-          mysql root password: ${{ secrets.MYSQL_PASSWORD }}
+          mysql root password: ${{ secrets.MYSQL_PASSWORD }} # Required if "mysql user" is empty, default is empty. The root superuser password
 
       - name: 레지스트리 로그인
         uses: docker/login-action@v2
