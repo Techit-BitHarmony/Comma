@@ -16,7 +16,7 @@ spring:
       ddl-auto: none
 logging:
   level:
-    com.ll.medium: INFO
+    com.bitharmony.comma: INFO
     org.hibernate.SQL: INFO
     org.hibernate.orm.jdbc.bind: INFO
     org.hibernate.orm.jdbc.extract: INFO
