@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,6 +12,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.bitharmony.comma.domain.album.file.dto.FileResponse;
+import com.bitharmony.comma.domain.album.file.util.NcpProperties;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,15 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class FileService {
 
 	private final AmazonS3 amazonS3Client;
-
-	@Value("${cloud.aws.s3.bucket}")
-	private String bucketName;
-
-	@Value("${ncp.image-optimizer.cdn}")
-	private String cdnUrl;
-
-	@Value("${ncp.image-optimizer.query-string}")
-	private String cdnQueryString;
+	private final NcpProperties ncpProperties;
 
 	public String getUuidFileName(String fileName) {
 		String ext = fileName.substring(fileName.indexOf(".") + 1);
@@ -54,11 +46,11 @@ public class FileService {
 
 			// S3에 폴더 및 파일 업로드
 			amazonS3Client.putObject(
-				new PutObjectRequest(bucketName, keyName, inputStream, objectMetadata).withCannedAcl(
+				new PutObjectRequest(ncpProperties.getBucketName(), keyName, inputStream, objectMetadata).withCannedAcl(
 					CannedAccessControlList.PublicRead));
 
 			// S3에 업로드한 폴더 및 파일 URL
-			uploadFileUrl = bucketName + "/" + keyName;
+			uploadFileUrl = ncpProperties.getBucketName() + "/" + keyName;
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -70,25 +62,5 @@ public class FileService {
 			.uploadFilePath(filePath)
 			.uploadFileUrl(uploadFileUrl)
 			.build();
-	}
-
-	/**
-	 * ncp image optimizer 사용 cdn url을 통해서 변환된 이미지 가져오기
-	 */
-	public String getAlbumImageUrl(String filepath) {
-		String replacedFilePath = filepath.replace(bucketName,"");
-
-		//이미지 URL검증 필요시
-		// try {
-		// 	// 이미지 URL을 검증하는 코드를 추가합니다.
-		// 	// 이 부분은 실제 이미지 URL을 검증하는 로직에 따라 달라집니다.
-		// 	validateImageUrl(optimizedImageUrl);
-		// } catch (FileNotFoundException e) {
-		// 	// 적절한 에러 메시지를 설정하거나 다른 조치를 취합니다.
-		// 	System.out.println("The requested image does not exist: " + optimizedImageUrl);
-		// 	return null; // 또는 적절한 에러 응답을 반환합니다.
-		// }
-
-		return cdnUrl + replacedFilePath + cdnQueryString;
 	}
 }
