@@ -2,6 +2,8 @@ package com.bitharmony.comma.domain.credit.charge.service;
 
 import com.bitharmony.comma.domain.credit.charge.entity.Charge;
 import com.bitharmony.comma.domain.credit.charge.repository.ChargeRepository;
+import com.bitharmony.comma.domain.credit.creditLog.entity.CreditLog;
+import com.bitharmony.comma.domain.credit.creditLog.service.CreditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.Optional;
 public class ChargeService {
 
     private final ChargeRepository chargeRepository;
+    private final CreditLogService creditLogService;
 
 
     public Charge getChargeById(long id) {
@@ -24,6 +27,10 @@ public class ChargeService {
         }
 
         return charge.get();
+    }
+
+    public List<Charge> getChargeList() {
+        return this.chargeRepository.findAll();
     }
 
     public Charge createCharge(long chargeAmount) {
@@ -67,11 +74,9 @@ public class ChargeService {
 
         chargeRepository.save(_charge);
 
-        // 크레딧 내역 기록하는 메서드 추가 예정
+        creditLogService.addCreditLog(CreditLog.EventType.충전__토스페이먼츠, amount);
     }
 
 
-    public List<Charge> getChargeList() {
-        return this.chargeRepository.findAll();
-    }
+
 }
