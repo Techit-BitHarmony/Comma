@@ -24,8 +24,7 @@ jobs:
           passphrase: ${{ secrets.REMOTE_SSH_PASSPHRASE }}
 #          password: ${{ secrets.REMOTE_SSH_PASSWORD }}
           port: ${{ secrets.REMOTE_SSH_PORT }}
-          proxy_port: 3000
-          script: |
+          script:
             whoami
 
   makeTagAndRelease:
