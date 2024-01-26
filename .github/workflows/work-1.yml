@@ -50,7 +50,7 @@ jobs:
         run: echo "$APPLICATION_SECRET" > ./src/main/resources/application-secret.yml
 
       - name: application-secret.yml 확인
-        run: cat ./src/main/resources/application-secret.yml
+        run: cat ./src/main/resources/application.yml
 
       - name: ✨ JDK 17 설정
         uses: actions/setup-java@v3
