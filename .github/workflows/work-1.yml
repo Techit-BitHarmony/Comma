@@ -18,12 +18,13 @@ jobs:
         with:
           host: ${{ secrets.REMOTE_SSH_HOST }}
           username: ${{ secrets.REMOTE_SSH_USERNAME }}
-          key: ${{ secrets.REMOTE_SSH_KEY }}
+#          key: ${{ secrets.REMOTE_SSH_KEY }}
 #          key_path: ${{ secrets.SSH_KEY_PATH }}
 #          fingerprint: ${{ secrets.SSH_FINGERPRINT }}
-          passphrase: ${{ secrets.REMOTE_SSH_PASSPHRASE }}
-#          password: ${{ secrets.REMOTE_SSH_PASSWORD }}
+#          passphrase: ${{ secrets.REMOTE_SSH_PASSPHRASE }}
+          password: ${{ secrets.REMOTE_SSH_PASSWORD }}
           port: ${{ secrets.REMOTE_SSH_PORT }}
+          debug: true
           script:
             whoami
 
