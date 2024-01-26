@@ -19,8 +19,8 @@ jobs:
           host: ${{ secrets.REMOTE_SSH_HOST }}
           username: ${{ secrets.REMOTE_SSH_USERNAME }}
           key: ${{ secrets.REMOTE_SSH_KEY }}
-          passphrase: ${{ secrets.REMOTE_SSH_PASSPHRASE }}
-          password: ${{ secrets.REMOTE_SSH_PASSWORD }}
+#          passphrase: ${{ secrets.REMOTE_SSH_PASSPHRASE }}
+#          password: ${{ secrets.REMOTE_SSH_PASSWORD }}
           port: ${{ secrets.REMOTE_SSH_PORT }}
           script: |
             whoami
