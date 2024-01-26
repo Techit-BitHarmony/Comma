@@ -9,25 +9,6 @@ on:
     branches:
       - ci_cd
 jobs:
-
-  remoteSshConnectionTest:
-    runs-on: ubuntu-latest
-    steps:
-      - name: execute remote ssh
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.REMOTE_SSH_HOST }}
-          username: ${{ secrets.REMOTE_SSH_USERNAME }}
-#          key: ${{ secrets.REMOTE_SSH_KEY }}
-#          key_path: ${{ secrets.SSH_KEY_PATH }}
-#          fingerprint: ${{ secrets.SSH_FINGERPRINT }}
-#          passphrase: ${{ secrets.REMOTE_SSH_PASSPHRASE }}
-          password: ${{ secrets.REMOTE_SSH_PASSWORD }}
-          port: ${{ secrets.REMOTE_SSH_PORT }}
-          debug: true
-          script:
-            whoami
-
   makeTagAndRelease:
     runs-on: ubuntu-latest
     outputs:
@@ -54,7 +35,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    name: 도커 이미지 빌드와 푸시
+    name: dockerImageBuildAndPush
     needs: makeTagAndRelease
     runs-on: ubuntu-latest
     steps:
@@ -104,3 +85,23 @@ jobs:
           tags: |
             ghcr.io/${{ env.OWNER_LC }}/bitharmony-comma:${{ needs.makeTagAndRelease.outputs.tag_name }},
             ghcr.io/${{ env.OWNER_LC }}/bitharmony-comma:latest
+
+  autoDeployUsingSSH:
+    needs: dockerImageBuildAndPush
+    runs-on: ubuntu-latest
+    steps:
+      - name: execute remote ssh
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_SSH_HOST }}
+          username: ${{ secrets.REMOTE_SSH_USERNAME }}
+          key: ${{ secrets.REMOTE_SSH_KEY }}
+          passphrase: ${{ secrets.REMOTE_SSH_PASSPHRASE }}
+          password: ${{ secrets.REMOTE_SSH_PASSWORD }}
+          port: ${{ secrets.REMOTE_SSH_PORT }}
+          debug: true
+          script:
+            whoami
+            docker rm -f deploy_1
+            docker pull ghcr.io/techit-bitharmony/bitharmony-comma:latest
+            docker run --name deploy_1  -d -p 8080:8090 ghcr.io/techit-bitharmony/bitharmony-comma:latest
