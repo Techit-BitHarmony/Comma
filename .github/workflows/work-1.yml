@@ -17,7 +17,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.REMOTE_SSH_HOST }}
-          username: root
+          username: ${{ secrets.REMOTE_SSH_USERNAME }}
 #          key: ${{ secrets.REMOTE_SSH_KEY }}
 #          key_path: ${{ secrets.SSH_KEY_PATH }}
 #          fingerprint: ${{ secrets.SSH_FINGERPRINT }}
