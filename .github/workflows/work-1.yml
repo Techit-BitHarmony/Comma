@@ -87,7 +87,7 @@ jobs:
             ghcr.io/${{ env.OWNER_LC }}/bitharmony-comma:latest
 
   autoDeployUsingSSH:
-    needs: dockerImageBuildAndPush
+    needs: buildImageAndPush
     runs-on: ubuntu-latest
     steps:
       - name: execute remote ssh
