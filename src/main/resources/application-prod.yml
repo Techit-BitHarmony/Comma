@@ -7,7 +7,7 @@ spring:
       max-file-size: 5MB
       max-request-size: 5MB
   datasource:
-    url: jdbc:mysql://host.docker.internal:3306
+    url: jdbc:mysql://172.17.0.2:3306
     username: root
     password: yonguk1234
     driver-class-name: com.mysql.cj.jdbc.Driver
