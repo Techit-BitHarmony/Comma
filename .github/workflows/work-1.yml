@@ -104,4 +104,4 @@ jobs:
             whoami;
             docker rm -f deploy_1;
             docker pull ghcr.io/${{ env.OWNER_LC }}/bitharmony-comma:${{ needs.makeTagAndRelease.outputs.tag_name }};
-            docker run --name deploy_1  -d -p 8080:8090 TZ=Asia/Seoul ghcr.io/techit-bitharmony/bitharmony-comma:latest;
+            docker run --name deploy_1  -d -p 8080:8090 -e TZ=Asia/Seoul ghcr.io/techit-bitharmony/bitharmony-comma:latest;
