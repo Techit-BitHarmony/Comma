@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import com.bitharmony.comma.member.entity.Member;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Builder(toBuilder = true)
@@ -19,17 +21,22 @@ public class Donation {
 
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
+    @NotNull
     private Member patron;
 
     @NotNull
-    private Long artistId;
+    private String artistUsername;
 
+    @NotNull
     private Integer amount;
 
     private String message;
 
     @Builder.Default
     private boolean anonymous = false;
+
+    @Builder.Default
+    private LocalDateTime createDate = LocalDateTime.now();
 
 }
 
