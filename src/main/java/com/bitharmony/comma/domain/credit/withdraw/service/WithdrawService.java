@@ -26,6 +26,8 @@ public class WithdrawService {
         return withdraw.get();
     }
 
+
+    // 추후 멤버 기능 추가시 멤버 아이디로 리스트 가져오는 것으로 변경 예정
     public List<Withdraw> getWithdrawList() {
         return this.withdrawRepository.findAll();
     }
@@ -64,4 +66,29 @@ public class WithdrawService {
         this.withdrawRepository.deleteById(id);
     }
 
+    public void delete(long withdrawId) {
+        try {
+            withdrawRepository.deleteById(withdrawId);
+        } catch(Exception e) {
+            throw new RuntimeException("존재하지 않는 출금 신청입니다.");
+        }
+    }
+
+//    멤버 기능 연동 후 수정 예정
+//    public boolean canDelete(Member member, Withdraw withdraw){
+//        if (withdraw.getWithdrawDoneDate() != null) {
+//            return false;
+//        }
+//        if (withdraw.getWithdrawCancelDate() != null) {
+//            return false;
+//        }
+//
+//        if (member.isAdmin()) return true;
+//
+//        if (!withdraw.getApplicant().equals(member)) {
+//            return false;
+//        }
+//
+//        return true;
+//    }
 }

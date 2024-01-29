@@ -5,7 +5,7 @@
     <script src="https://js.tosspayments.com/v1/payment-widget"></script>
 
     <script th:inline="javascript">
-        const chargerUsername = 'parktoss'
+        const chargerUsername = 'parktoss' // 추후 멤버 연동시 username 입력
         const chargeCode = /*[[ ${charge.code} ]]*/ null;
         const chargeAmount = /*[[ ${charge.chargeAmount} ]]*/ null;
         const toss_clientKey = /*[[ ${@environment.getProperty('custom.tossPayments.widget.clientKey')} ]]*/ null;
@@ -33,7 +33,7 @@
     const paymentMethodWidget = paymentWidget.renderPaymentMethods(
         "#payment-method",
         { value: chargeAmount },
-        { variantKey: "DEFAULT" }
+        { variantKey: "DEFAULT" }  // 결제 UI를 여러개 생성했을 때, 각 UI에 부여되는 키 값 (계약한 경우만 사용 가능)
     );
 
     paymentWidget.renderAgreement(
@@ -50,6 +50,7 @@
             orderName: "크레딧 충전",
             successUrl: window.location.origin + "/credit/success",
             failUrl: window.location.origin + "/credit/fail",
+            // 이메일, 휴대전화, 실명 등은 생략 (필수 정보 아님)
         });
     });
 </script>

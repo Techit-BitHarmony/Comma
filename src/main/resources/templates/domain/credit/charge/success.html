@@ -43,6 +43,7 @@
         console.log(json);
 
         const id = urlParams.get("orderId").split("__")[1];
+        // 성공시 리다이렉트할 URL
         location.replace(`/credit/charges/${id}?msg=결제가 완료되었습니다.`);
     }
     confirm();
