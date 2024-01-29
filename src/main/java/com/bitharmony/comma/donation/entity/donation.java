@@ -1,10 +1,12 @@
 package com.bitharmony.comma.donation.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import com.bitharmony.comma.member.entity.Member;
 
 @Entity
 @Getter
@@ -16,9 +18,10 @@ public class donation {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Long memberId;
+    @JoinColumn(name = "MEMBER_ID")
+    private Member patron;
 
+    @NotNull
     private Long artistId;
 
     private Integer amount;
