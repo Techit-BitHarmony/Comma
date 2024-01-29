@@ -46,9 +46,12 @@ public class MemberService {
     @Transactional
     public MemberJoinResponse join(String username, String password, String email, String nickname) {
         if (memberRepository.findByUsername(username).isPresent()) {
-            throw new MemberDuplicateException("이미 존재하는 회원입니다");
+            throw new MemberDuplicateException("이미 존재하는 아이디입니다.");
         }
-        // TODO : Email or Nickname도 유니크하게 유지할 것인지 물어보고, 한다고하면 중복체크 로직을 추가
+
+        if (memberRepository.findByNickname(nickname).isPresent()) {
+            throw new MemberDuplicateException("이미 존재하는 닉네임입니다.");
+        }
 
         Member member = Member.builder()
                 .username(username)
