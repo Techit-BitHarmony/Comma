@@ -13,7 +13,7 @@ import com.bitharmony.comma.member.entity.Member;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class donation {
+public class Donation {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
@@ -28,7 +28,8 @@ public class donation {
 
     private String message;
 
-    private boolean anonymous;
+    @Builder.Default
+    private boolean anonymous = false;
 
 }
 
