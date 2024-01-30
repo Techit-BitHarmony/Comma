@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Album Form</title>
+    <style>
+        #licenseDescription, #licenseDescriptionLabel, #price, #priceLabel {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<form method="post" enctype="multipart/form-data">
+    <label>Album Name</label>
+    <input type="text" name="albumname"> <br>
+
+    <label>Genre</label>
+    <select name="genre">
+        <option value="rock">Rock</option>
+        <option value="pop">Pop</option>
+        <option value="jazz">Jazz</option>
+        <option value="classical">Classical</option>
+        <!-- Add more options as needed -->
+    </select> <br>
+
+    <label>Music File</label>
+    <input type="file" id="musicFile" name="musicFile"> <br>
+
+    <label>Music Img File</label>
+    <input type="file" id="musicImageFile" name="musicImageFile"> <br>
+
+    <input type="hidden" name="license" value="false">
+    <label>License</label>
+    <input type="checkbox" id="license" name="license" value="false"> <br>
+
+    <label id="licenseDescriptionLabel">License Description</label>
+    <textarea id="licenseDescription" name="licenseDescription"></textarea> <br>
+
+    <input type="hidden" name="permit" value="false">
+    <label>Permit</label>
+    <input type="checkbox" id="permit" name="permit" value="false"> <br>
+
+    <input type="hidden" name="price" value="0">
+    <label id="priceLabel">Price</label>
+    <input type="number" id="price" name="price" min="0"> <br>
+
+    <input type="submit" value="Submit">
+</form>
+
+<script>
+    document.getElementById('license').addEventListener('change', function() {
+        var licenseDescription = document.getElementById('licenseDescription');
+        var licenseDescriptionLabel = document.getElementById('licenseDescriptionLabel');
+        if (this.checked) {
+            licenseDescription.style.display = 'block';
+            licenseDescriptionLabel.style.display = 'block';
+        } else {
+            licenseDescription.style.display = 'none';
+            licenseDescriptionLabel.style.display = 'none';
+        }
+    });
+
+    document.getElementById('permit').addEventListener('change', function() {
+        var price = document.getElementById('price');
+        var priceLabel = document.getElementById('priceLabel');
+        if (this.checked) {
+            price.style.display = 'block';
+            priceLabel.style.display = 'block';
+        } else {
+            price.style.display = 'none';
+            priceLabel.style.display = 'none';
+        }
+    });
+
+    //TODO : musicFile, musicImageFile 의 확장자를 체크하는 기능 추가
+    //TODO : musicFile, musicImageFile 의 크기를 체크하는 기능 추가
+    //TODO : 등
+</script>
+
+</body>
+</html>
