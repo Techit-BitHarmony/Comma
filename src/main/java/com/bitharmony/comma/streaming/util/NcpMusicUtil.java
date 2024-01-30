@@ -6,7 +6,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.bitharmony.comma.global.config.NCPConfig;
+import com.bitharmony.comma.global.config.NcpConfig;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -16,23 +16,23 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class StreamingUtil {
+public class NcpMusicUtil {
     private final AmazonS3 amazonS3;
 
     public final String bucketName;
     public final String path;
 
-    public StreamingUtil(NCPConfig ncpConfig) {
-        bucketName = ncpConfig.getNcps3Config().getBucketName();
-        path = ncpConfig.getNcpStreamingConfig().getPath();
+    public NcpMusicUtil(NcpConfig ncpConfig) {
+        bucketName = ncpConfig.getS3().getMusicBucket();
+        path = ncpConfig.getS3().getMusicPath();
 
-        String accessKey = ncpConfig.getNcps3Config().getAccessKey();
-        String secretKey = ncpConfig.getNcps3Config().getSecretKey();
-        String endPoint = ncpConfig.getNcps3Config().getEndPoint();
-        String regionName = ncpConfig.getNcps3Config().getRegionName();
+        String accessKey = ncpConfig.getMusicCredentials().getAccessKey();
+        String secretKey = ncpConfig.getMusicCredentials().getSecretKey();
+        String endPoint = ncpConfig.getS3().getEndPoint();
+        String region = ncpConfig.getS3().getRegion();
 
         amazonS3 = AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endPoint, regionName))
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endPoint, region))
                 .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
                 .build();
     }
