@@ -1,22 +1,3 @@
 custom:
-  dev-mysql-username: root
-  dev-mysql-password: lldj123414
-cloud:
-  aws:
-    credentials:
-      access-key: q6YAPX1p8y3N8UP6DTCS
-      secret-key: uUbKCAFycuDc6vFinZCnEAOI9y1De6mVTtS4vOHY
-    stack:
-      auto: false
-    region:
-      static: kr-standard
-    s3:
-      endpoint: https://kr.object.ncloudstorage.com
-      image-bucket: musicstorage
-      music-bucket: musicstreaming
-ncp:
-  object-storage:
-    img-folder: albumimage
-  image-optimizer:
-    cdn: https://kv6d2rdb2209.edge.naverncp.com/GSctnLFiOr
-    query-string: ?type=f&w=300&h=300&ttype=jpg
+  dev-mysql-username:
+  dev-mysql-password:
