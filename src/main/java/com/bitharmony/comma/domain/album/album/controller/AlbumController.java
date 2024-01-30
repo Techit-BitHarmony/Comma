@@ -30,7 +30,7 @@ public class AlbumController {
 
 	@GetMapping("/release")
 	public String showAlbumForm() {
-		return "domain/album/album_form";
+		return "domain/albzum/album_form";
 	}
 
 	@PostMapping("/release")
@@ -78,6 +78,16 @@ public class AlbumController {
 	private AlbumResponse albumToResponseDto(Album album) {
 		album.updateFileUrl(albumService.getAlbumFileUrl(album.getFilePath()));
 		album.updateImageUrl(albumService.getAlbumImageUrl(album.getImagePath()));
-		return new AlbumResponse(album);
+
+		return AlbumResponse.builder()
+			.albumname(album.getAlbumname())
+			.genre(album.getGenre())
+			.license(album.isLicense())
+			.licenseDescription(album.getLicenseDescription())
+			.imgPath(album.getImagePath())
+			.filePath(album.getFilePath())
+			.permit(album.isPermit())
+			.price(album.getPrice())
+			.build();
 	}
 }
