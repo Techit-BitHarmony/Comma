@@ -1,22 +1,22 @@
 server:
   shutdown: graceful
-  port: ${port}
+  port: 8090
 spring:
   servlet:
     multipart:
       max-file-size: 5MB
       max-request-size: 5MB
   datasource:
-    url: ${database.url}
-    username: ${database.username}
-    password: ${database.password}
+    url: ${secret.mysql-url}
+    username: ${secret.dev-mysql-username}
+    password: ${secret.dev-mysql-password}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: none
 logging:
   level:
-    com.ll.medium: INFO
+    com.bitharmony.comma: INFO
     org.hibernate.SQL: INFO
     org.hibernate.orm.jdbc.bind: INFO
     org.hibernate.orm.jdbc.extract: INFO

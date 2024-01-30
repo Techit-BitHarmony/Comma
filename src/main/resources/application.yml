@@ -1,7 +1,7 @@
 spring:
   profiles:
     active: dev
-    include: secret
+    include: secret, custom
   servlet:
     multipart:
       max-file-size: 50MB
@@ -19,8 +19,13 @@ spring:
         use_sql_comments: true
 logging:
   level:
-    com.ll.medium: DEBUG
+    com.bitharmony.comma: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
+custom:
+  tossPayments:
+    widget:
+      clientKey: test_ck_5OWRapdA8dmGZpoK9jpA3o1zEqZK
+      secretKey: ON_SECRET
