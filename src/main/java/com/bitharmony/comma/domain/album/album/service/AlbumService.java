@@ -1,6 +1,7 @@
 package com.bitharmony.comma.domain.album.album.service;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +11,6 @@ import com.bitharmony.comma.domain.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.domain.album.album.dto.AlbumEditRequest;
 import com.bitharmony.comma.domain.album.album.entity.Album;
 import com.bitharmony.comma.domain.album.album.repository.AlbumRepository;
-import com.bitharmony.comma.domain.album.file.dto.FileResponse;
 import com.bitharmony.comma.domain.album.file.service.FileService;
 import com.bitharmony.comma.domain.album.file.util.FileType;
 import com.bitharmony.comma.domain.album.file.util.NcpConfig;
@@ -28,51 +28,44 @@ public class AlbumService {
 
 	@Transactional
 	public Album release(AlbumCreateRequest request, MultipartFile musicFile, MultipartFile musicImageFile) {
-		return saveOrUpdateAlbum(request.toEntity(), musicFile, musicImageFile, false);
+		return saveAlbum(request.toEntity(), musicFile, musicImageFile);
 	}
 
 	@Transactional
 	public Album edit(AlbumEditRequest request, Album album, MultipartFile musicFile, MultipartFile musicImageFile) {
+		album.update(request);
+
 		if (musicFile != null)
 			fileService.deleteFile(fileService.getAlbumFileUrl(album.getFilePath()),
 				ncpProperties.getMusicBucketName());
 
-		if (album.getImagePath() != null && musicImageFile != null)
+		if (musicImageFile != null)
 			fileService.deleteFile(fileService.getAlbumFileUrl(album.getImagePath()),
 				ncpProperties.getImageBucketName());
 
-		album.update(request);
-		saveOrUpdateAlbum(album, musicFile, musicImageFile, true);
+		saveAlbum(album, musicFile, musicImageFile);
 		return album;
 	}
 
 	@Transactional
 	public void delete(Album album) {
-		//TODO ncp에 있는 파일도 삭제해야됨.
 		fileService.deleteFile(album.getFilePath(), ncpProperties.getMusicBucketName());
 		fileService.deleteFile(album.getImagePath(), ncpProperties.getImageBucketName());
 		albumRepository.delete(album);
 	}
 
-	public Album saveOrUpdateAlbum(Album album, MultipartFile musicFile, MultipartFile musicImageFile,
-		boolean isUpdate) {
-
-		if (musicFile != null) {
-			if (isUpdate) {
-				fileService.updateFile(musicFile, album.getFilePath(), ncpProperties.getMusicBucketName());
-			} else {
-				FileResponse audioResponse = fileService.uploadFile(musicFile, ncpProperties.getMusicBucketName());
-				album.updateFileUrl(audioResponse.uploadFileUrl());
-			}
-		}
-
-		if (musicImageFile != null) {
-			FileResponse imgResponse = fileService.uploadFile(musicImageFile, ncpProperties.getImageBucketName());
-			album.updateImageUrl(imgResponse.uploadFileUrl());
-		}
+	public Album saveAlbum(Album album, MultipartFile musicFile, MultipartFile musicImageFile) {
+		uploadFileAndSetUrl(musicFile, ncpProperties.getMusicBucketName(), album::updateFileUrl);
+		uploadFileAndSetUrl(musicImageFile, ncpProperties.getImageBucketName(), album::updateImageUrl);
 
 		albumRepository.save(album);
 		return album;
+	}
+
+	private void uploadFileAndSetUrl(MultipartFile file, String bucketName, Consumer<String> urlSetter) {
+		Optional.ofNullable(file)
+			.map(f -> fileService.uploadFile(f, bucketName))
+			.ifPresent(response -> urlSetter.accept(response.uploadFileUrl()));
 	}
 
 	public Optional<Album> getAlbumById(long id) {
@@ -82,43 +75,36 @@ public class AlbumService {
 	/**
 	 * ncp image optimizer 사용 cdn url을 통해서 변환된 이미지 가져오기
 	 */
+	private String replaceBucketName(String filepath, String bucketName, String replacement) {
+		return filepath.replace(bucketName, replacement);
+	}
+
 	public String getAlbumImageUrl(String filepath) {
-		String replacedFilePath = filepath.replace(ncpProperties.getImageBucketName(), "");
-		return ncpProperties.getCdnUrl() + replacedFilePath + ncpProperties.getCdnQueryString();
+		if(filepath == null) return "여기에 기본 이미지 url";
+
+		return ncpProperties.getCdnUrl() + replaceBucketName(filepath, ncpProperties.getImageBucketName(), "")
+			+ ncpProperties.getCdnQueryString();
 	}
 
 	public String getAlbumFileUrl(String filepath) {
-		String replacedFilePath = filepath.replace(ncpProperties.getImageBucketName(), "");
-		return ncpConfig.getEndPoint() + "/" + replacedFilePath;
+		return ncpConfig.getEndPoint() + "/" + replaceBucketName(filepath, ncpProperties.getImageBucketName(), "");
 	}
 
 	public boolean canRelease(String name, MultipartFile musicFile, MultipartFile musicImageFile) {
-		//TODO : 등록 가능한 여부 확인
 		Optional<MultipartFile> audioFile = fileService.checkFileByType(musicFile, FileType.AUDIO);
+		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
 
-		if (audioFile.isEmpty()) {
-			return false;
-		}
+		if (albumRepository.findByAlbumname(name).isPresent()) return false;
+		if (audioFile.isEmpty()) return false;
 
-		if (albumRepository.findByAlbumname(name).isPresent()) {
-			return false;
-		}
 		return true;
 	}
 
 	public boolean canEdit(Album album) {
-		//TODO : 수정 가능한 여부 확인
-		if (album == null) {
-			return false;
-		}
-		return true;
+		return album != null;
 	}
 
 	public boolean canDelete(Album album) {
-		//TODO : 삭제 가능한 여부 확인
-		if (album == null) {
-			return false;
-		}
-		return true;
+		return album != null;
 	}
 }
