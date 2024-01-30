@@ -43,49 +43,43 @@ public class AlbumController {
 		}
 
 		Album album = albumService.release(request, musicFile, musicImageFile);
-		album.updateFileUrl(albumService.getAlbumFileUrl(album.getFilePath()));
-		album.updateImageUrl(albumService.getAlbumImageUrl(album.getImagePath()));
-		AlbumResponse dto = albumToResponseDto(album);
-
-		return new ResponseEntity<>(dto, HttpStatus.CREATED);
+		return new ResponseEntity<>(albumToResponseDto(album), HttpStatus.CREATED);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<AlbumResponse> getAlbum(@PathVariable long id) {
-		Album album = albumService.getAlbumById(id).orElseThrow(RuntimeException::new);
-		album.updateFileUrl(albumService.getAlbumFileUrl(album.getFilePath()));
-		album.updateImageUrl(albumService.getAlbumImageUrl(album.getImagePath()));
-		AlbumResponse dto = albumToResponseDto(album);
-		return new ResponseEntity<>(dto, HttpStatus.OK);
+		Album album = getAlbumById(id);
+		return new ResponseEntity<>(albumToResponseDto(album), HttpStatus.OK);
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<AlbumResponse> editAlbum(@PathVariable long id, @Valid AlbumEditRequest request,
 		@RequestParam(value = "musicFile", required = false) MultipartFile musicFile,
 		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile) {
-		Album album = albumService.getAlbumById(id).orElseThrow(RuntimeException::new);
+		Album album = getAlbumById(id);
 
 		if (!albumService.canEdit(album)) {
 			throw new IllegalArgumentException("앨범을 수정할 수 없습니다.");
 		}
 
 		Album editedAlbum = albumService.edit(request, album, musicFile, musicImageFile);
-		album.updateFileUrl(albumService.getAlbumFileUrl(editedAlbum.getFilePath()));
-		album.updateImageUrl(albumService.getAlbumImageUrl(editedAlbum.getImagePath()));
-		AlbumResponse dto = albumToResponseDto(editedAlbum);
-
-		return new ResponseEntity<>(dto, HttpStatus.OK);
+		return new ResponseEntity<>(albumToResponseDto(editedAlbum), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Album> deleteAlbum(@PathVariable long id) {
-		Album album = albumService.getAlbumById(id).orElseThrow(RuntimeException::new);
+	public ResponseEntity<Void> deleteAlbum(@PathVariable long id) {
+		Album album = getAlbumById(id);
 		albumService.delete(album);
-		return new ResponseEntity<>(HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	private Album getAlbumById(long id) {
+		return albumService.getAlbumById(id).orElseThrow(() -> new RuntimeException("Album not found"));
 	}
 
 	private AlbumResponse albumToResponseDto(Album album) {
-		AlbumResponse dto = new AlbumResponse(album);
-		return dto;
+		album.updateFileUrl(albumService.getAlbumFileUrl(album.getFilePath()));
+		album.updateImageUrl(albumService.getAlbumImageUrl(album.getImagePath()));
+		return new AlbumResponse(album);
 	}
 }
