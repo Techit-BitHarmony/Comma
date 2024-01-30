@@ -36,7 +36,6 @@ public class Member {
     @NotNull
     private String nickname;
 
-//    @NotNull
-//    private LocalDateTime createTime;
+    private Integer creditId;
 
 }

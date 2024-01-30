@@ -8,7 +8,6 @@ import com.bitharmony.comma.member.dto.MemberJoinResponse;
 import com.bitharmony.comma.member.dto.MemberLoginResponse;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.repository.MemberRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,10 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public MemberLoginResponse login(String username, String password) {
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+        Member member = getMemberByUsername(username);
 
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new IllegalArgumentException("정확한 비밀번호를 입력해주세요");
@@ -34,10 +33,12 @@ public class MemberService {
                 .username(member.getUsername())
                 .build();
 
-        String token = JwtUtil.createToken(jwtCreateRequest);
+        String accessToken = jwtUtil.createAccessToken(jwtCreateRequest);
+        String refreshToken = jwtUtil.createRefreshToken(jwtCreateRequest);
 
         MemberLoginResponse response = MemberLoginResponse.builder()
-                .accessToken(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
 
         return response;
@@ -67,5 +68,13 @@ public class MemberService {
                 .build();
 
         return response;
+    }
+
+    public Member getMemberByUsername(String username) {
+
+        Member findMember = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+
+        return findMember;
     }
 }
