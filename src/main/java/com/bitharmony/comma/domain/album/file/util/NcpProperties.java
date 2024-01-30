@@ -8,8 +8,11 @@ import lombok.Getter;
 @Getter
 @Component
 public class NcpProperties {
-	@Value("${cloud.aws.s3.bucket}")
-	private String bucketName;
+	@Value("${cloud.aws.s3.image-bucket}")
+	private String imageBucketName;
+
+	@Value("${cloud.aws.s3.music-bucket}")
+	private String musicBucketName;
 
 	@Value("${ncp.object-storage.img-folder}")
 	private String uploadFolder;

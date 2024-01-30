@@ -12,6 +12,8 @@ import com.bitharmony.comma.domain.album.album.entity.Album;
 import com.bitharmony.comma.domain.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.domain.album.file.dto.FileResponse;
 import com.bitharmony.comma.domain.album.file.service.FileService;
+import com.bitharmony.comma.domain.album.file.util.FileType;
+import com.bitharmony.comma.domain.album.file.util.NcpConfig;
 import com.bitharmony.comma.domain.album.file.util.NcpProperties;
 
 import lombok.RequiredArgsConstructor;
@@ -21,41 +23,56 @@ import lombok.RequiredArgsConstructor;
 public class AlbumService {
 	private final AlbumRepository albumRepository;
 	private final FileService fileService;
+	private final NcpConfig ncpConfig;
 	private final NcpProperties ncpProperties;
 
 	@Transactional
-	public Album release(AlbumCreateRequest request, MultipartFile imgFile) {
-		//앨범 생성
-		Album album = request.toEntity();
-		saveAlbum(album, imgFile);
-
-		album.updateImageUrl(getAlbumImageUrl(album.getImagePath()));
-		return album;
+	public Album release(AlbumCreateRequest request, MultipartFile musicFile, MultipartFile musicImageFile) {
+		return saveOrUpdateAlbum(request.toEntity(), musicFile, musicImageFile, false);
 	}
 
 	@Transactional
-	public Album edit(AlbumEditRequest request, MultipartFile imgFile, Album album) {
-		album.update(request);
-		saveAlbum(album, imgFile);
+	public Album edit(AlbumEditRequest request, Album album, MultipartFile musicFile, MultipartFile musicImageFile) {
+		if (musicFile != null)
+			fileService.deleteFile(fileService.getAlbumFileUrl(album.getFilePath()),
+				ncpProperties.getMusicBucketName());
 
-		album.updateImageUrl(getAlbumImageUrl(album.getImagePath()));
+		if (album.getImagePath() != null && musicImageFile != null)
+			fileService.deleteFile(fileService.getAlbumFileUrl(album.getImagePath()),
+				ncpProperties.getImageBucketName());
+
+		album.update(request);
+		saveOrUpdateAlbum(album, musicFile, musicImageFile, true);
 		return album;
 	}
 
 	@Transactional
 	public void delete(Album album) {
+		//TODO ncp에 있는 파일도 삭제해야됨.
+		fileService.deleteFile(album.getFilePath(), ncpProperties.getMusicBucketName());
+		fileService.deleteFile(album.getImagePath(), ncpProperties.getImageBucketName());
 		albumRepository.delete(album);
 	}
 
-	public void saveAlbum(Album album, MultipartFile imgFile) {
-		FileResponse imgResponse;
+	public Album saveOrUpdateAlbum(Album album, MultipartFile musicFile, MultipartFile musicImageFile,
+		boolean isUpdate) {
 
-		if (imgFile != null) {
-			imgResponse = fileService.uploadFile(imgFile, ncpProperties.getUploadFolder());
+		if (musicFile != null) {
+			if (isUpdate) {
+				fileService.updateFile(musicFile, album.getFilePath(), ncpProperties.getMusicBucketName());
+			} else {
+				FileResponse audioResponse = fileService.uploadFile(musicFile, ncpProperties.getMusicBucketName());
+				album.updateFileUrl(audioResponse.uploadFileUrl());
+			}
+		}
+
+		if (musicImageFile != null) {
+			FileResponse imgResponse = fileService.uploadFile(musicImageFile, ncpProperties.getImageBucketName());
 			album.updateImageUrl(imgResponse.uploadFileUrl());
 		}
 
 		albumRepository.save(album);
+		return album;
 	}
 
 	public Optional<Album> getAlbumById(long id) {
@@ -66,25 +83,24 @@ public class AlbumService {
 	 * ncp image optimizer 사용 cdn url을 통해서 변환된 이미지 가져오기
 	 */
 	public String getAlbumImageUrl(String filepath) {
-		String replacedFilePath = filepath.replace(ncpProperties.getBucketName(), "");
-
-		//이미지 URL검증 필요시
-		// try {
-		// 	// 이미지 URL을 검증하는 코드를 추가합니다.
-		// 	// 이 부분은 실제 이미지 URL을 검증하는 로직에 따라 달라집니다.
-		// 	validateImageUrl(optimizedImageUrl);
-		// } catch (FileNotFoundException e) {
-		// 	// 적절한 에러 메시지를 설정하거나 다른 조치를 취합니다.
-		// 	System.out.println("The requested image does not exist: " + optimizedImageUrl);
-		// 	return null; // 또는 적절한 에러 응답을 반환합니다.
-		// }
-
+		String replacedFilePath = filepath.replace(ncpProperties.getImageBucketName(), "");
 		return ncpProperties.getCdnUrl() + replacedFilePath + ncpProperties.getCdnQueryString();
 	}
 
-	public boolean canRelease(String name) {
+	public String getAlbumFileUrl(String filepath) {
+		String replacedFilePath = filepath.replace(ncpProperties.getImageBucketName(), "");
+		return ncpConfig.getEndPoint() + "/" + replacedFilePath;
+	}
+
+	public boolean canRelease(String name, MultipartFile musicFile, MultipartFile musicImageFile) {
 		//TODO : 등록 가능한 여부 확인
-		if (!albumRepository.findByAlbumname(name).isPresent()) {
+		Optional<MultipartFile> audioFile = fileService.checkFileByType(musicFile, FileType.AUDIO);
+
+		if (audioFile.isEmpty()) {
+			return false;
+		}
+
+		if (albumRepository.findByAlbumname(name).isPresent()) {
 			return false;
 		}
 		return true;

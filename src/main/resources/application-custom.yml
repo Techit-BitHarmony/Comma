@@ -12,7 +12,8 @@ cloud:
       static: kr-standard
     s3:
       endpoint: https://kr.object.ncloudstorage.com
-      bucket: musicstorage
+      image-bucket: musicstorage
+      music-bucket: musicstreaming
 ncp:
   object-storage:
     img-folder: albumimage

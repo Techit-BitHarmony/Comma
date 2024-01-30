@@ -24,7 +24,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Album {
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "album_id")
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "album_id")
 	private Long id;
 
 	// @ManyToOne(name = "member_id")(fetch = FetchType.LAZY)
@@ -57,16 +59,15 @@ public class Album {
 	@OneToMany(fetch = FetchType.LAZY)
 	private List<AlbumLike> albumLike;
 
-	public void updateImageUrl(String url) {
-		this.imagePath = url;
-	}
+	public void updateImageUrl(String url) { this.imagePath = url; }
+
+	public void updateFileUrl(String url) { this.filePath = url; }
 
 	public void update(AlbumEditRequest request) {
 		this.albumname = request.albumname();
 		this.genre = request.genre();
 		this.license = request.license();
 		this.licenseDescription = request.licenseDescription();
-		this.imagePath = request.filePath();
 		this.permit = request.permit();
 		this.price = request.price();
 	}

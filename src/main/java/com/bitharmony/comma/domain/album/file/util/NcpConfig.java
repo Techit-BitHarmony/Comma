@@ -10,7 +10,10 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 
+import lombok.Getter;
+
 @Configuration
+@Getter
 public class NcpConfig {
 	/**
 	 * NCP S3 설정 주의사항

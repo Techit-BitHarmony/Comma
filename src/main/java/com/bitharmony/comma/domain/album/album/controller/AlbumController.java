@@ -35,34 +35,45 @@ public class AlbumController {
 
 	@PostMapping("/release")
 	public ResponseEntity<AlbumResponse> releaseAlbum(@Valid AlbumCreateRequest request,
-		@RequestParam("musicImageFile") MultipartFile multipartFile) {
+		@RequestParam("musicFile") MultipartFile musicFile,
+		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile) {
 
-		if (!albumService.canRelease(request.albumname())) {
+		if (!albumService.canRelease(request.albumname(), musicFile, musicImageFile)) {
 			throw new IllegalArgumentException("앨범을 등록할 수 없습니다.");
 		}
 
-		Album album = albumService.release(request, multipartFile);
+		Album album = albumService.release(request, musicFile, musicImageFile);
+		album.updateFileUrl(albumService.getAlbumFileUrl(album.getFilePath()));
+		album.updateImageUrl(albumService.getAlbumImageUrl(album.getImagePath()));
 		AlbumResponse dto = albumToResponseDto(album);
+
 		return new ResponseEntity<>(dto, HttpStatus.CREATED);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<AlbumResponse> getAlbum(@PathVariable long id) {
 		Album album = albumService.getAlbumById(id).orElseThrow(RuntimeException::new);
+		album.updateFileUrl(albumService.getAlbumFileUrl(album.getFilePath()));
+		album.updateImageUrl(albumService.getAlbumImageUrl(album.getImagePath()));
 		AlbumResponse dto = albumToResponseDto(album);
 		return new ResponseEntity<>(dto, HttpStatus.OK);
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<AlbumResponse> editAlbum(@PathVariable long id, @Valid AlbumEditRequest request,
-		@RequestParam("musicImageFile") MultipartFile multipartFile) {
+		@RequestParam(value = "musicFile", required = false) MultipartFile musicFile,
+		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile) {
 		Album album = albumService.getAlbumById(id).orElseThrow(RuntimeException::new);
+
 		if (!albumService.canEdit(album)) {
 			throw new IllegalArgumentException("앨범을 수정할 수 없습니다.");
 		}
 
-		Album editedAlbum = albumService.edit(request, multipartFile, album);
+		Album editedAlbum = albumService.edit(request, album, musicFile, musicImageFile);
+		album.updateFileUrl(albumService.getAlbumFileUrl(editedAlbum.getFilePath()));
+		album.updateImageUrl(albumService.getAlbumImageUrl(editedAlbum.getImagePath()));
 		AlbumResponse dto = albumToResponseDto(editedAlbum);
+
 		return new ResponseEntity<>(dto, HttpStatus.OK);
 	}
 

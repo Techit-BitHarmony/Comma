@@ -8,7 +8,7 @@ import lombok.Builder;
 
 @Builder
 public record AlbumCreateRequest(@NotEmpty @Size(max = 50) String albumname, String genre, boolean license,
-								 String licenseDescription, @NotEmpty String filePath, boolean permit,
+								 String licenseDescription, boolean permit,
 								 int price
 
 ) {
@@ -18,7 +18,6 @@ public record AlbumCreateRequest(@NotEmpty @Size(max = 50) String albumname, Str
 			.genre(genre)
 			.license(license)
 			.licenseDescription(licenseDescription)
-			.filePath(filePath)
 			.permit(permit)
 			.price(price)
 			.build();
