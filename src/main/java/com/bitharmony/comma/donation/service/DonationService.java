@@ -22,6 +22,7 @@ public class DonationService {
         Member patron = memberService.getMemberByUsername(dto.patronName());
         Member artist = memberService.getMemberByUsername(dto.artistName());
 
+        //donation entity create
         Donation donation = Donation.builder()
                 .artistUsername(artist.getUsername())
                 .patron(patron)
@@ -29,8 +30,16 @@ public class DonationService {
                 .message(dto.message())
                 .anonymous(dto.anonymous())
                 .build();
-
         donationRespository.save(donation);
+
+        //credit count
+        checkCredit(patron,dto.amount());
+    }
+
+    public void checkCredit(Member patron, Integer amount){
+        if(patron.getCredit() < amount){
+
+        }
     }
 
     public DonationResponse getDonationListByArtistUsername(String username){
