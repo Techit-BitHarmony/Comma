@@ -24,3 +24,8 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
+custom:
+  tossPayments:
+    widget:
+      clientKey: test_ck_5OWRapdA8dmGZpoK9jpA3o1zEqZK
+      secretKey: ON_SECRET
