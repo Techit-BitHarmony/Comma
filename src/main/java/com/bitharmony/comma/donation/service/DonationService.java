@@ -6,6 +6,7 @@ import com.bitharmony.comma.donation.dto.DonationResponse;
 import com.bitharmony.comma.donation.entity.Donation;
 import com.bitharmony.comma.donation.repository.DonationRespository;
 import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,7 @@ public class DonationService {
     }
 
     public void checkCredit(Member patron, Integer amount){
-        if(patron.getCredit() < amount){
+        if(patron.getCreditId() < amount){
 
         }
     }
