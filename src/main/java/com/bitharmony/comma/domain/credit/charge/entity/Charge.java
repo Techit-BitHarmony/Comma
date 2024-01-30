@@ -1,6 +1,7 @@
 package com.bitharmony.comma.domain.credit.charge.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class Charge {
 //    @ManyToOne
 //    private Member charger;
 
+    @NotNull
     private long chargeAmount;
 
     private LocalDateTime createDate;

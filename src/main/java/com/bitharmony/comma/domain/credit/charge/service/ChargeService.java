@@ -58,7 +58,8 @@ public class ChargeService {
         }
     }
 
-    // 결제 성공시 멤버의 크레딧을 증가시키는 메서드 (추후 멤버 기능 연동시 수정)
+
+    // 결제 성공시 멤버의 크레딧을 증가시키고 크레딧 로그를 남기는 메서드 (추후 멤버 기능 연동시 수정)
     public void addCredit(String orderId, long amount, String paymentKey) {
         long id = Long.parseLong(orderId.split("__", 2)[1]);
         Charge charge = chargeRepository.findById(id).orElse(null);

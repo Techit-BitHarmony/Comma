@@ -1,6 +1,7 @@
 package com.bitharmony.comma.domain.credit.creditLog.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class CreditLog {
     @Enumerated(EnumType.STRING)
     private EventType eventType;
 
+    @NotNull
     private long creditChangeAmount;
 
 //    추후 멤버 기능 통합시 멤버 크레딧 값과 연동
@@ -29,6 +31,7 @@ public class CreditLog {
 
     private LocalDateTime createDate;
 
+    @NotNull
     public enum EventType {
         충전__토스페이먼츠,
         정산__음원판매,

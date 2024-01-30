@@ -1,6 +1,7 @@
 package com.bitharmony.comma.domain.credit.withdraw.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,10 +24,13 @@ public class Withdraw {
 //    @ManyToOne
 //    private Member applicant;
 
+    @NotNull
     private String bankName;
 
+    @NotNull
     private String bankAccountNo;
 
+    @NotNull
     private long withdrawAmount;
 
     private LocalDateTime applyDate;

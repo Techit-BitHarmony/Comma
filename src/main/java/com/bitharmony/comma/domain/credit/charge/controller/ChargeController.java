@@ -58,13 +58,16 @@ public class ChargeController {
     }
 
 
-
+    // POST 발송을 위해 임의로 생성한 템플릿
+    // 추후 프론트 구현시 삭제 예정
+    // 금액(chargeAmount) 입력 후 '/charges'로 POST 발송
     @GetMapping("/charge_form")
     public String charge(){
         return "domain/credit/charge/charge_form";
     }
 
 
+    // Charge 객체 생성 & 저장 후 해당 객체를 Response에 실어 보냄
     // Response의 chargeId 값으로 "/charge/pay/{id}"로 리다이렉트하여 결제 진행
     @PostMapping("/charges")
     public ResponseEntity<ChargeCreateResponse> createCharge(
