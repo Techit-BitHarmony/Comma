@@ -68,8 +68,8 @@ public class AlbumService {
 			.ifPresent(response -> urlSetter.accept(response.uploadFileUrl()));
 	}
 
-	public Optional<Album> getAlbumById(long id) {
-		return albumRepository.findById(id);
+	public Album getAlbumById(long id) {
+		return albumRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Album not found"));
 	}
 
 	/**
@@ -80,7 +80,9 @@ public class AlbumService {
 	}
 
 	public String getAlbumImageUrl(String filepath) {
-		if(filepath == null) return "여기에 기본 이미지 url";
+		if (filepath == null) {
+			return "여기에 기본 이미지 URL";
+		}
 
 		return ncpProperties.getCdnUrl() + replaceBucketName(filepath, ncpProperties.getImageBucketName(), "")
 			+ ncpProperties.getCdnQueryString();
@@ -94,8 +96,10 @@ public class AlbumService {
 		Optional<MultipartFile> audioFile = fileService.checkFileByType(musicFile, FileType.AUDIO);
 		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
 
-		if (albumRepository.findByAlbumname(name).isPresent()) return false;
-		if (audioFile.isEmpty()) return false;
+		if (albumRepository.findByAlbumname(name).isPresent())
+			return false;
+		if (audioFile.isEmpty())
+			return false;
 
 		return true;
 	}

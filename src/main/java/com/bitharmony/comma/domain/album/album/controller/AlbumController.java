@@ -48,7 +48,8 @@ public class AlbumController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<AlbumResponse> getAlbum(@PathVariable long id) {
-		Album album = getAlbumById(id);
+		Album album = albumService.getAlbumById(id);
+
 		return new ResponseEntity<>(albumToResponseDto(album), HttpStatus.OK);
 	}
 
@@ -56,7 +57,7 @@ public class AlbumController {
 	public ResponseEntity<AlbumResponse> editAlbum(@PathVariable long id, @Valid AlbumEditRequest request,
 		@RequestParam(value = "musicFile", required = false) MultipartFile musicFile,
 		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile) {
-		Album album = getAlbumById(id);
+		Album album = albumService.getAlbumById(id);
 
 		if (!albumService.canEdit(album)) {
 			throw new IllegalArgumentException("앨범을 수정할 수 없습니다.");
@@ -68,13 +69,10 @@ public class AlbumController {
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteAlbum(@PathVariable long id) {
-		Album album = getAlbumById(id);
+		Album album = albumService.getAlbumById(id);
+
 		albumService.delete(album);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-
-	private Album getAlbumById(long id) {
-		return albumService.getAlbumById(id).orElseThrow(() -> new RuntimeException("Album not found"));
 	}
 
 	private AlbumResponse albumToResponseDto(Album album) {
