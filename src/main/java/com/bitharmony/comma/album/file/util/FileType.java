@@ -1,4 +1,4 @@
-package com.bitharmony.comma.domain.album.file.util;
+package com.bitharmony.comma.album.file.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

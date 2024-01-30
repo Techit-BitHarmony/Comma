@@ -1,17 +1,12 @@
-package com.bitharmony.comma.domain.album.album.entity;
+package com.bitharmony.comma.album.album.entity;
 
-import java.util.List;
-
-import com.bitharmony.comma.domain.album.album.dto.AlbumEditRequest;
-import com.bitharmony.comma.domain.album.albumLike.entity.AlbumLike;
+import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,8 +51,8 @@ public class Album {
 	@Column(nullable = false, columnDefinition = "int default 0")
 	private int price;
 
-	@OneToMany(fetch = FetchType.LAZY)
-	private List<AlbumLike> albumLike;
+	// @OneToMany(fetch = FetchType.LAZY)
+	// private List<AlbumLike> albumLike;
 
 	public void updateImageUrl(String url) { this.imagePath = url; }
 

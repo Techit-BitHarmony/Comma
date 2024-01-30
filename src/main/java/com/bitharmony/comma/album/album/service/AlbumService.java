@@ -1,4 +1,4 @@
-package com.bitharmony.comma.domain.album.album.service;
+package com.bitharmony.comma.album.album.service;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -7,14 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.bitharmony.comma.domain.album.album.dto.AlbumCreateRequest;
-import com.bitharmony.comma.domain.album.album.dto.AlbumEditRequest;
-import com.bitharmony.comma.domain.album.album.entity.Album;
-import com.bitharmony.comma.domain.album.album.repository.AlbumRepository;
-import com.bitharmony.comma.domain.album.file.service.FileService;
-import com.bitharmony.comma.domain.album.file.util.FileType;
-import com.bitharmony.comma.domain.album.file.util.NcpConfig;
-import com.bitharmony.comma.domain.album.file.util.NcpProperties;
+import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
+import com.bitharmony.comma.album.album.entity.Album;
+import com.bitharmony.comma.album.album.repository.AlbumRepository;
+import com.bitharmony.comma.album.file.service.FileService;
+import com.bitharmony.comma.album.file.util.FileType;
+import com.bitharmony.comma.global.config.NcpConfig;
+import com.bitharmony.comma.album.file.util.NcpImageUtil;
+import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +24,7 @@ public class AlbumService {
 	private final AlbumRepository albumRepository;
 	private final FileService fileService;
 	private final NcpConfig ncpConfig;
-	private final NcpProperties ncpProperties;
+	private final NcpImageUtil ncpImageUtil;
 
 	@Transactional
 	public Album release(AlbumCreateRequest request, MultipartFile musicFile, MultipartFile musicImageFile) {
@@ -37,11 +37,11 @@ public class AlbumService {
 
 		if (musicFile != null)
 			fileService.deleteFile(fileService.getAlbumFileUrl(album.getFilePath()),
-				ncpProperties.getMusicBucketName());
+				ncpImageUtil.getBucketName());
 
 		if (musicImageFile != null)
 			fileService.deleteFile(fileService.getAlbumFileUrl(album.getImagePath()),
-				ncpProperties.getImageBucketName());
+				ncpImageUtil.getBucketName());
 
 		saveAlbum(album, musicFile, musicImageFile);
 		return album;
@@ -49,14 +49,14 @@ public class AlbumService {
 
 	@Transactional
 	public void delete(Album album) {
-		fileService.deleteFile(album.getFilePath(), ncpProperties.getMusicBucketName());
-		fileService.deleteFile(album.getImagePath(), ncpProperties.getImageBucketName());
+		//fileService.deleteFile(album.getFilePath(), ncpImageUtil.getMusicBucketName());
+		fileService.deleteFile(album.getImagePath(), ncpImageUtil.getBucketName());
 		albumRepository.delete(album);
 	}
 
 	public Album saveAlbum(Album album, MultipartFile musicFile, MultipartFile musicImageFile) {
-		uploadFileAndSetUrl(musicFile, ncpProperties.getMusicBucketName(), album::updateFileUrl);
-		uploadFileAndSetUrl(musicImageFile, ncpProperties.getImageBucketName(), album::updateImageUrl);
+		//uploadFileAndSetUrl(musicFile, ncpImageUtil.getMusicBucketName(), album::updateFileUrl);
+		uploadFileAndSetUrl(musicImageFile, ncpImageUtil.getBucketName(), album::updateImageUrl);
 
 		albumRepository.save(album);
 		return album;
@@ -84,12 +84,12 @@ public class AlbumService {
 			return "여기에 기본 이미지 URL";
 		}
 
-		return ncpProperties.getCdnUrl() + replaceBucketName(filepath, ncpProperties.getImageBucketName(), "")
-			+ ncpProperties.getCdnQueryString();
+		return ncpConfig.getImageOptimizer().getCdn() + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "")
+			+ ncpConfig.getImageOptimizer().getQueryString();
 	}
 
 	public String getAlbumFileUrl(String filepath) {
-		return ncpConfig.getEndPoint() + "/" + replaceBucketName(filepath, ncpProperties.getImageBucketName(), "");
+		return ncpConfig.getS3().getEndPoint() + "/" + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "");
 	}
 
 	public boolean canRelease(String name, MultipartFile musicFile, MultipartFile musicImageFile) {

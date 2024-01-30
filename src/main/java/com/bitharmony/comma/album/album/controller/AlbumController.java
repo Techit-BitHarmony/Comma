@@ -1,8 +1,7 @@
-package com.bitharmony.comma.domain.album.album.controller;
+package com.bitharmony.comma.album.album.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,18 +9,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.bitharmony.comma.domain.album.album.dto.AlbumCreateRequest;
-import com.bitharmony.comma.domain.album.album.dto.AlbumEditRequest;
-import com.bitharmony.comma.domain.album.album.dto.AlbumResponse;
-import com.bitharmony.comma.domain.album.album.entity.Album;
-import com.bitharmony.comma.domain.album.album.service.AlbumService;
+import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
+import com.bitharmony.comma.album.album.entity.Album;
+import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
+import com.bitharmony.comma.album.album.dto.AlbumResponse;
+import com.bitharmony.comma.album.album.service.AlbumService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@Controller
+@RestController
 @RequestMapping("/album")
 @RequiredArgsConstructor
 public class AlbumController {
@@ -30,7 +30,7 @@ public class AlbumController {
 
 	@GetMapping("/release")
 	public String showAlbumForm() {
-		return "domain/albzum/album_form";
+		return "domain/album/album_form";
 	}
 
 	@PostMapping("/release")

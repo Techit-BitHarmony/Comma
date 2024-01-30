@@ -1,4 +1,4 @@
-package com.bitharmony.comma.domain.album.file.service;
+package com.bitharmony.comma.album.file.service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,15 +8,14 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.bitharmony.comma.domain.album.file.dto.FileResponse;
-import com.bitharmony.comma.domain.album.file.util.FileType;
-import com.bitharmony.comma.domain.album.file.util.NcpConfig;
-import com.bitharmony.comma.domain.album.file.util.NcpProperties;
+import com.bitharmony.comma.album.file.dto.FileResponse;
+import com.bitharmony.comma.album.file.util.FileType;
+import com.bitharmony.comma.album.file.util.NcpImageUtil;
+import com.bitharmony.comma.global.config.NcpConfig;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,9 +23,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FileService {
 
-	private final AmazonS3 amazonS3Client;
 	private final NcpConfig ncpConfig;
-	private final NcpProperties ncpProperties;
+	private final NcpImageUtil ncpImageUtil;
 
 	public String getUuidFileName(String fileName) {
 		String ext = fileName.substring(fileName.indexOf(".") + 1);
@@ -50,7 +48,7 @@ public class FileService {
 			String keyName = uploadFileName;
 
 			// S3에 폴더 및 파일 업로드
-			amazonS3Client.putObject(
+			ncpImageUtil.getAmazonS3().putObject(
 				new PutObjectRequest(bucketName, keyName, inputStream, objectMetadata).withCannedAcl(
 					CannedAccessControlList.PublicRead));
 
@@ -93,7 +91,7 @@ public class FileService {
 
 	public void deleteFile(String filePath, String bucketName) {
 		if(filePath == null) return;
-		amazonS3Client.deleteObject(new DeleteObjectRequest(bucketName, getFileName(filePath, bucketName)));
+		ncpImageUtil.getAmazonS3().deleteObject(new DeleteObjectRequest(bucketName, getFileName(filePath, bucketName)));
 	}
 
 	public Optional<MultipartFile> checkFileByType(MultipartFile multipartFile, FileType fileType) {
@@ -104,7 +102,7 @@ public class FileService {
 	}
 
 	public String getAlbumFileUrl(String filepath) {
-		return ncpConfig.getEndPoint() + "/" + filepath;
+		return ncpConfig.getS3().getEndPoint() + "/" + filepath;
 	}
 
 	public String getFileName(String filepath, String bucketName) {

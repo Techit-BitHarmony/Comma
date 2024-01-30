@@ -1,6 +1,6 @@
-package com.bitharmony.comma.domain.album.album.dto;
+package com.bitharmony.comma.album.album.dto;
 
-import com.bitharmony.comma.domain.album.album.entity.Album;
+import com.bitharmony.comma.album.album.entity.Album;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;

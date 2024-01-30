@@ -38,3 +38,4 @@ out/
 
 ### resources ###
 /src/main/resources/application-custom.yml
+/src/main/resources/application-secret.yml

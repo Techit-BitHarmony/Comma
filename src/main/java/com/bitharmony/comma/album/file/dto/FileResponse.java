@@ -1,4 +1,4 @@
-package com.bitharmony.comma.domain.album.file.dto;
+package com.bitharmony.comma.album.file.dto;
 
 import lombok.Builder;
 
