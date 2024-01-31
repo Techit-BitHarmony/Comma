@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
-import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 import com.bitharmony.comma.album.album.dto.AlbumResponse;
+import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.service.AlbumService;
+import com.bitharmony.comma.global.exception.AlbumFieldException;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class AlbumController {
 		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile) {
 
 		if (!albumService.canRelease(request.albumname(), musicFile, musicImageFile)) {
-			throw new IllegalArgumentException("앨범을 등록할 수 없습니다.");
+			throw new AlbumFieldException("앨범을 등록할 수 없습니다.");
 		}
 
 		Album album = albumService.release(request, musicFile, musicImageFile);
@@ -60,7 +61,7 @@ public class AlbumController {
 		Album album = albumService.getAlbumById(id);
 
 		if (!albumService.canEdit(album)) {
-			throw new IllegalArgumentException("앨범을 수정할 수 없습니다.");
+			throw new AlbumFieldException("앨범을 수정할 수 없습니다.");
 		}
 
 		Album editedAlbum = albumService.edit(request, album, musicFile, musicImageFile);

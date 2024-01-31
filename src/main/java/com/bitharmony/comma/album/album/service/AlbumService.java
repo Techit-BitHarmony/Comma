@@ -14,6 +14,7 @@ import com.bitharmony.comma.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.album.file.service.FileService;
 import com.bitharmony.comma.album.file.util.FileType;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
+import com.bitharmony.comma.global.exception.AlbumNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -68,7 +69,7 @@ public class AlbumService {
 	}
 
 	public Album getAlbumById(long id) {
-		return albumRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Album not found"));
+		return albumRepository.findById(id).orElseThrow(() -> new AlbumNotFoundException("앨범을 찾을 수 없습니다."));
 	}
 
 	/**

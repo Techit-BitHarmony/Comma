@@ -15,6 +15,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.bitharmony.comma.album.file.dto.FileResponse;
 import com.bitharmony.comma.album.file.util.FileType;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
+import com.bitharmony.comma.global.exception.AlbumFileException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -53,7 +54,7 @@ public class FileService {
 			uploadFileUrl = bucketName + "/" + keyName;
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new AlbumFileException("파일 업로드에 실패했습니다.");
 		}
 
 		return FileResponse.builder()
