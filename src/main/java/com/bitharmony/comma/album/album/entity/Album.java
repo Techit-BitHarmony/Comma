@@ -14,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -50,13 +50,6 @@ public class Album {
 
 	@Column(nullable = false, columnDefinition = "int default 0")
 	private int price;
-
-	// @OneToMany(fetch = FetchType.LAZY)
-	// private List<AlbumLike> albumLike;
-
-	public void updateImageUrl(String url) { this.imagePath = url; }
-
-	public void updateFileUrl(String url) { this.filePath = url; }
 
 	public void update(AlbumEditRequest request) {
 		this.albumname = request.albumname();

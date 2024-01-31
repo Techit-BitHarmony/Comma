@@ -76,8 +76,8 @@ public class AlbumController {
 	}
 
 	private AlbumResponse albumToResponseDto(Album album) {
-		album.updateFileUrl(albumService.getAlbumFileUrl(album.getFilePath()));
-		album.updateImageUrl(albumService.getAlbumImageUrl(album.getImagePath()));
+		album = album.toBuilder().filePath(albumService.getAlbumFileUrl(album.getFilePath())).build();
+		album = album.toBuilder().imagePath(albumService.getAlbumImageUrl(album.getImagePath())).build();
 
 		return AlbumResponse.builder()
 			.albumname(album.getAlbumname())

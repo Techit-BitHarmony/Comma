@@ -56,7 +56,8 @@ public class AlbumService {
 
 	public Album saveAlbum(Album album, MultipartFile musicFile, MultipartFile musicImageFile) {
 		//uploadFileAndSetUrl(musicFile, ncpImageUtil.getMusicBucketName(), album::updateFileUrl);
-		uploadFileAndSetUrl(musicImageFile, ncpImageUtil.getBucketName(), album::updateImageUrl);
+		String fileUrl = fileService.uploadFile(musicFile, ncpImageUtil.getBucketName()).uploadFileUrl();
+		album = album.toBuilder().filePath(fileUrl).build();
 
 		albumRepository.save(album);
 		return album;
