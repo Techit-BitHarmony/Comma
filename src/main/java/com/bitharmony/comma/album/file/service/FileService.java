@@ -15,20 +15,17 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.bitharmony.comma.album.file.dto.FileResponse;
 import com.bitharmony.comma.album.file.util.FileType;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
-import com.bitharmony.comma.global.config.NcpConfig;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class FileService {
-
-	private final NcpConfig ncpConfig;
 	private final NcpImageUtil ncpImageUtil;
 
 	public String getUuidFileName(String fileName) {
 		String ext = fileName.substring(fileName.indexOf(".") + 1);
-		return UUID.randomUUID().toString() + "." + ext;
+		return UUID.randomUUID() + "." + ext;
 	}
 
 	/**
@@ -102,7 +99,7 @@ public class FileService {
 	}
 
 	public String getAlbumFileUrl(String filepath) {
-		return ncpConfig.getS3().getEndPoint() + "/" + filepath;
+		return ncpImageUtil.getEndPoint() + "/" + filepath;
 	}
 
 	public String getFileName(String filepath, String bucketName) {

@@ -15,11 +15,16 @@ import lombok.Getter;
 @Component
 public class NcpImageUtil {
 	private final AmazonS3 amazonS3;
-
-	public final String bucketName;
+	private final String bucketName;
+	private final String endPoint;
+	private final String imageCdn;
+	private final String imageCdnQueryString;
 
 	public NcpImageUtil(NcpConfig ncpConfig) {
 		bucketName = ncpConfig.getS3().getImageBucket();
+		endPoint = ncpConfig.getS3().getEndPoint();
+		imageCdn = ncpConfig.getImageOptimizer().getCdn();
+		imageCdnQueryString = ncpConfig.getImageOptimizer().getQueryString();
 
 		String accessKey = ncpConfig.getImageCredentials().getAccessKey();
 		String secretKey = ncpConfig.getImageCredentials().getSecretKey();

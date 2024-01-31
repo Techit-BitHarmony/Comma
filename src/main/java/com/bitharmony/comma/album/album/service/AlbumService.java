@@ -8,13 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
+import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.album.file.service.FileService;
 import com.bitharmony.comma.album.file.util.FileType;
-import com.bitharmony.comma.global.config.NcpConfig;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
-import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class AlbumService {
 	private final AlbumRepository albumRepository;
 	private final FileService fileService;
-	private final NcpConfig ncpConfig;
 	private final NcpImageUtil ncpImageUtil;
 
 	@Transactional
@@ -85,12 +83,12 @@ public class AlbumService {
 			return "여기에 기본 이미지 URL";
 		}
 
-		return ncpConfig.getImageOptimizer().getCdn() + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "")
-			+ ncpConfig.getImageOptimizer().getQueryString();
+		return ncpImageUtil.getImageCdn() + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "")
+			+ ncpImageUtil.getImageCdnQueryString();
 	}
 
 	public String getAlbumFileUrl(String filepath) {
-		return ncpConfig.getS3().getEndPoint() + "/" + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "");
+		return ncpImageUtil.getEndPoint() + "/" + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "");
 	}
 
 	public boolean canRelease(String name, MultipartFile musicFile, MultipartFile musicImageFile) {
