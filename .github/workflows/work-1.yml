@@ -103,5 +103,6 @@ jobs:
           script:
             whoami;
             docker rm -f deploy_1;
+            docker rmi ghcr.io/techit-bitharmony/bitharmony-comma
             docker pull ghcr.io/techit-bitharmony/bitharmony-comma:latest;
             docker run --name deploy_1  -d -p 8080:8090 -e TZ=Asia/Seoul ghcr.io/techit-bitharmony/bitharmony-comma:latest;
