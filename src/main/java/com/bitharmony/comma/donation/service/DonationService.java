@@ -38,7 +38,7 @@ public class DonationService {
     }
 
     public void checkCredit(Member patron, Integer amount){
-        if(patron.getCreditId() < amount){
+        if(patron.getCredit() < amount){
 
         }
     }
