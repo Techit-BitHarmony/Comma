@@ -1,9 +1,6 @@
 package com.bitharmony.comma.domain.credit.charge.controller;
 
-import com.bitharmony.comma.domain.credit.charge.dto.ChargeCreateRequest;
-import com.bitharmony.comma.domain.credit.charge.dto.ChargeCreateResponse;
-import com.bitharmony.comma.domain.credit.charge.dto.ChargeGetListResponse;
-import com.bitharmony.comma.domain.credit.charge.dto.ChargeGetResponse;
+import com.bitharmony.comma.domain.credit.charge.dto.*;
 import com.bitharmony.comma.domain.credit.charge.entity.Charge;
 import com.bitharmony.comma.domain.credit.charge.service.ChargeService;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +36,8 @@ public class ChargeController {
 
     @GetMapping("/charges/{id}")
     public ChargeGetResponse getCharge(@PathVariable long id) {
-            Charge charge = this.chargeService.getChargeById(id);
+
+        Charge charge = chargeService.getChargeById(id);
 
         return ChargeGetResponse.builder()
                 .chargeAmount(charge.getChargeAmount())
@@ -51,10 +49,14 @@ public class ChargeController {
 
     @GetMapping("/charges")
     public ResponseEntity<ChargeGetListResponse> getChargeList() {
-        List<Charge> charges = this.chargeService.getChargeList();
-        ChargeGetListResponse chargeGetListResponse = ChargeGetListResponse.toDtoList(charges);
 
-        return new ResponseEntity<>(chargeGetListResponse, HttpStatus.OK); 
+        List<Charge> charges = chargeService.getChargeList();
+
+        ChargeGetListResponse chargeGetListResponse = ChargeGetListResponse.builder()
+                .chargeDtos(charges.stream().map(ChargeDto::new).toList())
+                .build();
+
+        return new ResponseEntity<>(chargeGetListResponse, HttpStatus.OK);
     }
 
 
@@ -62,7 +64,7 @@ public class ChargeController {
     // 추후 프론트 구현시 삭제 예정
     // 금액(chargeAmount) 입력 후 '/charges'로 POST 발송
     @GetMapping("/charge_form")
-    public String charge(){
+    public String charge() {
         return "domain/credit/charge/charge_form";
     }
 
@@ -71,17 +73,19 @@ public class ChargeController {
     // Response의 chargeId 값으로 "/charge/pay/{id}"로 리다이렉트하여 결제 진행
     @PostMapping("/charges")
     public ResponseEntity<ChargeCreateResponse> createCharge(
-            @RequestBody ChargeCreateRequest chargeCreateRequest){
+            @RequestBody ChargeCreateRequest chargeCreateRequest) {
 
-    Charge charge = this.chargeService.createCharge(chargeCreateRequest.chargeAmount());
-    ChargeCreateResponse chargeCreateResponse = new ChargeCreateResponse(charge);
+        Charge charge = chargeService.createCharge(chargeCreateRequest.chargeAmount());
 
-    return new ResponseEntity<>(chargeCreateResponse, HttpStatus.CREATED);
+        return new ResponseEntity<>(
+                ChargeCreateResponse.builder().chargeId(charge.getId()).build(),
+                HttpStatus.CREATED
+        );
     }
 
     @GetMapping("/charges/pay/{id}")
-    public String payCharge(@PathVariable long id, Model model){
-        Charge charge = this.chargeService.getChargeById(id);
+    public String payCharge(@PathVariable long id, Model model) {
+        Charge charge = chargeService.getChargeById(id);
         model.addAttribute("charge", charge);
 
         return "/domain/credit/charge/charge";
@@ -115,7 +119,8 @@ public class ChargeController {
             amount = (String) requestData.get("amount");
         } catch (ParseException e) {
             throw new RuntimeException(e);
-        };
+        }
+        ;
 
 
         // orderId와 amount 맞는지 체크하는 로직

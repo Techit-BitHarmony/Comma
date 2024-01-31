@@ -6,9 +6,5 @@ import lombok.Builder;
 @Builder
 public record ChargeCreateRequest(
         long chargeAmount
-
 ) {
-    public ChargeCreateRequest(Charge charge) {
-        this(charge.getChargeAmount());
-    }
 }

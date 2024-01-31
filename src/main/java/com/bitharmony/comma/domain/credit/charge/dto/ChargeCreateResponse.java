@@ -7,16 +7,6 @@ import java.time.LocalDateTime;
 
 @Builder
 public record ChargeCreateResponse(
-        long chargeId,
-        long chargeAmount,
-        LocalDateTime createDate
-
+        long chargeId
 ) {
-    public ChargeCreateResponse(Charge charge) {
-        this(
-                charge.getId(),
-                charge.getChargeAmount(),
-                charge.getCreateDate()
-                );
-    }
 }
