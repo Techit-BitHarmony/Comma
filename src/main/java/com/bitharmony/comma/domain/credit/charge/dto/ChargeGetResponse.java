@@ -13,11 +13,4 @@ public record ChargeGetResponse(
         LocalDateTime payDate
 
 ) {
-    public ChargeGetResponse(Charge charge) {
-        this(
-                charge.getChargeAmount(),
-                charge.getCreateDate(),
-                charge.getPaymentKey(),
-                charge.getPayDate());
-    }
 }

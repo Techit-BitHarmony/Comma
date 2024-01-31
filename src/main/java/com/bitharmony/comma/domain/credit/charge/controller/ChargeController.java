@@ -27,7 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/credit")
 public class ChargeController {
@@ -38,15 +38,15 @@ public class ChargeController {
     private String tossPaymentsWidgetSecretKey;
 
     @GetMapping("/charges/{id}")
-    public ResponseEntity<ChargeGetResponse> getCharge(@PathVariable long id) {
-        try {
+    public ChargeGetResponse getCharge(@PathVariable long id) {
             Charge charge = this.chargeService.getChargeById(id);
-            ChargeGetResponse chargeGetResponse = new ChargeGetResponse(charge);
 
-            return new ResponseEntity<>(chargeGetResponse, HttpStatus.OK);
-        }  catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return ChargeGetResponse.builder()
+                .chargeAmount(charge.getChargeAmount())
+                .createDate(charge.getCreateDate())
+                .payDate(charge.getPayDate())
+                .paymentKey(charge.getPaymentKey())
+                .build();
     }
 
     @GetMapping("/charges")

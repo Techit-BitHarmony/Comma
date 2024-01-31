@@ -5,6 +5,7 @@ import com.bitharmony.comma.domain.credit.charge.service.ChargeService;
 import com.bitharmony.comma.domain.credit.creditLog.entity.CreditLog;
 import com.bitharmony.comma.domain.credit.creditLog.service.CreditLogService;
 import com.bitharmony.comma.domain.credit.withdraw.service.WithdrawService;
+import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.boot.ApplicationRunner;
@@ -23,6 +24,7 @@ public class InitData {
     private final ChargeRepository chargeRepository;
     private final CreditLogService creditLogService;
     private final WithdrawService withdrawService;
+    private final MemberService memberService;
 
 
     @Bean
@@ -34,6 +36,11 @@ public class InitData {
             public void run(ApplicationArguments args) {
 
                 if(chargeRepository.count() > 0) { return; }
+
+
+                memberService.join("user1", "1234", "user1@user.com", "nickname1");
+                memberService.join("user2", "1234", "user2@user.com", "nickname2");
+                memberService.join("user3", "1234", "user3@user.com", "nickname3");
 
                 chargeService.createCharge(10000);
                 chargeService.createCharge(20000);
