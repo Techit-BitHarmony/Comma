@@ -28,7 +28,7 @@ public class JwtUtil {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    @Value("${spring.jwt.secret}")
+    @Value("${spring.jwt.secretKey}")
     private String SECRET_KEY;
     @Value("${spring.jwt.token.access-expiration-time}")
     private Long ACCESS_TOKEN_EXPIRATION_TIME; // 1시간으로 설정
@@ -72,12 +72,12 @@ public class JwtUtil {
                 .compact();
 
         // redis에 저장
-        redisTemplate.opsForValue().set(
-                jwtCreateRequest.username(),
-                refreshToken,
-                REFRESH_TOKEN_EXPIRATION_TIME,
-                TimeUnit.MILLISECONDS
-        );
+//        redisTemplate.opsForValue().set(
+//                jwtCreateRequest.username(),
+//                refreshToken,
+//                REFRESH_TOKEN_EXPIRATION_TIME,
+//                TimeUnit.MILLISECONDS
+//        );
 
         return refreshToken;
     }
