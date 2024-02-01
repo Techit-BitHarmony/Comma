@@ -37,14 +37,11 @@ public class ChargeController {
     @GetMapping("/charges/{id}")
     public ResponseEntity<ChargeGetResponse> getCharge(@PathVariable long id) {
 
-        // TODO : 멤버 가져오는 메서드 추가시 수정(임시로 user1 사용)
-        Member member = memberService.getMemberByUsername("user1");
-
         Charge charge = chargeService.getChargeById(id);
 
         return new ResponseEntity<>(
                 ChargeGetResponse.builder()
-                        .username(member.getUsername())
+                        .username(charge.getCharger().getUsername())
                         .chargeAmount(charge.getChargeAmount())
                         .createDate(charge.getCreateDate())
                         .payDate(charge.getPayDate())
@@ -53,8 +50,21 @@ public class ChargeController {
                 HttpStatus.OK);
     }
 
+    @GetMapping("/charges/mine")
+    public ResponseEntity<ChargeGetListResponse> getMyChargeList() {
+
+        Member member = memberService.getMemberByUsername("user1");
+        List<Charge> charges = chargeService.getChargeListByMemberId(member.getId());
+
+        ChargeGetListResponse chargeGetListResponse = ChargeGetListResponse.builder()
+                .chargeDtos(charges.stream().map(ChargeDto::new).toList())
+                .build();
+
+        return new ResponseEntity<>(chargeGetListResponse, HttpStatus.OK);
+    }
+
     @GetMapping("/charges")
-    public ResponseEntity<ChargeGetListResponse> getChargeList() {
+    public ResponseEntity<ChargeGetListResponse> getAllChargeList() {
 
         List<Charge> charges = chargeService.getChargeList();
 
@@ -71,8 +81,7 @@ public class ChargeController {
     public ResponseEntity<ChargeCreateResponse> createCharge(
             @RequestBody ChargeCreateRequest chargeCreateRequest) {
 
-        // TODO : 멤버 가져오는 메서드 추가시 수정
-        // 임시로 user1 로 구현
+        // TODO : 멤버 가져오는 메서드 추가시 수정 (임시로 user1 사용)
         Member member = memberService.getMemberByUsername("user1");
         Charge charge = chargeService.createCharge(member, chargeCreateRequest.chargeAmount());
 
@@ -100,19 +109,6 @@ public class ChargeController {
         return "/domain/credit/charge/charge";
     }
 
-    @GetMapping("/success")
-    public String showSuccess() {
-        return "domain/credit/charge/success";
-    }
-
-    @GetMapping("/fail")
-    public String showFail(Model model, @RequestParam String code, @RequestParam String message) {
-        model.addAttribute("code", code);
-        model.addAttribute("message", message);
-
-        return "domain/credit/charge/fail";
-    }
-
     @PostMapping(value = "/confirm")
     public ResponseEntity<ChargeConfirmResponse> confirmPayment(@RequestBody ChargeConfirmRequest chargeConfirmRequest) {
 
@@ -126,4 +122,16 @@ public class ChargeController {
         return new ResponseEntity<>(chargeConfirmResponse, HttpStatus.OK);
     }
 
+    @GetMapping("/success")
+    public String showSuccess() {
+        return "domain/credit/charge/success";
+    }
+
+    @GetMapping("/fail")
+    public String showFail(Model model, @RequestParam String code, @RequestParam String message) {
+        model.addAttribute("code", code);
+        model.addAttribute("message", message);
+
+        return "domain/credit/charge/fail";
+    }
 }

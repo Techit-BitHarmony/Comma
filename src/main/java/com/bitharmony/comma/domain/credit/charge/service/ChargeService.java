@@ -105,4 +105,7 @@ public class ChargeService {
         }
     }
 
+    public List<Charge> getChargeListByMemberId(Long id) {
+        return chargeRepository.findByChargerId(id);
+    }
 }
