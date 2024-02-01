@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public record CreditLogDto(
         CreditLog.EventType eventType,
         long creditChangeAmount,
+        long restCredit,
         LocalDateTime createDate
 
 ) {
@@ -16,6 +17,7 @@ public record CreditLogDto(
         this(
                 creditLog.getEventType(),
                 creditLog.getCreditChangeAmount(),
+                creditLog.getRestCredit(),
                 creditLog.getCreateDate()
         );
     }

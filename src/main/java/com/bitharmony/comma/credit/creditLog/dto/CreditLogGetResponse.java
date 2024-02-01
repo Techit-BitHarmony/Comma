@@ -9,13 +9,8 @@ import java.time.LocalDateTime;
 public record CreditLogGetResponse(
         CreditLog.EventType eventType,
         long creditChangeAmount,
+        long restCredit,
         LocalDateTime createDate
 
         ) {
-    public CreditLogGetResponse(CreditLog creditLog){
-        this(
-                creditLog.getEventType(),
-                creditLog.getCreditChangeAmount(),
-                creditLog.getCreateDate());
-    }
 }
