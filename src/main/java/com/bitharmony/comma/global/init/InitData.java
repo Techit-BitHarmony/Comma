@@ -1,10 +1,10 @@
 package com.bitharmony.comma.global.init;
 
-import com.bitharmony.comma.domain.credit.charge.repository.ChargeRepository;
-import com.bitharmony.comma.domain.credit.charge.service.ChargeService;
-import com.bitharmony.comma.domain.credit.creditLog.entity.CreditLog;
-import com.bitharmony.comma.domain.credit.creditLog.service.CreditLogService;
-import com.bitharmony.comma.domain.credit.withdraw.service.WithdrawService;
+import com.bitharmony.comma.credit.charge.repository.ChargeRepository;
+import com.bitharmony.comma.credit.charge.service.ChargeService;
+import com.bitharmony.comma.credit.creditLog.entity.CreditLog;
+import com.bitharmony.comma.credit.creditLog.service.CreditLogService;
+import com.bitharmony.comma.credit.withdraw.service.WithdrawService;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -49,10 +49,10 @@ public class InitData {
                 chargeService.createCharge(member, 30000);
                 chargeService.createCharge(member, 40000);
 
-                creditLogService.addCreditLog(CreditLog.EventType.충전__토스페이먼츠, 10000);
-                creditLogService.addCreditLog(CreditLog.EventType.충전__토스페이먼츠, 20000);
-                creditLogService.addCreditLog(CreditLog.EventType.충전__토스페이먼츠, 30000);
-                creditLogService.addCreditLog(CreditLog.EventType.충전__토스페이먼츠, 40000);
+                creditLogService.addCreditLog(member, CreditLog.EventType.충전__토스페이먼츠, 10000);
+                creditLogService.addCreditLog(member, CreditLog.EventType.충전__토스페이먼츠, 20000);
+                creditLogService.addCreditLog(member, CreditLog.EventType.충전__토스페이먼츠, 30000);
+                creditLogService.addCreditLog(member, CreditLog.EventType.충전__토스페이먼츠, 40000);
 
                 withdrawService.applyWithdraw("신한은행", "11111111", 10000);
                 withdrawService.applyWithdraw("우리은행", "22222222", 20000);
