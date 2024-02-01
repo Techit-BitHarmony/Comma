@@ -76,16 +76,26 @@ public class WithdrawController {
     public ResponseEntity<Void> cancelWithdraw(@PathVariable long withdrawId) {
         Withdraw withdraw = withdrawService.getWithdraw(withdrawId);
 
-        // TODO : 멤버 기능 연동시 수정
+        // TODO : 멤버 가져오는 메서드 추가시 수정 (임시로 user1 사용)
         Member member = memberService.getMemberByUsername("user1");
 
-        if(!withdrawService.canDelete(member, withdraw)){
-            throw new RuntimeException("출금 신청을 취소할 수 없습니다.");
-        }
-
-        withdrawService.delete(withdrawId);
+        withdrawService.delete(member, withdraw);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PutMapping("/withdraws/{withdrawId}")
+    public ResponseEntity<WithdrawModifyResponse> modifyWithdraw(
+            @PathVariable long withdrawId, @RequestBody WithdrawModifyRequest request){
+        Withdraw withdraw = withdrawService.getWithdraw(withdrawId);
+        Withdraw _withdraw = withdrawService.modifyWithdraw(withdraw, request.bankName(), request.bankAccountNo(), request.withdrawAmount());
+
+        WithdrawModifyResponse withdrawModifyResponse = WithdrawModifyResponse.builder()
+                .bankName(_withdraw.getBankName())
+                .bankAccountNo(_withdraw.getBankName())
+                .withdrawAmount(_withdraw.getWithdrawAmount())
+                .build();
+
+        return new ResponseEntity<>(withdrawModifyResponse, HttpStatus.OK);
+    }
 }

@@ -1,11 +1,16 @@
 package com.bitharmony.comma.credit.withdraw.service;
 
+import com.bitharmony.comma.credit.creditLog.entity.CreditLog;
+import com.bitharmony.comma.credit.creditLog.service.CreditLogService;
 import com.bitharmony.comma.credit.withdraw.entity.Withdraw;
 import com.bitharmony.comma.credit.withdraw.repository.WithdrawRepository;
 import com.bitharmony.comma.global.exception.HandledWithdrawException;
 import com.bitharmony.comma.global.exception.NotEnoughCreditException;
 import com.bitharmony.comma.global.exception.WithdrawNotFoundException;
+import com.bitharmony.comma.global.exception.NotAuthorizedException;
 import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.repository.MemberRepository;
+import io.lettuce.core.AbstractRedisAsyncCommands;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +23,8 @@ import java.util.Optional;
 public class WithdrawService {
 
     private final WithdrawRepository withdrawRepository;
+    private final CreditLogService creditLogService;
+    private final MemberRepository memberRepository;
 
     public Withdraw getWithdraw(long id) {
         Optional<Withdraw> withdraw = this.withdrawRepository.findById(id);
@@ -50,7 +57,7 @@ public class WithdrawService {
 
     public Withdraw applyWithdraw(Member member, String bankName, String bankAccountNo, long withdrawAmount) {
 
-        if (canApply(member, withdrawAmount)) {
+        if (!canApply(member, withdrawAmount)) {
             throw new NotEnoughCreditException();
         }
 
@@ -62,18 +69,23 @@ public class WithdrawService {
                 .applyDate(LocalDateTime.now())
                 .build();
 
-        this.withdrawRepository.save(withdraw);
+        Member _member = member.toBuilder()
+                .credit(member.getCredit() - withdrawAmount)
+                .build();
+
+        memberRepository.save(_member);
+        withdrawRepository.save(withdraw);
+        creditLogService.addCreditLog(member, CreditLog.EventType.출금신청__통장입금, -1 * withdrawAmount);
         return withdraw;
     }
 
-    public Withdraw modifyWithdraw(long id, String bankName, String bankAccountNo, long withdrawAmount) {
-        Optional<Withdraw> withdraw = this.withdrawRepository.findById(id);
+    public Withdraw modifyWithdraw(Withdraw withdraw, String bankName, String bankAccountNo, long withdrawAmount) {
 
-        if (withdraw.isEmpty()) {
-            throw new WithdrawNotFoundException();
+        if (isHandled(withdraw)) {
+            throw new HandledWithdrawException();
         }
 
-        Withdraw _withdraw = withdraw.get().toBuilder()
+        Withdraw _withdraw = withdraw.toBuilder()
                 .bankName(bankName)
                 .bankAccountNo(bankAccountNo)
                 .withdrawAmount(withdrawAmount)
@@ -84,20 +96,28 @@ public class WithdrawService {
         return _withdraw;
     }
 
-    public void delete(long withdrawId) {
-        withdrawRepository.deleteById(withdrawId);
+    public void delete(Member member, Withdraw withdraw) {
+
+        if(isHandled(withdraw)){
+            throw new HandledWithdrawException();
+        }
+
+        if(!withdraw.getApplicant().equals(member)){
+            throw new NotAuthorizedException();
+        }
+        withdrawRepository.deleteById(withdraw.getId());
     }
 
     public Withdraw doWithdraw(long id) {
         Withdraw withdraw = getWithdraw(id);
 
-        if (!canDoOrCancel(withdraw)) {
+        if (isHandled(withdraw)) {
             throw new HandledWithdrawException();
         }
 
         Withdraw _withdraw = withdraw.toBuilder()
                 .processResult("처리완료")
-                .withdrawCancelDate(LocalDateTime.now())
+                .withdrawDoneDate(LocalDateTime.now())
                 .build();
 
         withdrawRepository.save(_withdraw);
@@ -108,7 +128,7 @@ public class WithdrawService {
     public Withdraw cancelWithdraw(long id) {
         Withdraw withdraw = getWithdraw(id);
 
-        if (!canDoOrCancel(withdraw)) {
+        if (isHandled(withdraw)) {
             throw new HandledWithdrawException();
         }
 
@@ -126,34 +146,18 @@ public class WithdrawService {
         return applicant.getCredit() >= withdrawAmount;
     }
 
-    //    TODO : 멤버 찾기 메서드 추가시 수정할 것
-    public boolean canDelete(Member member, Withdraw withdraw) {
-        if (withdraw.getWithdrawDoneDate() != null) {
-            return false;
-        }
+
+    public boolean isHandled(Withdraw withdraw) {
+
         if (withdraw.getWithdrawCancelDate() != null) {
-            return false;
+            return true;
+        }
+        if (withdraw.getWithdrawDoneDate() != null) {
+            return true;
         }
 
-//        if (member.isAdmin()) return true;
-
-        if (!withdraw.getApplicant().equals(member)) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
 
-    public boolean canDoOrCancel(Withdraw withdraw) {
-
-        if (withdraw.getWithdrawCancelDate() != null) {
-            return false;
-        }
-        if (withdraw.getWithdrawDoneDate() != null) {
-            return false;
-        }
-
-        return true;
-    }
 }
