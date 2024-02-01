@@ -1,14 +1,19 @@
 package com.bitharmony.comma.credit.withdraw.controller;
 
+import com.bitharmony.comma.credit.withdraw.dto.WithdrawDto;
 import com.bitharmony.comma.credit.withdraw.service.WithdrawService;
 import com.bitharmony.comma.credit.withdraw.dto.WithdrawGetListResponse;
 import com.bitharmony.comma.credit.withdraw.dto.WithdrawGetResponse;
 import com.bitharmony.comma.credit.withdraw.entity.Withdraw;
+import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/credit")
@@ -16,21 +21,41 @@ import org.springframework.web.bind.annotation.*;
 public class WithdrawController {
 
     private final WithdrawService withdrawService;
+    private MemberService memberService;
 
     @GetMapping("/withdraws/{id}")
     public ResponseEntity<WithdrawGetResponse> getWithdraw(@PathVariable long id){
-        WithdrawGetResponse withdrawGetResponse = new WithdrawGetResponse(this.withdrawService.getWithdraw(id));
+        Withdraw withdraw = withdrawService.getWithdraw(id);
+
+        WithdrawGetResponse withdrawGetResponse = WithdrawGetResponse.builder()
+                .id(withdraw.getId())
+                .applicantName(withdraw.getApplicant().getUsername())
+                .bankName(withdraw.getBankName())
+                .bankAcountNo(withdraw.getBankAccountNo())
+                .withdrawAmount(withdraw.getWithdrawAmount())
+                .applyDate(withdraw.getApplyDate())
+                .build();
 
         return new ResponseEntity<>(withdrawGetResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/withdraws")
-    public ResponseEntity<WithdrawGetListResponse> getWithdrawList(){
+    @GetMapping("/withdraws/mine")
+    public ResponseEntity<WithdrawGetListResponse> getMyWithdrawList(){
+
+        Member member = memberService.getMemberByUsername("user1");
+        List<Withdraw> withdraws = withdrawService.getMyWithdrawList(member.getId());
+
         WithdrawGetListResponse withdrawGetListResponse =
-                WithdrawGetListResponse.toDtoList(this.withdrawService.getWithdrawList());
+                WithdrawGetListResponse.builder()
+                        .withdrawDtos(
+                                withdraws.stream()
+                                        .map(WithdrawDto::new)
+                                        .toList())
+                        .build();
 
         return new ResponseEntity<>(withdrawGetListResponse, HttpStatus.OK);
     }
+
 
     @DeleteMapping("/withdraws/{withdrawId}")
     public ResponseEntity<Void> deleteWithdraw(@PathVariable long withdrawId){

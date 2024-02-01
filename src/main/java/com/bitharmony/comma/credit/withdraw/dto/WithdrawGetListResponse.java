@@ -9,9 +9,5 @@ import java.util.List;
 public record WithdrawGetListResponse(
         List<WithdrawDto> withdrawDtos
 ) {
-    public static WithdrawGetListResponse toDtoList(List<Withdraw> withdraws){
-        List<WithdrawDto> withdrawDtos = withdraws.stream().map(WithdrawDto::new).toList();
 
-        return new WithdrawGetListResponse(withdrawDtos);
-    }
 }

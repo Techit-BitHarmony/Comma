@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Builder
 public record WithdrawGetResponse(
         long id,
+        String applicantName,
         String bankName,
         String bankAcountNo,
         long withdrawAmount,
@@ -16,15 +17,5 @@ public record WithdrawGetResponse(
         LocalDateTime withdrawDoneDate
 
 ) {
-    public WithdrawGetResponse(Withdraw withdraw){
-        this(
-                withdraw.getId(),
-                withdraw.getBankName(),
-                withdraw.getBankAccountNo(),
-                withdraw.getWithdrawAmount(),
-                withdraw.getApplyDate(),
-                withdraw.getWithdrawCancelDate(),
-                withdraw.getWithdrawDoneDate()
-        );
-    }
+
 }

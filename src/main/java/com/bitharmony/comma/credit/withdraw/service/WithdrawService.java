@@ -2,6 +2,8 @@ package com.bitharmony.comma.credit.withdraw.service;
 
 import com.bitharmony.comma.credit.withdraw.entity.Withdraw;
 import com.bitharmony.comma.credit.withdraw.repository.WithdrawRepository;
+import com.bitharmony.comma.global.exception.WithdrawNotFoundException;
+import com.bitharmony.comma.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,20 +21,34 @@ public class WithdrawService {
         Optional<Withdraw> withdraw = this.withdrawRepository.findById(id);
 
         if (withdraw.isEmpty()) {
-            throw new RuntimeException("존재하지 않는 신청입니다.");
+            throw new WithdrawNotFoundException();
         }
 
         return withdraw.get();
     }
 
-
-    // 추후 멤버 기능 추가시 멤버 아이디로 리스트 가져오는 것으로 변경 예정
-    public List<Withdraw> getWithdrawList() {
-        return this.withdrawRepository.findAll();
+    public List<Withdraw> getMyWithdrawList(Long id) {
+        List<Withdraw> withdraws = withdrawRepository.findByApplicantId(id);
+        if(withdraws.isEmpty()){
+            throw new WithdrawNotFoundException();
+        }
+        return withdraws;
     }
 
-    public Withdraw applyWithdraw(String bankName, String bankAccountNo, long withdrawAmount) {
-        Withdraw withdraw = new Withdraw().builder()
+
+    public List<Withdraw> getAllWithdrawList() {
+        List<Withdraw> withdraws =this.withdrawRepository.findAll();
+
+        if(withdraws.isEmpty()){
+            throw new WithdrawNotFoundException();
+        }
+
+        return withdraws;
+    }
+
+    public Withdraw applyWithdraw(Member member, String bankName, String bankAccountNo, long withdrawAmount) {
+        Withdraw withdraw = Withdraw.builder()
+                .applicant(member)
                 .bankName(bankName)
                 .bankAccountNo(bankAccountNo)
                 .withdrawAmount(withdrawAmount)
@@ -47,7 +63,7 @@ public class WithdrawService {
         Optional<Withdraw> withdraw = this.withdrawRepository.findById(id);
 
         if(withdraw.isEmpty()){
-            throw new RuntimeException("존재하지 않는 신청입니다.");
+            throw new WithdrawNotFoundException();
         }
 
         Withdraw _withdraw = withdraw.get().toBuilder()
@@ -69,9 +85,11 @@ public class WithdrawService {
         try {
             withdrawRepository.deleteById(withdrawId);
         } catch(Exception e) {
-            throw new RuntimeException("존재하지 않는 출금 신청입니다.");
+            throw new WithdrawNotFoundException();
         }
     }
+
+
 
 //    멤버 기능 연동 후 수정 예정
 //    public boolean canDelete(Member member, Withdraw withdraw){

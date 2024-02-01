@@ -1,5 +1,6 @@
 package com.bitharmony.comma.credit.withdraw.entity;
 
+import com.bitharmony.comma.member.entity.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,9 +21,8 @@ public class Withdraw {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    // 멤버 기능 추가시 수정 예정
-//    @ManyToOne
-//    private Member applicant;
+    @ManyToOne
+    private Member applicant;
 
     @NotNull
     private String bankName;
