@@ -1,7 +1,7 @@
 package com.bitharmony.comma.album.album.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 import com.bitharmony.comma.member.entity.Member;
@@ -63,10 +63,10 @@ public class Album {
 	private int price;
 
 	@OneToMany(mappedBy = "album", fetch = FetchType.LAZY)
-	private List<AlbumLike> albumLikes = new ArrayList<>();
+	private Set<AlbumLike> albumLikes = new HashSet<>();
 
 	@OneToMany(mappedBy = "album", fetch = FetchType.LAZY)
-	private List<StreamingCount> streamingCounts = new ArrayList<>();
+	private Set<StreamingCount> streamingCounts = new HashSet<>();
 
 	public void update(AlbumEditRequest request) {
 		this.albumname = request.albumname();
