@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Builder
 public record WithdrawApplyRequest(
         String bankName,
-        String bankAcountNo,
+        String bankAccountNo,
         long withdrawAmount
 ) {
 

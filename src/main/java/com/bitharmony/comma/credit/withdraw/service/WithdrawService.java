@@ -2,6 +2,8 @@ package com.bitharmony.comma.credit.withdraw.service;
 
 import com.bitharmony.comma.credit.withdraw.entity.Withdraw;
 import com.bitharmony.comma.credit.withdraw.repository.WithdrawRepository;
+import com.bitharmony.comma.global.exception.HandledWithdrawException;
+import com.bitharmony.comma.global.exception.NotEnoughCreditException;
 import com.bitharmony.comma.global.exception.WithdrawNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +31,7 @@ public class WithdrawService {
 
     public List<Withdraw> getMyWithdrawList(Long id) {
         List<Withdraw> withdraws = withdrawRepository.findByApplicantId(id);
-        if(withdraws.isEmpty()){
+        if (withdraws.isEmpty()) {
             throw new WithdrawNotFoundException();
         }
         return withdraws;
@@ -37,9 +39,9 @@ public class WithdrawService {
 
 
     public List<Withdraw> getAllWithdrawList() {
-        List<Withdraw> withdraws =this.withdrawRepository.findAll();
+        List<Withdraw> withdraws = this.withdrawRepository.findAll();
 
-        if(withdraws.isEmpty()){
+        if (withdraws.isEmpty()) {
             throw new WithdrawNotFoundException();
         }
 
@@ -47,6 +49,11 @@ public class WithdrawService {
     }
 
     public Withdraw applyWithdraw(Member member, String bankName, String bankAccountNo, long withdrawAmount) {
+
+        if (canApply(member, withdrawAmount)) {
+            throw new NotEnoughCreditException();
+        }
+
         Withdraw withdraw = Withdraw.builder()
                 .applicant(member)
                 .bankName(bankName)
@@ -59,10 +66,10 @@ public class WithdrawService {
         return withdraw;
     }
 
-    public Withdraw modifyWithdraw(long id, String bankName, String bankAccountNo, long withdrawAmount){
+    public Withdraw modifyWithdraw(long id, String bankName, String bankAccountNo, long withdrawAmount) {
         Optional<Withdraw> withdraw = this.withdrawRepository.findById(id);
 
-        if(withdraw.isEmpty()){
+        if (withdraw.isEmpty()) {
             throw new WithdrawNotFoundException();
         }
 
@@ -77,35 +84,76 @@ public class WithdrawService {
         return _withdraw;
     }
 
-    public void cancelWithdraw(long id){
-        this.withdrawRepository.deleteById(id);
-    }
-
     public void delete(long withdrawId) {
-        try {
-            withdrawRepository.deleteById(withdrawId);
-        } catch(Exception e) {
-            throw new WithdrawNotFoundException();
+        withdrawRepository.deleteById(withdrawId);
+    }
+
+    public Withdraw doWithdraw(long id) {
+        Withdraw withdraw = getWithdraw(id);
+
+        if (!canDoOrCancel(withdraw)) {
+            throw new HandledWithdrawException();
         }
+
+        Withdraw _withdraw = withdraw.toBuilder()
+                .processResult("처리완료")
+                .withdrawCancelDate(LocalDateTime.now())
+                .build();
+
+        withdrawRepository.save(_withdraw);
+
+        return _withdraw;
+    }
+
+    public Withdraw cancelWithdraw(long id) {
+        Withdraw withdraw = getWithdraw(id);
+
+        if (!canDoOrCancel(withdraw)) {
+            throw new HandledWithdrawException();
+        }
+
+        Withdraw _withdraw = withdraw.toBuilder()
+                .processResult("취소 - 계좌정보가 불일치")
+                .withdrawCancelDate(LocalDateTime.now())
+                .build();
+
+        withdrawRepository.save(_withdraw);
+
+        return _withdraw;
+    }
+
+    public boolean canApply(Member applicant, long withdrawAmount) {
+        return applicant.getCredit() >= withdrawAmount;
+    }
+
+    //    TODO : 멤버 찾기 메서드 추가시 수정할 것
+    public boolean canDelete(Member member, Withdraw withdraw) {
+        if (withdraw.getWithdrawDoneDate() != null) {
+            return false;
+        }
+        if (withdraw.getWithdrawCancelDate() != null) {
+            return false;
+        }
+
+//        if (member.isAdmin()) return true;
+
+        if (!withdraw.getApplicant().equals(member)) {
+            return false;
+        }
+
+        return true;
     }
 
 
+    public boolean canDoOrCancel(Withdraw withdraw) {
 
-//    멤버 기능 연동 후 수정 예정
-//    public boolean canDelete(Member member, Withdraw withdraw){
-//        if (withdraw.getWithdrawDoneDate() != null) {
-//            return false;
-//        }
-//        if (withdraw.getWithdrawCancelDate() != null) {
-//            return false;
-//        }
-//
-//        if (member.isAdmin()) return true;
-//
-//        if (!withdraw.getApplicant().equals(member)) {
-//            return false;
-//        }
-//
-//        return true;
-//    }
+        if (withdraw.getWithdrawCancelDate() != null) {
+            return false;
+        }
+        if (withdraw.getWithdrawDoneDate() != null) {
+            return false;
+        }
+
+        return true;
+    }
 }

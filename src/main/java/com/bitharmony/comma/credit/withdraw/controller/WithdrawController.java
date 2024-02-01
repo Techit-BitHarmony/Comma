@@ -1,9 +1,7 @@
 package com.bitharmony.comma.credit.withdraw.controller;
 
-import com.bitharmony.comma.credit.withdraw.dto.WithdrawDto;
+import com.bitharmony.comma.credit.withdraw.dto.*;
 import com.bitharmony.comma.credit.withdraw.service.WithdrawService;
-import com.bitharmony.comma.credit.withdraw.dto.WithdrawGetListResponse;
-import com.bitharmony.comma.credit.withdraw.dto.WithdrawGetResponse;
 import com.bitharmony.comma.credit.withdraw.entity.Withdraw;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
@@ -15,16 +13,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/credit")
 @RequiredArgsConstructor
 public class WithdrawController {
 
     private final WithdrawService withdrawService;
-    private MemberService memberService;
+    private final MemberService memberService;
 
     @GetMapping("/withdraws/{id}")
-    public ResponseEntity<WithdrawGetResponse> getWithdraw(@PathVariable long id){
+    public ResponseEntity<WithdrawGetResponse> getWithdraw(@PathVariable long id) {
         Withdraw withdraw = withdrawService.getWithdraw(id);
 
         WithdrawGetResponse withdrawGetResponse = WithdrawGetResponse.builder()
@@ -40,8 +38,9 @@ public class WithdrawController {
     }
 
     @GetMapping("/withdraws/mine")
-    public ResponseEntity<WithdrawGetListResponse> getMyWithdrawList(){
+    public ResponseEntity<WithdrawGetListResponse> getMyWithdrawList() {
 
+        // TODO : 멤버 가져오는 메서드 추가시 수정 (임시로 user1 사용)
         Member member = memberService.getMemberByUsername("user1");
         List<Withdraw> withdraws = withdrawService.getMyWithdrawList(member.getId());
 
@@ -56,15 +55,33 @@ public class WithdrawController {
         return new ResponseEntity<>(withdrawGetListResponse, HttpStatus.OK);
     }
 
+    @PostMapping("/withdraws")
+    public ResponseEntity<WithdrawApplyResponse> applyWithdraw(
+            @RequestBody WithdrawApplyRequest request) {
+
+        // TODO : 멤버 가져오는 메서드 추가시 수정 (임시로 user1 사용)
+        Member member = memberService.getMemberByUsername("user1");
+        Withdraw withdraw = withdrawService.applyWithdraw(
+                member, request.bankName(), request.bankAccountNo(), request.withdrawAmount());
+
+        return new ResponseEntity<>(
+                WithdrawApplyResponse.builder()
+                        .id(withdraw.getId())
+                        .build(),
+                HttpStatus.CREATED
+        );
+    }
 
     @DeleteMapping("/withdraws/{withdrawId}")
-    public ResponseEntity<Void> deleteWithdraw(@PathVariable long withdrawId){
+    public ResponseEntity<Void> cancelWithdraw(@PathVariable long withdrawId) {
         Withdraw withdraw = withdrawService.getWithdraw(withdrawId);
 
-        // 멤버 기능 연동시 수정
-//        if(!withdrawService.canDelete(rq.getMember(), withdraw)){
-//            throw new RuntimeException("출금 신청을 취소할 수 없습니다.");
-//        }
+        // TODO : 멤버 기능 연동시 수정
+        Member member = memberService.getMemberByUsername("user1");
+
+        if(!withdrawService.canDelete(member, withdraw)){
+            throw new RuntimeException("출금 신청을 취소할 수 없습니다.");
+        }
 
         withdrawService.delete(withdrawId);
 

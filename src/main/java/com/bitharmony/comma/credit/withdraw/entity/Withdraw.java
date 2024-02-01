@@ -38,4 +38,6 @@ public class Withdraw {
     private LocalDateTime withdrawCancelDate;
 
     private LocalDateTime withdrawDoneDate;
+
+    private String processResult;
 }
