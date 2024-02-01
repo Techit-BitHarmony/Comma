@@ -16,18 +16,18 @@ import static org.quartz.JobBuilder.newJob;
 @RequiredArgsConstructor
 @Component
 public class DonationRegularJobDetailService {
-    public JobDetail build(JobKey jobKey, Long donationId, DonationRegularRequsetDto dto) throws IllegalAccessException {
-        log.warn("job detail donationId= {}", donationId);
+    public JobDetail build(JobKey jobKey, DonationRegularRequsetDto dto) {
+        log.warn("job detail name= {}", jobKey.getName());
 
         JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put("donationId", donationId);
+        jobDataMap.put("dto", dto);
         jobDataMap.put("retry", 0);
-        for (Field field : dto.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            Object value = field.get(dto);
-
-            jobDataMap.put(field.getName(),value);
-        }
+//        for (Field field : dto.getClass().getDeclaredFields()) {
+//            field.setAccessible(true);
+//            Object value = field.get(dto);
+//
+//            jobDataMap.put(field.getName(),value);
+//        }
 
         return newJob(DonationRegularJob.class)
                 .withIdentity(jobKey.getName(), jobKey.getGroup())
