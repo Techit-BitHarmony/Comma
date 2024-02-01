@@ -2,11 +2,9 @@ package com.bitharmony.comma.album.album.entity;
 
 import com.bitharmony.comma.member.entity.Member;
 
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -20,16 +18,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AlbumLike {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	@EmbeddedId
+	private AlbumLikeId id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "album_id")
+	@JoinColumn(name = "album_id", insertable = false, updatable = false)
 	private Album album;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_id")
+	@JoinColumn(name = "member_id", insertable = false, updatable = false)
 	private Member member;
 }

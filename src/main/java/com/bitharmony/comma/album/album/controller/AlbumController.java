@@ -16,6 +16,8 @@ import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 import com.bitharmony.comma.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.album.album.entity.Album;
+import com.bitharmony.comma.album.album.entity.AlbumLike;
+import com.bitharmony.comma.album.album.service.AlbumLikeService;
 import com.bitharmony.comma.album.album.service.AlbumService;
 import com.bitharmony.comma.global.exception.AlbumFieldException;
 
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class AlbumController {
 
 	private final AlbumService albumService;
+	private final AlbumLikeService albumLikeService;
 
 	@GetMapping("/release")
 	public String showAlbumForm() {
@@ -74,6 +77,14 @@ public class AlbumController {
 
 		albumService.delete(album);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@PostMapping(value = "/{albumId}/like")
+	public ResponseEntity<AlbumLike> addAlbumLike(@PathVariable long albumId, @RequestParam Long memberId) {
+		//TODO: 여기에 엔티티 가져오는거 추가
+		AlbumLike albumLike = albumLikeService.addAlbumLike(albumId, memberId);
+		//TODO: 앨범으로 리다이렉트
+		return ResponseEntity.ok(albumLike);
 	}
 
 	private AlbumResponse albumToResponseDto(Album album) {
