@@ -10,11 +10,4 @@ import java.util.List;
 public record ChargeGetListResponse(
         List<ChargeDto> chargeDtos
 ) {
-        public static ChargeGetListResponse toDtoList(List<Charge> charges){
-            List<ChargeDto> chargeDtos = charges.stream()
-                    .map(ChargeDto::new)
-                    .toList();
-
-            return new ChargeGetListResponse(chargeDtos);
-        }
 }

@@ -23,10 +23,14 @@
             amount: amount,
         };
 
+        // const csrfTokenHeaderName = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+        // const csrfTokenValue = document.querySelector("meta[name='_csrf']").getAttribute("content");
+
         const response = await fetch("/credit/confirm", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                // [csrfTokenHeaderName]: csrfTokenValue
             },
             body: JSON.stringify(requestData),
         });
@@ -37,6 +41,7 @@
             // 결제 실패 비즈니스 로직을 구현하세요.
             console.log(json);
             window.location.href = `fail?message=${json.message}&code=${json.code}`;
+            return;
         }
 
         // 결제 성공 비즈니스 로직을 구현하세요.

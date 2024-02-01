@@ -5,6 +5,7 @@ import com.bitharmony.comma.domain.credit.charge.service.ChargeService;
 import com.bitharmony.comma.domain.credit.creditLog.entity.CreditLog;
 import com.bitharmony.comma.domain.credit.creditLog.service.CreditLogService;
 import com.bitharmony.comma.domain.credit.withdraw.service.WithdrawService;
+import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -42,10 +43,11 @@ public class InitData {
                 memberService.join("user2", "1234", "user2@user.com", "nickname2");
                 memberService.join("user3", "1234", "user3@user.com", "nickname3");
 
-                chargeService.createCharge(10000);
-                chargeService.createCharge(20000);
-                chargeService.createCharge(30000);
-                chargeService.createCharge(40000);
+                Member member = memberService.getMemberByUsername("user1");
+                chargeService.createCharge(member, 10000);
+                chargeService.createCharge(member, 20000);
+                chargeService.createCharge(member, 30000);
+                chargeService.createCharge(member, 40000);
 
                 creditLogService.addCreditLog(CreditLog.EventType.충전__토스페이먼츠, 10000);
                 creditLogService.addCreditLog(CreditLog.EventType.충전__토스페이먼츠, 20000);

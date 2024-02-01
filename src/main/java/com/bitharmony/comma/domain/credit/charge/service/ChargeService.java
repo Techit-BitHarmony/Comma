@@ -4,6 +4,7 @@ import com.bitharmony.comma.domain.credit.charge.entity.Charge;
 import com.bitharmony.comma.domain.credit.charge.repository.ChargeRepository;
 import com.bitharmony.comma.domain.credit.creditLog.entity.CreditLog;
 import com.bitharmony.comma.domain.credit.creditLog.service.CreditLogService;
+import com.bitharmony.comma.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,10 +34,10 @@ public class ChargeService {
         return this.chargeRepository.findAll();
     }
 
-    public Charge createCharge(long chargeAmount) {
-        Charge charge = new Charge().builder()
+    public Charge createCharge(Member member, long chargeAmount) {
+        Charge charge = Charge.builder()
+                .charger(member)
                 .chargeAmount(chargeAmount)
-                .createDate(LocalDateTime.now())
                 .build();
         this.chargeRepository.save(charge);
 
@@ -77,7 +78,6 @@ public class ChargeService {
 
         creditLogService.addCreditLog(CreditLog.EventType.충전__토스페이먼츠, amount);
     }
-
 
 
 }

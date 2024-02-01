@@ -3,6 +3,8 @@ package com.bitharmony.comma.domain.credit.charge.controller;
 import com.bitharmony.comma.domain.credit.charge.dto.*;
 import com.bitharmony.comma.domain.credit.charge.entity.Charge;
 import com.bitharmony.comma.domain.credit.charge.service.ChargeService;
+import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -24,27 +26,35 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/credit")
 public class ChargeController {
 
     private final ChargeService chargeService;
+    private final MemberService memberService;
 
     @Value("${custom.tossPayments.widget.secretKey}")
     private String tossPaymentsWidgetSecretKey;
 
     @GetMapping("/charges/{id}")
-    public ChargeGetResponse getCharge(@PathVariable long id) {
+    public ResponseEntity<ChargeGetResponse> getCharge(@PathVariable long id) {
+
+        // TODO : 멤버 가져오는 메서드 추가시 수정
+        // 임시로 user1 로 구현
+        Member member = memberService.getMemberByUsername("user1");
 
         Charge charge = chargeService.getChargeById(id);
 
-        return ChargeGetResponse.builder()
-                .chargeAmount(charge.getChargeAmount())
-                .createDate(charge.getCreateDate())
-                .payDate(charge.getPayDate())
-                .paymentKey(charge.getPaymentKey())
-                .build();
+        return new ResponseEntity<>(
+                ChargeGetResponse.builder()
+                        .username(member.getUsername())
+                        .chargeAmount(charge.getChargeAmount())
+                        .createDate(charge.getCreateDate())
+                        .payDate(charge.getPayDate())
+                        .paymentKey(charge.getPaymentKey())
+                        .build(),
+                HttpStatus.OK);
     }
 
     @GetMapping("/charges")
@@ -59,6 +69,25 @@ public class ChargeController {
         return new ResponseEntity<>(chargeGetListResponse, HttpStatus.OK);
     }
 
+    // Charge 객체 생성 & 저장 후 해당 객체를 Response에 실어 보냄
+    // Response의 chargeId 값으로 "/charge/pay/{id}"로 리다이렉트하여 결제 진행
+    @PostMapping("/charges")
+    public ResponseEntity<ChargeCreateResponse> createCharge(
+            @RequestBody ChargeCreateRequest chargeCreateRequest) {
+
+        // TODO : 멤버 가져오는 메서드 추가시 수정
+        // 임시로 user1 로 구현
+        Member member = memberService.getMemberByUsername("user1");
+        Charge charge = chargeService.createCharge(member, chargeCreateRequest.chargeAmount());
+
+        return new ResponseEntity<>(
+                ChargeCreateResponse.builder()
+                        .chargeId(charge.getId())
+                        .build(),
+                HttpStatus.CREATED
+        );
+    }
+
 
     // POST 발송을 위해 임의로 생성한 템플릿
     // 추후 프론트 구현시 삭제 예정
@@ -68,20 +97,6 @@ public class ChargeController {
         return "domain/credit/charge/charge_form";
     }
 
-
-    // Charge 객체 생성 & 저장 후 해당 객체를 Response에 실어 보냄
-    // Response의 chargeId 값으로 "/charge/pay/{id}"로 리다이렉트하여 결제 진행
-    @PostMapping("/charges")
-    public ResponseEntity<ChargeCreateResponse> createCharge(
-            @RequestBody ChargeCreateRequest chargeCreateRequest) {
-
-        Charge charge = chargeService.createCharge(chargeCreateRequest.chargeAmount());
-
-        return new ResponseEntity<>(
-                ChargeCreateResponse.builder().chargeId(charge.getId()).build(),
-                HttpStatus.CREATED
-        );
-    }
 
     @GetMapping("/charges/pay/{id}")
     public String payCharge(@PathVariable long id, Model model) {
@@ -97,9 +112,9 @@ public class ChargeController {
     }
 
     @GetMapping("/fail")
-    public String showFail(Model model, String failCode, String failMessage) {
-        model.addAttribute("code", failCode);
-        model.addAttribute("message", failMessage);
+    public String showFail(Model model, @RequestParam String code, @RequestParam String message) {
+        model.addAttribute("code", code);
+        model.addAttribute("message", message);
 
         return "domain/credit/charge/fail";
     }
