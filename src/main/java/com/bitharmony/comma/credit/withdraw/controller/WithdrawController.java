@@ -92,7 +92,7 @@ public class WithdrawController {
 
         WithdrawModifyResponse withdrawModifyResponse = WithdrawModifyResponse.builder()
                 .bankName(_withdraw.getBankName())
-                .bankAccountNo(_withdraw.getBankName())
+                .bankAccountNo(_withdraw.getBankAccountNo())
                 .withdrawAmount(_withdraw.getWithdrawAmount())
                 .build();
 

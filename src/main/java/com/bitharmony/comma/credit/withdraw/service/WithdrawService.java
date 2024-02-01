@@ -12,6 +12,7 @@ import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.repository.MemberRepository;
 import io.lettuce.core.AbstractRedisAsyncCommands;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -69,26 +70,35 @@ public class WithdrawService {
                 .applyDate(LocalDateTime.now())
                 .build();
 
-        Member _member = member.toBuilder()
-                .credit(member.getCredit() - withdrawAmount)
-                .build();
+        withdrawCredit(member, CreditLog.EventType.출금신청__통장입금, withdrawAmount);
 
-        memberRepository.save(_member);
         withdrawRepository.save(withdraw);
-        creditLogService.addCreditLog(member, CreditLog.EventType.출금신청__통장입금, -1 * withdrawAmount);
         return withdraw;
     }
 
-    public Withdraw modifyWithdraw(Withdraw withdraw, String bankName, String bankAccountNo, long withdrawAmount) {
+    public Withdraw modifyWithdraw(Withdraw withdraw, String bankName, String bankAccountNo, long newWithdrawAmount) {
 
         if (isHandled(withdraw)) {
             throw new HandledWithdrawException();
         }
 
+        if (newWithdrawAmount > withdraw.getWithdrawAmount()) {
+            long creditNeeded = newWithdrawAmount - withdraw.getWithdrawAmount();
+            if(!canApply(withdraw.getApplicant(), creditNeeded)){
+                throw new NotEnoughCreditException();
+            }
+            withdrawCredit(withdraw.getApplicant(), CreditLog.EventType.출금신청__수정, creditNeeded);
+        }
+
+        if (newWithdrawAmount < withdraw.getWithdrawAmount()){
+            long creditRebate = withdraw.getWithdrawAmount() - newWithdrawAmount;
+            rebateCredit(withdraw.getApplicant(), CreditLog.EventType.출금신청__수정, creditRebate);
+        }
+
         Withdraw _withdraw = withdraw.toBuilder()
                 .bankName(bankName)
                 .bankAccountNo(bankAccountNo)
-                .withdrawAmount(withdrawAmount)
+                .withdrawAmount(newWithdrawAmount)
                 .build();
 
         this.withdrawRepository.save(_withdraw);
@@ -105,6 +115,7 @@ public class WithdrawService {
         if(!withdraw.getApplicant().equals(member)){
             throw new NotAuthorizedException();
         }
+        rebateCredit(member, CreditLog.EventType.출금신청__취소,withdraw.getWithdrawAmount());
         withdrawRepository.deleteById(withdraw.getId());
     }
 
@@ -159,5 +170,23 @@ public class WithdrawService {
         return false;
     }
 
+    public void withdrawCredit(Member member, CreditLog.EventType eventType, long amount) {
+        Member _member = member.toBuilder()
+                .credit(member.getCredit() - amount)
+                .build();
+
+        memberRepository.save(_member);
+        creditLogService.addCreditLog(member, eventType, -1 * amount);
+    }
+
+    public void rebateCredit(Member member, CreditLog.EventType eventType, long amount) {
+        Member _member = member.toBuilder()
+                .credit(member.getCredit() + amount)
+                .build();
+
+        memberRepository.save(_member);
+        creditLogService.addCreditLog(member, eventType, amount);
+
+    }
 
 }
