@@ -1,7 +1,8 @@
 package com.bitharmony.comma.donation.service;
 
 import com.bitharmony.comma.donation.dto.DonationFindResponseDto;
-import com.bitharmony.comma.donation.dto.DonationRequestDto;
+import com.bitharmony.comma.donation.dto.DonationOnceRequestDto;
+import com.bitharmony.comma.donation.dto.DonationRegularRequsetDto;
 import com.bitharmony.comma.donation.dto.DonationResponse;
 import com.bitharmony.comma.donation.entity.Donation;
 import com.bitharmony.comma.donation.repository.DonationRepository;
@@ -19,7 +20,7 @@ public class DonationService {
     private final DonationRepository donationRespository;
     private final MemberService memberService;
 
-    public void donateOnceToArtist(DonationRequestDto dto) {
+    public void donateOnceToArtist(DonationOnceRequestDto dto) {
         Member patron = memberService.getMemberByUsername(dto.patronName());
         Member artist = memberService.getMemberByUsername(dto.artistName());
 
@@ -44,8 +45,24 @@ public class DonationService {
 
     }
 
-    public void donateRegularToArtist(){
+    public void donateRegularToArtist(DonationRegularRequsetDto dto){
+        Member patron = memberService.getMemberByUsername(dto.patronName());
+        Member artist = memberService.getMemberByUsername(dto.artistName());
 
+        //credit 부족한지 확인
+        checkCredit(patron, dto.amount());
+
+        //멤버 엔티티에서 credit 차감
+
+        //donation 엔티티 생성 및 저장
+        Donation donation = Donation.builder()
+                .artistUsername(artist.getUsername())
+                .patron(patron)
+                .amount(dto.amount())
+                .message("")
+                .anonymous(dto.anonymous())
+                .build();
+        donationRespository.save(donation);
     }
 
     private void checkCredit(Member patron, Integer amount) {

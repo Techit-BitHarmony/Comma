@@ -1,4 +1,4 @@
-package com.bitharmony.comma.donation.service;
+package com.bitharmony.comma.donation.scheduling;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +17,7 @@ public class DonationRegularJob implements Job {
         JobDataMap mergedJobDataMap = context.getMergedJobDataMap();
 
         // 정기 후원 로직 작성
+
 
     }
 }

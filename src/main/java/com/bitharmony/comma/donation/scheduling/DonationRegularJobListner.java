@@ -1,4 +1,4 @@
-package com.bitharmony.comma.donation.service;
+package com.bitharmony.comma.donation.scheduling;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
