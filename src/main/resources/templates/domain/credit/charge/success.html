@@ -23,14 +23,11 @@
             amount: amount,
         };
 
-        // const csrfTokenHeaderName = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
-        // const csrfTokenValue = document.querySelector("meta[name='_csrf']").getAttribute("content");
 
         const response = await fetch("/credit/confirm", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                // [csrfTokenHeaderName]: csrfTokenValue
             },
             body: JSON.stringify(requestData),
         });

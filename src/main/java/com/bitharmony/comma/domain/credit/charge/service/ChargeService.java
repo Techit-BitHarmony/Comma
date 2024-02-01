@@ -1,11 +1,13 @@
 package com.bitharmony.comma.domain.credit.charge.service;
 
+import com.bitharmony.comma.domain.credit.charge.dto.ChargeConfirmResponse;
 import com.bitharmony.comma.domain.credit.charge.entity.Charge;
 import com.bitharmony.comma.domain.credit.charge.repository.ChargeRepository;
 import com.bitharmony.comma.domain.credit.creditLog.entity.CreditLog;
 import com.bitharmony.comma.domain.credit.creditLog.service.CreditLogService;
 import com.bitharmony.comma.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,6 +20,9 @@ public class ChargeService {
 
     private final ChargeRepository chargeRepository;
     private final CreditLogService creditLogService;
+    private final TossPaymentsService tossPaymentsService;
+
+
 
 
     public Charge getChargeById(long id) {
@@ -46,7 +51,7 @@ public class ChargeService {
 
 
     // 주문서와 결제요청의 정보가 일치하는지 확인하는 메서드
-    public void checkValidity(String orderId, long amount) throws RuntimeException {
+    public void checkValidity(String orderId, long amount) {
         long id = Long.parseLong(orderId.split("__", 2)[1]);
         Charge charge = chargeRepository.findById(id).orElse(null);
 
@@ -79,5 +84,25 @@ public class ChargeService {
         creditLogService.addCreditLog(CreditLog.EventType.충전__토스페이먼츠, amount);
     }
 
+
+    public ChargeConfirmResponse confirmPayment(String orderId, String amount, String paymentKey) {
+
+        // orderId와 amount 맞는지 체크하는 메서드
+        checkValidity(orderId, Long.parseLong(amount));
+
+
+        try {
+            ChargeConfirmResponse chargeConfirmResponse =
+                    tossPaymentsService.requestApprovalAndGetResponse(orderId, amount, paymentKey);
+
+            if(chargeConfirmResponse.isApproved()) {
+                addCredit(orderId, Long.parseLong(amount), paymentKey);
+            }
+
+            return chargeConfirmResponse;
+        } catch (Exception e) {
+            throw new RuntimeException("결제 승인 실패");
+        }
+    }
 
 }
