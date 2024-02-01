@@ -34,13 +34,10 @@ public class ChargeController {
     private final ChargeService chargeService;
     private final MemberService memberService;
 
-
-
     @GetMapping("/charges/{id}")
     public ResponseEntity<ChargeGetResponse> getCharge(@PathVariable long id) {
 
-        // TODO : 멤버 가져오는 메서드 추가시 수정
-        // 임시로 user1 로 구현
+        // TODO : 멤버 가져오는 메서드 추가시 수정(임시로 user1 사용)
         Member member = memberService.getMemberByUsername("user1");
 
         Charge charge = chargeService.getChargeById(id);
@@ -87,7 +84,6 @@ public class ChargeController {
         );
     }
 
-
     // POST 발송을 위해 임의로 생성한 템플릿
     // 추후 프론트 구현시 삭제 예정
     // 금액(chargeAmount) 입력 후 '/charges'로 POST 발송
@@ -95,7 +91,6 @@ public class ChargeController {
     public String charge() {
         return "domain/credit/charge/charge_form";
     }
-
 
     @GetMapping("/charges/pay/{id}")
     public String payCharge(@PathVariable long id, Model model) {
@@ -125,7 +120,8 @@ public class ChargeController {
         String amount = chargeConfirmRequest.amount();
         String paymentKey = chargeConfirmRequest.paymentKey();
 
-        ChargeConfirmResponse chargeConfirmResponse = chargeService.confirmPayment(orderId, amount, paymentKey);
+        ChargeConfirmResponse chargeConfirmResponse =
+                chargeService.confirmPayment(orderId, amount, paymentKey);
 
         return new ResponseEntity<>(chargeConfirmResponse, HttpStatus.OK);
     }

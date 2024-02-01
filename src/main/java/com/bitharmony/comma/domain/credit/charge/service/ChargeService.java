@@ -5,9 +5,11 @@ import com.bitharmony.comma.domain.credit.charge.entity.Charge;
 import com.bitharmony.comma.domain.credit.charge.repository.ChargeRepository;
 import com.bitharmony.comma.domain.credit.creditLog.entity.CreditLog;
 import com.bitharmony.comma.domain.credit.creditLog.service.CreditLogService;
+import com.bitharmony.comma.global.exception.ChargeAmountNotMatchException;
+import com.bitharmony.comma.global.exception.ChargeNotFoundException;
+import com.bitharmony.comma.global.exception.PaymentFailureException;
 import com.bitharmony.comma.member.entity.Member;
 import lombok.RequiredArgsConstructor;
-import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,13 +25,11 @@ public class ChargeService {
     private final TossPaymentsService tossPaymentsService;
 
 
-
-
     public Charge getChargeById(long id) {
         Optional<Charge> charge = this.chargeRepository.findById(id);
 
         if (charge.isEmpty()) {
-            throw new RuntimeException("존재하지 않는 주문입니다.");
+            throw new ChargeNotFoundException();
         }
 
         return charge.get();
@@ -56,11 +56,11 @@ public class ChargeService {
         Charge charge = chargeRepository.findById(id).orElse(null);
 
         if (charge == null) {
-            throw new RuntimeException("존재하지 않는 주문입니다.");
+            throw new ChargeNotFoundException();
         }
 
         if (charge.getChargeAmount() != amount) {
-            throw new RuntimeException("금액이 일치하지 않습니다.");
+            throw new ChargeAmountNotMatchException();
         }
     }
 
@@ -71,7 +71,7 @@ public class ChargeService {
         Charge charge = chargeRepository.findById(id).orElse(null);
 
         if (charge == null) {
-            throw new RuntimeException("존재하지 않는 주문입니다.");
+            throw new ChargeNotFoundException();
         }
 
         Charge _charge = charge.toBuilder()
@@ -101,7 +101,7 @@ public class ChargeService {
 
             return chargeConfirmResponse;
         } catch (Exception e) {
-            throw new RuntimeException("결제 승인 실패");
+            throw new PaymentFailureException();
         }
     }
 
