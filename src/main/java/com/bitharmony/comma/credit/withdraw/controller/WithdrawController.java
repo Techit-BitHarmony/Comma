@@ -8,9 +8,11 @@ import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -22,6 +24,7 @@ public class WithdrawController {
     private final MemberService memberService;
 
     @GetMapping("/withdraws/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<WithdrawGetResponse> getWithdraw(@PathVariable long id) {
         Withdraw withdraw = withdrawService.getWithdraw(id);
 
@@ -38,10 +41,10 @@ public class WithdrawController {
     }
 
     @GetMapping("/withdraws/mine")
-    public ResponseEntity<WithdrawGetListResponse> getMyWithdrawList() {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<WithdrawGetListResponse> getMyWithdrawList(Principal principal) {
 
-        // TODO : 멤버 가져오는 메서드 추가시 수정 (임시로 user1 사용)
-        Member member = memberService.getMemberByUsername("user1");
+        Member member = memberService.getMemberByUsername(principal.getName());
         List<Withdraw> withdraws = withdrawService.getMyWithdrawList(member.getId());
 
         WithdrawGetListResponse withdrawGetListResponse =
@@ -56,11 +59,11 @@ public class WithdrawController {
     }
 
     @PostMapping("/withdraws")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<WithdrawApplyResponse> applyWithdraw(
-            @RequestBody WithdrawApplyRequest request) {
+            @RequestBody WithdrawApplyRequest request, Principal principal) {
 
-        // TODO : 멤버 가져오는 메서드 추가시 수정 (임시로 user1 사용)
-        Member member = memberService.getMemberByUsername("user1");
+        Member member = memberService.getMemberByUsername(principal.getName());
         Withdraw withdraw = withdrawService.applyWithdraw(
                 member, request.bankName(), request.bankAccountNo(), request.withdrawAmount());
 
@@ -73,11 +76,11 @@ public class WithdrawController {
     }
 
     @DeleteMapping("/withdraws/{withdrawId}")
-    public ResponseEntity<Void> cancelWithdraw(@PathVariable long withdrawId) {
-        Withdraw withdraw = withdrawService.getWithdraw(withdrawId);
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> cancelWithdraw(@PathVariable long withdrawId, Principal principal) {
 
-        // TODO : 멤버 가져오는 메서드 추가시 수정 (임시로 user1 사용)
-        Member member = memberService.getMemberByUsername("user1");
+        Withdraw withdraw = withdrawService.getWithdraw(withdrawId);
+        Member member = memberService.getMemberByUsername(principal.getName());
 
         withdrawService.delete(member, withdraw);
 
@@ -85,8 +88,10 @@ public class WithdrawController {
     }
 
     @PutMapping("/withdraws/{withdrawId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<WithdrawModifyResponse> modifyWithdraw(
-            @PathVariable long withdrawId, @RequestBody WithdrawModifyRequest request){
+            @PathVariable long withdrawId, @RequestBody WithdrawModifyRequest request
+    ){
         Withdraw withdraw = withdrawService.getWithdraw(withdrawId);
         Withdraw _withdraw = withdrawService.modifyWithdraw(withdraw, request.bankName(), request.bankAccountNo(), request.withdrawAmount());
 

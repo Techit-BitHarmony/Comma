@@ -8,10 +8,12 @@ import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -23,6 +25,7 @@ public class ChargeController {
     private final MemberService memberService;
 
     @GetMapping("/charges/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ChargeGetResponse> getCharge(@PathVariable long id) {
 
         Charge charge = chargeService.getChargeById(id);
@@ -39,9 +42,10 @@ public class ChargeController {
     }
 
     @GetMapping("/charges/mine")
-    public ResponseEntity<ChargeGetListResponse> getMyChargeList() {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ChargeGetListResponse> getMyChargeList(Principal principal) {
 
-        Member member = memberService.getMemberByUsername("user1");
+        Member member = memberService.getMemberByUsername(principal.getName());
         List<Charge> charges = chargeService.getChargeListByMemberId(member.getId());
 
         ChargeGetListResponse chargeGetListResponse = ChargeGetListResponse.builder()
@@ -52,6 +56,7 @@ public class ChargeController {
     }
 
     @GetMapping("/charges")
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ChargeGetListResponse> getAllChargeList() {
 
         List<Charge> charges = chargeService.getChargeList();
@@ -66,11 +71,12 @@ public class ChargeController {
     // Charge 객체 생성 & 저장 후 해당 객체를 Response에 실어 보냄
     // Response의 chargeId 값으로 "/charge/pay/{id}"로 리다이렉트하여 결제 진행
     @PostMapping("/charges")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ChargeCreateResponse> createCharge(
-            @RequestBody ChargeCreateRequest chargeCreateRequest) {
+            @RequestBody ChargeCreateRequest chargeCreateRequest,
+            Principal principal) {
 
-        // TODO : 멤버 가져오는 메서드 추가시 수정 (임시로 user1 사용)
-        Member member = memberService.getMemberByUsername("user1");
+        Member member = memberService.getMemberByUsername(principal.getName());
         Charge charge = chargeService.createCharge(member, chargeCreateRequest.chargeAmount());
 
         return new ResponseEntity<>(
