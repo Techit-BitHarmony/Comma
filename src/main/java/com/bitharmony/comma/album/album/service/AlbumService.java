@@ -1,5 +1,6 @@
 package com.bitharmony.comma.album.album.service;
 
+import java.security.Principal;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -92,7 +93,9 @@ public class AlbumService {
 		return ncpImageUtil.getEndPoint() + "/" + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "");
 	}
 
-	public boolean canRelease(String name, MultipartFile musicFile, MultipartFile musicImageFile) {
+	public boolean canRelease(String name, MultipartFile musicFile, MultipartFile musicImageFile, Principal principal) {
+		if(principal == null) return false;
+
 		Optional<MultipartFile> audioFile = fileService.checkFileByType(musicFile, FileType.AUDIO);
 		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
 
@@ -104,11 +107,13 @@ public class AlbumService {
 		return true;
 	}
 
-	public boolean canEdit(Album album) {
-		return album != null;
+	public boolean canEdit(Album album, Principal principal) {
+		if(!album.getMember().getUsername().equals(principal.getName())) return false;
+		return true;
 	}
 
-	public boolean canDelete(Album album) {
-		return album != null;
+	public boolean canDelete(Album album, Principal principal) {
+		if(!album.getMember().getUsername().equals(principal.getName())) return false;
+		return true;
 	}
 }

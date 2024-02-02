@@ -1,7 +1,10 @@
 package com.bitharmony.comma.album.album.controller;
 
+import java.security.Principal;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +23,8 @@ import com.bitharmony.comma.album.album.entity.AlbumLike;
 import com.bitharmony.comma.album.album.service.AlbumLikeService;
 import com.bitharmony.comma.album.album.service.AlbumService;
 import com.bitharmony.comma.global.exception.AlbumFieldException;
+import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.service.MemberService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +36,7 @@ public class AlbumController {
 
 	private final AlbumService albumService;
 	private final AlbumLikeService albumLikeService;
+	private final MemberService memberService;
 
 	@GetMapping("/release")
 	public String showAlbumForm() {
@@ -38,11 +44,13 @@ public class AlbumController {
 	}
 
 	@PostMapping("/release")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<AlbumResponse> releaseAlbum(@Valid AlbumCreateRequest request,
 		@RequestParam("musicFile") MultipartFile musicFile,
-		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile) {
+		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile,
+		Principal principal) {
 
-		if (!albumService.canRelease(request.albumname(), musicFile, musicImageFile)) {
+		if (!albumService.canRelease(request.albumname(), musicFile, musicImageFile, principal)) {
 			throw new AlbumFieldException("앨범을 등록할 수 없습니다.");
 		}
 
@@ -58,12 +66,14 @@ public class AlbumController {
 	}
 
 	@PutMapping("/{id}")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<AlbumResponse> editAlbum(@PathVariable long id, @Valid AlbumEditRequest request,
 		@RequestParam(value = "musicFile", required = false) MultipartFile musicFile,
-		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile) {
+		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile,
+		Principal principal) {
 		Album album = albumService.getAlbumById(id);
 
-		if (!albumService.canEdit(album)) {
+		if (!albumService.canEdit(album, principal)) {
 			throw new AlbumFieldException("앨범을 수정할 수 없습니다.");
 		}
 
@@ -72,19 +82,44 @@ public class AlbumController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteAlbum(@PathVariable long id) {
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<Void> deleteAlbum(@PathVariable long id, Principal principal) {
 		Album album = albumService.getAlbumById(id);
+
+		if (!albumService.canDelete(album, principal)) {
+			throw new AlbumFieldException("앨범을 삭제할 수 없습니다.");
+		}
 
 		albumService.delete(album);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@PostMapping(value = "/{albumId}/like")
-	public ResponseEntity<AlbumLike> addAlbumLike(@PathVariable long albumId, @RequestParam Long memberId) {
-		//TODO: 여기에 엔티티 가져오는거 추가
-		AlbumLike albumLike = albumLikeService.addAlbumLike(albumId, memberId);
-		//TODO: 앨범으로 리다이렉트
-		return ResponseEntity.ok(albumLike);
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<AlbumLike> like(@PathVariable long albumId, Principal principal) {
+		Member member = memberService.getMemberByUsername(principal.getName());
+		Album album = albumService.getAlbumById(albumId);
+
+		if (!albumLikeService.canLike(member, album)) {
+			throw new AlbumFieldException("이미 좋아요를 누르셨습니다.");
+		}
+
+		albumLikeService.like(member,album);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/{albumId}/cancelLike")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<AlbumLike> cancelLike(@PathVariable long albumId, Principal principal) {
+		Member member = memberService.getMemberByUsername(principal.getName());
+		Album album = albumService.getAlbumById(albumId);
+
+		if (!albumLikeService.canCancelLike(member, album)) {
+			throw new AlbumFieldException("좋아요를 누르지 않으셨습니다.");
+		}
+
+		albumLikeService.cancelLike(member,album);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	private AlbumResponse albumToResponseDto(Album album) {

@@ -11,4 +11,6 @@ import com.bitharmony.comma.member.entity.Member;
 
 public interface AlbumLikeRepository extends JpaRepository<AlbumLike, AlbumLikeId> {
 	Optional<AlbumLike> findByAlbumAndMember(Album album, Member member);
+
+	boolean existsByMemberAndAlbum(Member actor, Album album);
 }

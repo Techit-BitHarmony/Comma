@@ -1,5 +1,8 @@
 package com.bitharmony.comma.album.album.entity;
 
+import static jakarta.persistence.CascadeType.*;
+import static lombok.AccessLevel.*;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,6 +24,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Builder(toBuilder = true)
@@ -62,10 +66,15 @@ public class Album {
 	@Column(nullable = false, columnDefinition = "int default 0")
 	private int price;
 
-	@OneToMany(mappedBy = "album", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "id.album", cascade = ALL, orphanRemoval = true)
+	@Builder.Default
 	private Set<AlbumLike> albumLikes = new HashSet<>();
 
-	@OneToMany(mappedBy = "album", fetch = FetchType.LAZY)
+	@Setter(PROTECTED)
+	private long albumLikesCount;
+
+	@OneToMany(mappedBy = "album", cascade = ALL, orphanRemoval = true)
+	@Builder.Default
 	private Set<StreamingCount> streamingCounts = new HashSet<>();
 
 	public void update(AlbumEditRequest request) {
@@ -75,5 +84,44 @@ public class Album {
 		this.licenseDescription = request.licenseDescription();
 		this.permit = request.permit();
 		this.price = request.price();
+	}
+
+	public void increaseLikesCount() {
+		albumLikesCount++;
+	}
+
+	private void decreaseLikesCount() {
+		albumLikesCount--;
+	}
+
+	public void addLike(Member member) {
+		boolean added = albumLikes.add(AlbumLike.builder()
+			.album(this)
+			.member(member)
+			.build());
+
+		if (added) increaseLikesCount();
+	}
+
+	public void deleteLike(Member member) {
+		boolean removed = albumLikes.remove(
+			AlbumLike.builder()
+				.album(this)
+				.member(member)
+				.build()
+		);
+
+		if (removed) {
+			decreaseLikesCount();
+		}
+	}
+
+	public boolean hasLike(Member actor) {
+		return albumLikes.contains(
+			AlbumLike.builder()
+				.album(this)
+				.member(actor)
+				.build()
+		);
 	}
 }
