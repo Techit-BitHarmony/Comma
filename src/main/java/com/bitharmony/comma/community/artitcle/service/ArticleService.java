@@ -1,5 +1,6 @@
 package com.bitharmony.comma.community.artitcle.service;
 
+import com.bitharmony.comma.community.artitcle.dto.ArticleModifyRequest;
 import com.bitharmony.comma.community.artitcle.entity.Article;
 import com.bitharmony.comma.community.artitcle.repository.ArticleRepository;
 import com.bitharmony.comma.global.exception.ArticleNotFoundException;
@@ -8,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -37,5 +40,24 @@ public class ArticleService {
         articleRepository.save(article);
 
         return article;
+    }
+
+    public List<Article> getArticleByMemberId(Long id) {
+        return articleRepository.findByWriterId(id);
+    }
+
+    public void modifyArticle(Article article, ArticleModifyRequest request) {
+        Article _article = article.toBuilder()
+                .category(request.category())
+                .title(request.title())
+                .content(request.content())
+                .modifyDate(LocalDateTime.now())
+                .build();
+
+        articleRepository.save(_article);
+    }
+
+    public void deleteArticle(long id) {
+        articleRepository.deleteById(id);
     }
 }
