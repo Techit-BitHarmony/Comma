@@ -34,8 +34,6 @@ logging:
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
 custom:
-  dev-mysql-username: ON_SECRET
-  dev-mysql-password: ON_SECRET
   tossPayments:
     widget:
       clientKey: test_ck_5OWRapdA8dmGZpoK9jpA3o1zEqZK
