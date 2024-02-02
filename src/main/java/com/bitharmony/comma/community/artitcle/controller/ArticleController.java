@@ -30,7 +30,6 @@ public class ArticleController {
 
         return GlobalResponse.of(
                 "200",
-                "성공",
                 ArticleGetResponse.builder()
                         .username(article.getWriter().getUsername())
                         .category(article.getCategory())
@@ -51,7 +50,6 @@ public class ArticleController {
 
         return GlobalResponse.of(
                 "200",
-                "글 불러오기 성공",
                 ArticleGetMyListResponse.builder()
                         .myList(articles.stream()
                                 .map(ArticleDto::new)
@@ -70,7 +68,6 @@ public class ArticleController {
 
         return GlobalResponse.of(
                 "200",
-                "글 작성 성공",
                 ArticleCreateResponse.builder()
                         .id(article.getId())
                         .build()
@@ -92,7 +89,6 @@ public class ArticleController {
 
         return GlobalResponse.of(
                 "200",
-                "글 수정 성공",
                 ArticleModifyResponse.builder()
                         .id(article.getId())
                         .build()
@@ -112,8 +108,7 @@ public class ArticleController {
         articleService.deleteArticle(id);
 
         return GlobalResponse.of(
-                "204",
-                "글 삭제 성공"
+                "204"
         );
     }
 
