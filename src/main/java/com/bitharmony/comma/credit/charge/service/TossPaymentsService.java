@@ -21,7 +21,6 @@ public class TossPaymentsService {
     private String tossPaymentsWidgetSecretKey;
     @Value("${custom.tossPayments.confirm.url}")
     private String TOSS_CONFIRM_URL;
-    private JSONObject paymentStatement;
 
     public ChargeConfirmResponse requestApprovalAndGetResponse(String orderId, String amount, String paymentKey) throws Exception {
 
@@ -30,12 +29,7 @@ public class TossPaymentsService {
 
         sendPaymentInfo(connection, paymentInfo);
 
-        boolean isSuccess = getPaymentResult(connection);
-
-        return ChargeConfirmResponse.builder()
-                .paymentStatement(paymentStatement)
-                .isApproved(isSuccess)
-                .build();
+        return getPaymentResult(connection);
     }
 
     public HttpURLConnection makeAndSetConnetion() throws Exception{
@@ -73,7 +67,7 @@ public class TossPaymentsService {
         }
     }
 
-    private boolean getPaymentResult(HttpURLConnection connection) throws Exception {
+    private ChargeConfirmResponse getPaymentResult(HttpURLConnection connection) throws Exception {
         int code = connection.getResponseCode();
         boolean isSuccess = code == 200;
 
@@ -82,9 +76,12 @@ public class TossPaymentsService {
         JSONParser parser = new JSONParser();
 
         try (Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8)) {
-            paymentStatement = (JSONObject) parser.parse(reader);
-        }
+            JSONObject paymentStatement = (JSONObject) parser.parse(reader);
 
-        return isSuccess;
+            return ChargeConfirmResponse.builder()
+                    .paymentStatement(paymentStatement)
+                    .isApproved(isSuccess)
+                    .build();
+        }
     }
 }
