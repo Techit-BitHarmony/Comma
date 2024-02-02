@@ -33,13 +33,13 @@ public class AlbumLikeService {
 		if (album == null) return false;
 
 		// 이미 앨범에 있는가?
-		return !albumLikeRepository.existsByMemberAndAlbum(member, album);
+		return !albumLikeRepository.existsByIdMemberAndIdAlbum(member, album);
 	}
 
 	public Boolean canCancelLike(Member member, Album album) {
 		if (member == null) return false;
 		if (album == null) return false;
 		// 이미 앨범에 있는가?
-		return albumLikeRepository.existsByMemberAndAlbum(member, album);
+		return albumLikeRepository.existsByIdMemberAndIdAlbum(member, album);
 	}
 }
