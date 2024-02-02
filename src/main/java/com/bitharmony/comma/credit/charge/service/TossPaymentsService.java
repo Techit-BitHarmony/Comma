@@ -26,17 +26,11 @@ public class TossPaymentsService {
     public ChargeConfirmResponse requestApprovalAndGetResponse(String orderId, String amount, String paymentKey) throws Exception {
 
         JSONObject paymentInfo = createPaymentInfo(orderId, amount, paymentKey);
-
-        URL url = new URL(TOSS_CONFIRM_URL);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setDoOutput(true);
-        setRequestHeaders(connection);
+        HttpURLConnection connection = makeAndSetConnetion();
 
         sendPaymentInfo(connection, paymentInfo);
 
         boolean isSuccess = getPaymentResult(connection);
-
 
         return ChargeConfirmResponse.builder()
                 .paymentStatement(paymentStatement)
@@ -44,6 +38,16 @@ public class TossPaymentsService {
                 .build();
     }
 
+    public HttpURLConnection makeAndSetConnetion() throws Exception{
+        URL url = new URL(TOSS_CONFIRM_URL);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+        setRequestHeaders(connection);
+
+        return connection;
+    }
 
     private JSONObject createPaymentInfo(String orderId, String amount, String paymentKey){
         JSONObject paymentInfo = new JSONObject();
