@@ -36,19 +36,6 @@ public class InitData {
             @SneakyThrows
             public void run(ApplicationArguments args) {
 
-                if(chargeRepository.count() > 0) { return; }
-
-
-                memberService.join("user1", "1234", "user1@user.com", "nickname1");
-                memberService.join("user2", "1234", "user2@user.com", "nickname2");
-                memberService.join("user3", "1234", "user3@user.com", "nickname3");
-
-                Member member = memberService.getMemberByUsername("user1");
-                chargeService.createCharge(member, 10000);
-                chargeService.createCharge(member, 20000);
-                chargeService.createCharge(member, 30000);
-                chargeService.createCharge(member, 40000);
-
 
             }
         };
