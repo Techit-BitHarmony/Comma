@@ -1,5 +1,6 @@
 package com.bitharmony.comma.member.redis.Controller;
 
+import com.bitharmony.comma.global.response.GlobalResponse;
 import com.bitharmony.comma.member.redis.dto.JwtRegenerateRequest;
 import com.bitharmony.comma.member.redis.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/reissue")
-    public ResponseEntity<?> reissue(@RequestBody JwtRegenerateRequest jwtRegenerateRequest) {
+    public GlobalResponse reissue(@RequestBody JwtRegenerateRequest jwtRegenerateRequest) {
         log.info("refreshToken = {}", jwtRegenerateRequest.refreshToken());
-        return ResponseEntity.status(HttpStatus.OK).body(authService.reissue(jwtRegenerateRequest));
+        return GlobalResponse.of("200", authService.reissue(jwtRegenerateRequest));
     }
 }

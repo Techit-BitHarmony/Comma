@@ -2,14 +2,11 @@ package com.bitharmony.comma.member.controller;
 
 import com.bitharmony.comma.global.response.GlobalResponse;
 import com.bitharmony.comma.member.dto.MemberJoinRequest;
-import com.bitharmony.comma.member.dto.MemberJoinResponse;
 import com.bitharmony.comma.member.dto.MemberLoginRequest;
 import com.bitharmony.comma.member.dto.MemberReturnResponse;
 import com.bitharmony.comma.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,8 +24,8 @@ public class MemberController {
      * 요청마다 헤더로 포함해서 서버로 전송해야한다.
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid MemberLoginRequest memberLoginRequest) {
-        return ResponseEntity.status(HttpStatus.OK).body(
+    public GlobalResponse login(@RequestBody @Valid MemberLoginRequest memberLoginRequest) {
+        return GlobalResponse.of("200",
                 memberService.login(memberLoginRequest.username(), memberLoginRequest.password()));
     }
 
@@ -37,28 +34,29 @@ public class MemberController {
      */
 
     @PostMapping("/join")
-    public ResponseEntity<?> join(@RequestBody @Valid MemberJoinRequest memberJoinRequest) {
+    public GlobalResponse join(@RequestBody @Valid MemberJoinRequest memberJoinRequest) {
 
-        MemberJoinResponse joinMember = memberService.join(
+        memberService.join(
                 memberJoinRequest.username(), memberJoinRequest.password(),
                 memberJoinRequest.email(), memberJoinRequest.nickname());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(joinMember);
+        return GlobalResponse.of("201");
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
+    public GlobalResponse logout() {
         memberService.logout();
-        return ResponseEntity.ok("logout complete");
+        return GlobalResponse.of("200");
     }
 
-    // TODO : /PUT :/member/modify
-    // TODO : /GET :/member/profiel
+    // TODO : /GET :/member/profile
     @GetMapping("/profile")
     public GlobalResponse profile() {
         MemberReturnResponse response = memberService.getProfile();
         return GlobalResponse.of("200", response);
     }
+
+    // TODO : /PUT :/member/modify
 
     //TODO : 삭제예정(임시 테스트용)
     @GetMapping("/api/1")

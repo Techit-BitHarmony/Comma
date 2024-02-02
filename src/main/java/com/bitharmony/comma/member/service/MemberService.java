@@ -5,7 +5,6 @@ import com.bitharmony.comma.global.exception.MemberNotFoundException;
 import com.bitharmony.comma.global.security.SecurityUser;
 import com.bitharmony.comma.global.util.JwtUtil;
 import com.bitharmony.comma.member.dto.JwtCreateRequest;
-import com.bitharmony.comma.member.dto.MemberJoinResponse;
 import com.bitharmony.comma.member.dto.MemberLoginResponse;
 import com.bitharmony.comma.member.dto.MemberReturnResponse;
 import com.bitharmony.comma.member.entity.Member;
@@ -60,7 +59,7 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberJoinResponse join(String username, String password, String email, String nickname) {
+    public void join(String username, String password, String email, String nickname) {
         if (memberRepository.findByUsername(username).isPresent()) {
             throw new MemberDuplicateException("이미 존재하는 아이디입니다.");
         }
@@ -77,12 +76,6 @@ public class MemberService {
                 .build();
 
         memberRepository.save(member);
-
-        MemberJoinResponse response = MemberJoinResponse.builder()
-                .message("회원가입이 완료되었습니다.")
-                .build();
-
-        return response;
     }
 
     public Member getMemberByUsername(String username) {
@@ -97,6 +90,7 @@ public class MemberService {
 
         SecurityUser loginedMember = getUser();
         Member findMember = getMemberByUsername(loginedMember.getUsername());
+        
         MemberReturnResponse response = MemberReturnResponse.builder()
                 .username(findMember.getUsername())
                 .Email(findMember.getEmail())
