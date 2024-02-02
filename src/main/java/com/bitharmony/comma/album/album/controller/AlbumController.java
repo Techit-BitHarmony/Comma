@@ -51,7 +51,7 @@ public class AlbumController {
 		Principal principal) {
 
 		if (!albumService.canRelease(request.albumname(), musicFile, musicImageFile, principal)) {
-			throw new AlbumFieldException("앨범을 등록할 수 없습니다.");
+			throw new AlbumFieldException();
 		}
 
 		Album album = albumService.release(request, musicFile, musicImageFile);
@@ -74,7 +74,7 @@ public class AlbumController {
 		Album album = albumService.getAlbumById(id);
 
 		if (!albumService.canEdit(album, principal)) {
-			throw new AlbumFieldException("앨범을 수정할 수 없습니다.");
+			throw new AlbumFieldException();
 		}
 
 		Album editedAlbum = albumService.edit(request, album, musicFile, musicImageFile);
@@ -86,8 +86,9 @@ public class AlbumController {
 	public ResponseEntity<Void> deleteAlbum(@PathVariable long id, Principal principal) {
 		Album album = albumService.getAlbumById(id);
 
+		//필드가 아니라 권한이 좋은가..?
 		if (!albumService.canDelete(album, principal)) {
-			throw new AlbumFieldException("앨범을 삭제할 수 없습니다.");
+			throw new AlbumFieldException();
 		}
 
 		albumService.delete(album);
@@ -101,7 +102,7 @@ public class AlbumController {
 		Album album = albumService.getAlbumById(albumId);
 
 		if (!albumLikeService.canLike(member, album)) {
-			throw new AlbumFieldException("이미 좋아요를 누르셨습니다.");
+			throw new AlbumFieldException();
 		}
 
 		albumLikeService.like(member,album);
@@ -115,7 +116,7 @@ public class AlbumController {
 		Album album = albumService.getAlbumById(albumId);
 
 		if (!albumLikeService.canCancelLike(member, album)) {
-			throw new AlbumFieldException("좋아요를 누르지 않으셨습니다.");
+			throw new AlbumFieldException();
 		}
 
 		albumLikeService.cancelLike(member,album);

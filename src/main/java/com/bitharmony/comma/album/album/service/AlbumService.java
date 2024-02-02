@@ -70,7 +70,7 @@ public class AlbumService {
 	}
 
 	public Album getAlbumById(long id) {
-		return albumRepository.findById(id).orElseThrow(() -> new AlbumNotFoundException("앨범을 찾을 수 없습니다."));
+		return albumRepository.findById(id).orElseThrow(AlbumNotFoundException::new);
 	}
 
 	/**
@@ -118,6 +118,6 @@ public class AlbumService {
 	}
 
 	public Album getAlbumByFilePath(String filePath) {
-		return albumRepository.findByFilePath(filePath).orElseThrow(() -> new AlbumNotFoundException("앨범을 찾을 수 없습니다."));
+		return albumRepository.findByFilePath(filePath).orElseThrow(AlbumNotFoundException::new);
 	}
 }

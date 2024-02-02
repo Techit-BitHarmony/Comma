@@ -54,7 +54,7 @@ public class FileService {
 			uploadFileUrl = bucketName + "/" + keyName;
 
 		} catch (IOException e) {
-			throw new AlbumFileException("파일 업로드에 실패했습니다.");
+			throw new AlbumFileException();
 		}
 
 		return FileResponse.builder()
