@@ -5,6 +5,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -13,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Service
+@Transactional(readOnly = true)
 public class TossPaymentsService {
 
     @Value("${custom.tossPayments.widget.secretKey}")
@@ -29,8 +31,8 @@ public class TossPaymentsService {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
-
         setRequestHeaders(connection);
+
         sendPaymentInfo(connection, paymentInfo);
 
         boolean isSuccess = getPaymentResult(connection);

@@ -12,6 +12,7 @@ import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ChargeService {
 
     private final ChargeRepository chargeRepository;
@@ -41,6 +43,12 @@ public class ChargeService {
         return this.chargeRepository.findAll();
     }
 
+    public List<Charge> getChargeListByMemberId(Long id) {
+        return chargeRepository.findByChargerId(id);
+    }
+
+
+    @Transactional
     public Charge createCharge(Member member, long chargeAmount) {
         Charge charge = Charge.builder()
                 .charger(member)
@@ -52,7 +60,7 @@ public class ChargeService {
     }
 
 
-    // 주문서와 결제요청의 정보가 일치하는지 확인하는 메서드
+    // 주문서(Charge)와 결제요청의 정보가 일치하는지 확인하는 메서드
     public void checkValidity(String orderId, long amount) {
         long id = Long.parseLong(orderId.split("__", 2)[1]);
         Charge charge = chargeRepository.findById(id).orElse(null);
@@ -68,7 +76,8 @@ public class ChargeService {
 
 
     // 결제 성공시 멤버의 크레딧을 증가시키고 크레딧 로그를 남기는 메서드 (추후 멤버 기능 연동시 수정)
-    public void addCredit(String orderId, long amount, String paymentKey) {
+    @Transactional
+    public void approvePayment(String orderId, long amount, String paymentKey) {
         long id = Long.parseLong(orderId.split("__", 2)[1]);
         Charge charge = chargeRepository.findById(id).orElse(null);
 
@@ -81,14 +90,9 @@ public class ChargeService {
                 .paymentKey(paymentKey)
                 .build();
 
-        Member member = charge.getCharger().toBuilder()
-                .credit(charge.getCharger().getCredit() + amount)
-                .build();
-
-
         chargeRepository.save(_charge);
-        memberRepository.save(member);
-        creditLogService.addCreditLog(member, CreditLog.EventType.충전__토스페이먼츠, amount);
+        addCredit(_charge.getCharger(), amount);
+
     }
 
 
@@ -97,13 +101,12 @@ public class ChargeService {
         // orderId와 amount 맞는지 체크하는 메서드
         checkValidity(orderId, Long.parseLong(amount));
 
-
         try {
             ChargeConfirmResponse chargeConfirmResponse =
                     tossPaymentsService.requestApprovalAndGetResponse(orderId, amount, paymentKey);
 
             if(chargeConfirmResponse.isApproved()) {
-                addCredit(orderId, Long.parseLong(amount), paymentKey);
+                approvePayment(orderId, Long.parseLong(amount), paymentKey);
             }
 
             return chargeConfirmResponse;
@@ -112,7 +115,12 @@ public class ChargeService {
         }
     }
 
-    public List<Charge> getChargeListByMemberId(Long id) {
-        return chargeRepository.findByChargerId(id);
+    public void addCredit(Member member, long amount){
+        Member _member = member.toBuilder()
+                .credit(member.getCredit() + amount)
+                .build();
+
+        memberRepository.save(member);
+        creditLogService.addCreditLog(_member, CreditLog.EventType.충전__토스페이먼츠, amount);
     }
 }

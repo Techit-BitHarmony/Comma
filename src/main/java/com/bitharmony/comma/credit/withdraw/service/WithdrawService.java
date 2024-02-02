@@ -10,10 +10,9 @@ import com.bitharmony.comma.global.exception.WithdrawNotFoundException;
 import com.bitharmony.comma.global.exception.NotAuthorizedException;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.repository.MemberRepository;
-import io.lettuce.core.AbstractRedisAsyncCommands;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +20,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class WithdrawService {
 
     private final WithdrawRepository withdrawRepository;
@@ -45,7 +45,6 @@ public class WithdrawService {
         return withdraws;
     }
 
-
     public List<Withdraw> getAllWithdrawList() {
         List<Withdraw> withdraws = this.withdrawRepository.findAll();
 
@@ -56,6 +55,7 @@ public class WithdrawService {
         return withdraws;
     }
 
+    @Transactional
     public Withdraw applyWithdraw(Member member, String bankName, String bankAccountNo, long withdrawAmount) {
 
         if (!canApply(member, withdrawAmount)) {
@@ -76,24 +76,14 @@ public class WithdrawService {
         return withdraw;
     }
 
+    @Transactional
     public Withdraw modifyWithdraw(Withdraw withdraw, String bankName, String bankAccountNo, long newWithdrawAmount) {
 
-        if (isHandled(withdraw)) {
+        if (withdraw.isHandled()) {
             throw new HandledWithdrawException();
         }
 
-        if (newWithdrawAmount > withdraw.getWithdrawAmount()) {
-            long creditNeeded = newWithdrawAmount - withdraw.getWithdrawAmount();
-            if(!canApply(withdraw.getApplicant(), creditNeeded)){
-                throw new NotEnoughCreditException();
-            }
-            withdrawCredit(withdraw.getApplicant(), CreditLog.EventType.출금신청__수정, creditNeeded);
-        }
-
-        if (newWithdrawAmount < withdraw.getWithdrawAmount()){
-            long creditRebate = withdraw.getWithdrawAmount() - newWithdrawAmount;
-            rebateCredit(withdraw.getApplicant(), CreditLog.EventType.출금신청__수정, creditRebate);
-        }
+        checkCreditDifference(withdraw, newWithdrawAmount);
 
         Withdraw _withdraw = withdraw.toBuilder()
                 .bankName(bankName)
@@ -106,23 +96,26 @@ public class WithdrawService {
         return _withdraw;
     }
 
+    @Transactional
     public void delete(Member member, Withdraw withdraw) {
 
-        if(isHandled(withdraw)){
+        if(withdraw.isHandled()){
             throw new HandledWithdrawException();
         }
 
         if(!withdraw.getApplicant().equals(member)){
             throw new NotAuthorizedException();
         }
+
         rebateCredit(member, CreditLog.EventType.출금신청__취소,withdraw.getWithdrawAmount());
         withdrawRepository.deleteById(withdraw.getId());
     }
 
+    @Transactional
     public Withdraw doWithdraw(long id) {
         Withdraw withdraw = getWithdraw(id);
 
-        if (isHandled(withdraw)) {
+        if (withdraw.isHandled()) {
             throw new HandledWithdrawException();
         }
 
@@ -136,15 +129,16 @@ public class WithdrawService {
         return _withdraw;
     }
 
-    public Withdraw cancelWithdraw(long id) {
+    @Transactional
+    public Withdraw rejectWithdraw(long id) {
         Withdraw withdraw = getWithdraw(id);
 
-        if (isHandled(withdraw)) {
+        if (withdraw.isHandled()) {
             throw new HandledWithdrawException();
         }
 
         Withdraw _withdraw = withdraw.toBuilder()
-                .processResult("취소 - 계좌정보가 불일치")
+                .processResult("거절 - 계좌정보가 불일치")
                 .withdrawCancelDate(LocalDateTime.now())
                 .build();
 
@@ -157,19 +151,26 @@ public class WithdrawService {
         return applicant.getCredit() >= withdrawAmount;
     }
 
+    @Transactional
+    public void checkCreditDifference(Withdraw withdraw, long newWithdrawAmount) {
 
-    public boolean isHandled(Withdraw withdraw) {
+        if (newWithdrawAmount > withdraw.getWithdrawAmount()) {
+            long creditNeeded = newWithdrawAmount - withdraw.getWithdrawAmount();
 
-        if (withdraw.getWithdrawCancelDate() != null) {
-            return true;
+            if(!canApply(withdraw.getApplicant(), creditNeeded)){
+                throw new NotEnoughCreditException();
+            }
+
+            withdrawCredit(withdraw.getApplicant(), CreditLog.EventType.출금신청__수정, creditNeeded);
         }
-        if (withdraw.getWithdrawDoneDate() != null) {
-            return true;
-        }
 
-        return false;
+        if (newWithdrawAmount < withdraw.getWithdrawAmount()){
+            long creditRebate = withdraw.getWithdrawAmount() - newWithdrawAmount;
+            rebateCredit(withdraw.getApplicant(), CreditLog.EventType.출금신청__수정, creditRebate);
+        }
     }
 
+    @Transactional
     public void withdrawCredit(Member member, CreditLog.EventType eventType, long amount) {
         Member _member = member.toBuilder()
                 .credit(member.getCredit() - amount)
@@ -179,6 +180,7 @@ public class WithdrawService {
         creditLogService.addCreditLog(member, eventType, -1 * amount);
     }
 
+    @Transactional
     public void rebateCredit(Member member, CreditLog.EventType eventType, long amount) {
         Member _member = member.toBuilder()
                 .credit(member.getCredit() + amount)

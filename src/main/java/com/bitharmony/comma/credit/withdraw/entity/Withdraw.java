@@ -40,4 +40,14 @@ public class Withdraw {
     private LocalDateTime withdrawDoneDate;
 
     private String processResult;
+
+
+    public boolean isHandled() {
+
+        if (withdrawCancelDate != null || withdrawDoneDate != null) {
+            return true;
+        }
+
+        return false;
+    }
 }

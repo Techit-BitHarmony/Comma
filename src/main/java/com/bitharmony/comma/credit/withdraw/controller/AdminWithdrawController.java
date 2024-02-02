@@ -10,7 +10,6 @@ import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,7 +53,7 @@ public class AdminWithdrawController {
 
     @PutMapping("/withdraws/{id}/cancel")
     public ResponseEntity<WithdrawCancelResponse> cancelWithdraw(@PathVariable long id) {
-        Withdraw withdraw = withdrawService.cancelWithdraw(id);
+        Withdraw withdraw = withdrawService.rejectWithdraw(id);
 
         return new ResponseEntity<>(
                 WithdrawCancelResponse.builder()
