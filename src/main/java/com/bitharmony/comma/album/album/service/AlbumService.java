@@ -116,4 +116,8 @@ public class AlbumService {
 		if(!album.getMember().getUsername().equals(principal.getName())) return false;
 		return true;
 	}
+
+	public Album getAlbumByFilePath(String filePath) {
+		return albumRepository.findByFilePath(filePath).orElseThrow(() -> new AlbumNotFoundException("앨범을 찾을 수 없습니다."));
+	}
 }

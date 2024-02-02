@@ -1,25 +1,27 @@
 package com.bitharmony.comma.global.util;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.crypto.SecretKey;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+
 import com.bitharmony.comma.member.dto.JwtCreateRequest;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -72,12 +74,12 @@ public class JwtUtil {
                 .compact();
 
         // redis에 저장
-        redisTemplate.opsForValue().set(
-                jwtCreateRequest.username(),
-                refreshToken,
-                REFRESH_TOKEN_EXPIRATION_TIME,
-                TimeUnit.MILLISECONDS
-        );
+        // redisTemplate.opsForValue().set(
+        //         jwtCreateRequest.username(),
+        //         refreshToken,
+        //         REFRESH_TOKEN_EXPIRATION_TIME,
+        //         TimeUnit.MILLISECONDS
+        // );
 
         return refreshToken;
     }

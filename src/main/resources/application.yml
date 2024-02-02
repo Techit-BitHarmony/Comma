@@ -10,7 +10,7 @@ spring:
     sessions: STATELESS
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         default_batch_fetch_size: 100
@@ -29,3 +29,11 @@ custom:
     widget:
       clientKey: test_ck_5OWRapdA8dmGZpoK9jpA3o1zEqZK
       secretKey: ON_SECRET
+
+spring.jwt.secret : abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890
+
+spring.jwt.token.access-expiration-time: 60000
+spring.jwt.token.refresh-expiration-time: 604800000
+
+spring.data.redis.host : localhost
+spring.data.redis.port : 6379

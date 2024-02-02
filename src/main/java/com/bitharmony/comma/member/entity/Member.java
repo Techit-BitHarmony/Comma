@@ -1,14 +1,11 @@
 package com.bitharmony.comma.member.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,6 +34,6 @@ public class Member {
     @NotNull
     private String nickname;
 
-    private Integer creditId;
+    private long credit;
 
 }
