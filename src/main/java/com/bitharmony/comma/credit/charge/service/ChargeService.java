@@ -59,43 +59,8 @@ public class ChargeService {
         return charge;
     }
 
-
-    // 주문서(Charge)와 결제요청의 정보가 일치하는지 확인하는 메서드
-    public void checkValidity(String orderId, long amount) {
-        long id = Long.parseLong(orderId.split("__", 2)[1]);
-        Charge charge = chargeRepository.findById(id).orElse(null);
-
-        if (charge == null) {
-            throw new ChargeNotFoundException();
-        }
-
-        if (charge.getChargeAmount() != amount) {
-            throw new ChargeAmountNotMatchException();
-        }
-    }
-
-
-    // 결제 성공시 멤버의 크레딧을 증가시키고 크레딧 로그를 남기는 메서드 (추후 멤버 기능 연동시 수정)
-    @Transactional
-    public void approvePayment(String orderId, long amount, String paymentKey) {
-        long id = Long.parseLong(orderId.split("__", 2)[1]);
-        Charge charge = chargeRepository.findById(id).orElse(null);
-
-        if (charge == null) {
-            throw new ChargeNotFoundException();
-        }
-
-        Charge _charge = charge.toBuilder()
-                .payDate(LocalDateTime.now())
-                .paymentKey(paymentKey)
-                .build();
-
-        chargeRepository.save(_charge);
-        addCredit(_charge.getCharger(), amount);
-
-    }
-
-
+    // 1. 결제 요청 정보와 주문서 정보를 확인 후 카드사에 승인 요청
+    // 2. 승인이 된다면 주문서(Charge)에 PaymentKey와 PayDate 저장 후 Credit 부여
     public ChargeConfirmResponse confirmPayment(String orderId, String amount, String paymentKey) {
 
         // orderId와 amount 맞는지 체크하는 메서드
@@ -115,6 +80,43 @@ public class ChargeService {
         }
     }
 
+
+    // 주문서(Charge)와 결제요청의 정보가 일치하는지 확인하는 메서드
+    public void checkValidity(String orderId, long amount) {
+        long id = Long.parseLong(orderId.split("__", 2)[1]);
+        Charge charge = chargeRepository.findById(id).orElse(null);
+
+        if (charge == null) {
+            throw new ChargeNotFoundException();
+        }
+
+        if (charge.getChargeAmount() != amount) {
+            throw new ChargeAmountNotMatchException();
+        }
+    }
+
+
+    // 결제 성공시 Charge에 PayDate, PaymentKey 저장 후 Credit 부여
+    @Transactional
+    public void approvePayment(String orderId, long amount, String paymentKey) {
+        long id = Long.parseLong(orderId.split("__", 2)[1]);
+        Charge charge = chargeRepository.findById(id).orElse(null);
+
+        if (charge == null) {
+            throw new ChargeNotFoundException();
+        }
+
+        Charge _charge = charge.toBuilder()
+                .payDate(LocalDateTime.now())
+                .paymentKey(paymentKey)
+                .build();
+
+        chargeRepository.save(_charge);
+        addCredit(_charge.getCharger(), amount);
+
+    }
+
+    // Credit 부여 후 CreditLog 생성
     public void addCredit(Member member, long amount){
         Member _member = member.toBuilder()
                 .credit(member.getCredit() + amount)

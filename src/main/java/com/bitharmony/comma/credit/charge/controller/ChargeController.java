@@ -87,8 +87,7 @@ public class ChargeController {
         );
     }
 
-    // POST 발송을 위해 임의로 생성한 템플릿
-    // 추후 프론트 구현시 삭제 예정
+    // POST 발송을 위해 임의로 생성한 템플릿 (추후 프론트 구현시 삭제 예정)
     // 금액(chargeAmount) 입력 후 '/charges'로 POST 발송
     @GetMapping("/charge_form")
     public String charge() {
@@ -103,6 +102,7 @@ public class ChargeController {
         return "/domain/credit/charge/charge";
     }
 
+    // 결제 요청 정보와 서버에 저장된 주문서 정보가 일치하는 지 확인하는 메서드
     @PostMapping(value = "/confirm")
     public ResponseEntity<ChargeConfirmResponse> confirmPayment(@RequestBody ChargeConfirmRequest chargeConfirmRequest) {
 
@@ -116,11 +116,13 @@ public class ChargeController {
         return new ResponseEntity<>(chargeConfirmResponse, HttpStatus.OK);
     }
 
+    // 결제 성공했을 경우 리다이렉트 되는 페이지
     @GetMapping("/success")
     public String showSuccess() {
         return "domain/credit/charge/success";
     }
 
+    // 결제 실패했을 경우 리다이렉트 되는 페이지
     @GetMapping("/fail")
     public String showFail(Model model, @RequestParam String code, @RequestParam String message) {
         model.addAttribute("code", code);

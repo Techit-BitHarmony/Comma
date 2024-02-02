@@ -97,7 +97,7 @@ public class WithdrawService {
     }
 
     @Transactional
-    public void delete(Member member, Withdraw withdraw) {
+    public void cancelWithdraw(Member member, Withdraw withdraw) {
 
         if(withdraw.isHandled()){
             throw new HandledWithdrawException();
@@ -111,6 +111,7 @@ public class WithdrawService {
         withdrawRepository.deleteById(withdraw.getId());
     }
 
+    // 관리자가 출금 실행하는 메서드
     @Transactional
     public Withdraw doWithdraw(long id) {
         Withdraw withdraw = getWithdraw(id);
@@ -129,6 +130,7 @@ public class WithdrawService {
         return _withdraw;
     }
 
+    // 관리자가 출금 거절하는 메서드
     @Transactional
     public Withdraw rejectWithdraw(long id) {
         Withdraw withdraw = getWithdraw(id);
@@ -143,14 +145,17 @@ public class WithdrawService {
                 .build();
 
         withdrawRepository.save(_withdraw);
+        rebateCredit(withdraw.getApplicant(), CreditLog.EventType.출금신청__취소, withdraw.getWithdrawAmount());
 
         return _withdraw;
     }
 
+    // 사용자의 Credit이 출금 신청액보다 많은지 체크
     public boolean canApply(Member applicant, long withdrawAmount) {
         return applicant.getCredit() >= withdrawAmount;
     }
 
+    // 출금 신청을 수정하는 경우 수정된 금액과 기존 금액을 비교하여 환불, 추가 출금 하는 메서드
     @Transactional
     public void checkCreditDifference(Withdraw withdraw, long newWithdrawAmount) {
 
@@ -170,6 +175,7 @@ public class WithdrawService {
         }
     }
 
+    // 출금 신청시 Credit을 빼는 메서드
     @Transactional
     public void withdrawCredit(Member member, CreditLog.EventType eventType, long amount) {
         Member _member = member.toBuilder()
@@ -180,6 +186,7 @@ public class WithdrawService {
         creditLogService.addCreditLog(member, eventType, -1 * amount);
     }
 
+    // 출금 신청 수정, 출금 거절시 Credit을 돌려주는 메서드
     @Transactional
     public void rebateCredit(Member member, CreditLog.EventType eventType, long amount) {
         Member _member = member.toBuilder()

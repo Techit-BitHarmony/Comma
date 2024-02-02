@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -82,7 +81,7 @@ public class WithdrawController {
         Withdraw withdraw = withdrawService.getWithdraw(withdrawId);
         Member member = memberService.getMemberByUsername(principal.getName());
 
-        withdrawService.delete(member, withdraw);
+        withdrawService.cancelWithdraw(member, withdraw);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
