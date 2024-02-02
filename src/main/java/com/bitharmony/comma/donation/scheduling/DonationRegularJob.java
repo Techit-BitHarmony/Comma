@@ -1,6 +1,6 @@
 package com.bitharmony.comma.donation.scheduling;
 
-import com.bitharmony.comma.donation.dto.DonationRegularRequsetDto;
+import com.bitharmony.comma.donation.entity.DonationRegular;
 import com.bitharmony.comma.donation.service.DonationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ public class DonationRegularJob implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         JobDataMap mergedJobDataMap = context.getMergedJobDataMap();
-        DonationRegularRequsetDto dto = (DonationRegularRequsetDto) mergedJobDataMap.get("dto");
+        DonationRegular dto = (DonationRegular) mergedJobDataMap.get("donationRegular");
 
         // 정기 후원 실행
         donationService.donateRegularToArtist(dto);

@@ -2,9 +2,9 @@ package com.bitharmony.comma.donation.service;
 
 import com.bitharmony.comma.donation.dto.DonationFindResponseDto;
 import com.bitharmony.comma.donation.dto.DonationOnceRequestDto;
-import com.bitharmony.comma.donation.dto.DonationRegularRequsetDto;
 import com.bitharmony.comma.donation.dto.DonationResponse;
 import com.bitharmony.comma.donation.entity.Donation;
+import com.bitharmony.comma.donation.entity.DonationRegular;
 import com.bitharmony.comma.donation.repository.DonationRepository;
 import com.bitharmony.comma.global.exception.CreditShortageException;
 import com.bitharmony.comma.member.entity.Member;
@@ -47,25 +47,25 @@ public class DonationService {
 
     }
 
-    public void donateRegularToArtist(DonationRegularRequsetDto dto) {
-        Member patron = memberService.getMemberByUsername(dto.getPatronName());
-        Member artist = memberService.getMemberByUsername(dto.getArtistName());
+    public void donateRegularToArtist(DonationRegular donationRegular) {
+        Member patron = memberService.getMemberByUsername(donationRegular.getPatronName());
+        Member artist = memberService.getMemberByUsername(donationRegular.getArtistName());
 
         //credit 부족한지 확인
-        checkCredit(patron, dto.getAmount());
+        checkCredit(patron, donationRegular.getAmount());
 
         //donation 엔티티 생성 및 저장
         Donation donation = Donation.builder()
                 .artistUsername(artist.getUsername())
                 .patron(patron)
-                .amount(dto.getAmount())
+                .amount(donationRegular.getAmount())
                 .message("")
-                .anonymous(dto.isAnonymous())
+                .anonymous(donationRegular.isAnonymous())
                 .build();
         donationRespository.save(donation);
 
         //후원자의 크레딧을 아티스트에게 전달
-        countCredit(patron, artist, dto.getAmount());
+        countCredit(patron, artist, donationRegular.getAmount());
     }
 
     // donation에서 memberRepostiory에 접근 하는 방식이 옳은가?

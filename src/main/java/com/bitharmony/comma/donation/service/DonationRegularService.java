@@ -1,6 +1,5 @@
 package com.bitharmony.comma.donation.service;
 
-import com.bitharmony.comma.donation.dto.DonationRegularRequsetDto;
 import com.bitharmony.comma.donation.entity.DonationRegular;
 import com.bitharmony.comma.donation.scheduling.DonationRegularJobDetailService;
 import com.bitharmony.comma.donation.scheduling.DonationRegularTriggerService;

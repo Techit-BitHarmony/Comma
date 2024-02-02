@@ -1,6 +1,5 @@
 package com.bitharmony.comma.donation.scheduling;
 
-import com.bitharmony.comma.donation.dto.DonationRegularRequsetDto;
 import com.bitharmony.comma.donation.entity.DonationRegular;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
