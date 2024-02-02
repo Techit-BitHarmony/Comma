@@ -2,6 +2,7 @@ package com.bitharmony.comma.member.service;
 
 import com.bitharmony.comma.global.exception.MemberDuplicateException;
 import com.bitharmony.comma.global.exception.MemberNotFoundException;
+import com.bitharmony.comma.global.security.SecurityUser;
 import com.bitharmony.comma.global.util.JwtUtil;
 import com.bitharmony.comma.member.dto.JwtCreateRequest;
 import com.bitharmony.comma.member.dto.MemberJoinResponse;
@@ -9,6 +10,9 @@ import com.bitharmony.comma.member.dto.MemberLoginResponse;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public MemberLoginResponse login(String username, String password) {
         Member member = getMemberByUsername(username);
@@ -42,6 +48,14 @@ public class MemberService {
                 .build();
 
         return response;
+    }
+
+    @Transactional
+    public void logout() {
+        SecurityUser loginedMember = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (redisTemplate.opsForValue().get(loginedMember.getUsername()) != null) {
+            redisTemplate.delete(loginedMember.getUsername());
+        }
     }
 
     @Transactional
@@ -77,4 +91,5 @@ public class MemberService {
 
         return findMember;
     }
+
 }

@@ -42,12 +42,18 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(joinMember);
     }
 
+    @PostMapping("/member/logout")
+    public ResponseEntity<?> logout() {
+        memberService.logout();
+        return ResponseEntity.ok("logout complete");
+    }
+
+    // TODO : /PUT :/member/modify
+    // TODO : /GET :/member/mypage
+
+    //TODO : 삭제예정(임시 테스트용)
     @GetMapping("/api/1")
     public String get11() {
         return "example입니다.";
     }
-
-    // TODO : /POST :/member/logout
-    // TODO : /PUT :/member/modify
-    // TODO 토큰 재발급 ?
 }
