@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class TossPaymentsService {
 
     @Value("${custom.tossPayments.widget.secretKey}")

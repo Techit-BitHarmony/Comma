@@ -61,6 +61,7 @@ public class ChargeService {
 
     // 1. 결제 요청 정보와 주문서 정보를 확인 후 카드사에 승인 요청
     // 2. 승인이 된다면 주문서(Charge)에 PaymentKey와 PayDate 저장 후 Credit 부여
+    @Transactional
     public ChargeConfirmResponse confirmPayment(String orderId, String amount, String paymentKey) {
 
         // orderId와 amount 맞는지 체크하는 메서드
@@ -117,12 +118,13 @@ public class ChargeService {
     }
 
     // Credit 부여 후 CreditLog 생성
+    @Transactional
     public void addCredit(Member member, long amount){
         Member _member = member.toBuilder()
                 .credit(member.getCredit() + amount)
                 .build();
 
-        memberRepository.save(member);
+        memberRepository.save(_member);
         creditLogService.addCreditLog(_member, CreditLog.EventType.충전__토스페이먼츠, amount);
     }
 }
