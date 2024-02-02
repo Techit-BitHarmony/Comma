@@ -17,6 +17,15 @@ spring:
         format_sql: true
         highlight_sql: true
         use_sql_comments: true
+  jwt:
+    secret: abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890
+    token:
+      access-expiration-time: 60000
+      refresh-expiration-time: 604800000
+  data:
+    redis:
+      host: localhost
+      port: 6379
 logging:
   level:
     com.bitharmony.comma: DEBUG
@@ -25,6 +34,8 @@ logging:
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
 custom:
+  dev-mysql-username: ON_SECRET
+  dev-mysql-password: ON_SECRET
   tossPayments:
     widget:
       clientKey: test_ck_5OWRapdA8dmGZpoK9jpA3o1zEqZK
