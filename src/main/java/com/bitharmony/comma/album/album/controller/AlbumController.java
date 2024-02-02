@@ -2,8 +2,6 @@ package com.bitharmony.comma.album.album.controller;
 
 import java.security.Principal;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +17,10 @@ import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
 import com.bitharmony.comma.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.album.album.entity.Album;
-import com.bitharmony.comma.album.album.entity.AlbumLike;
 import com.bitharmony.comma.album.album.service.AlbumLikeService;
 import com.bitharmony.comma.album.album.service.AlbumService;
 import com.bitharmony.comma.global.exception.AlbumFieldException;
+import com.bitharmony.comma.global.response.GlobalResponse;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
 
@@ -45,7 +43,7 @@ public class AlbumController {
 
 	@PostMapping("/release")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<AlbumResponse> releaseAlbum(@Valid AlbumCreateRequest request,
+	public GlobalResponse releaseAlbum(@Valid AlbumCreateRequest request,
 		@RequestParam("musicFile") MultipartFile musicFile,
 		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile,
 		Principal principal) {
@@ -55,19 +53,19 @@ public class AlbumController {
 		}
 
 		Album album = albumService.release(request, musicFile, musicImageFile);
-		return new ResponseEntity<>(albumToResponseDto(album), HttpStatus.CREATED);
+		return GlobalResponse.of("200", albumToResponseDto(album));
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<AlbumResponse> getAlbum(@PathVariable long id) {
+	public GlobalResponse getAlbum(@PathVariable long id) {
 		Album album = albumService.getAlbumById(id);
 
-		return new ResponseEntity<>(albumToResponseDto(album), HttpStatus.OK);
+		return GlobalResponse.of("200", albumToResponseDto(album));
 	}
 
 	@PutMapping("/{id}")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<AlbumResponse> editAlbum(@PathVariable long id, @Valid AlbumEditRequest request,
+	public GlobalResponse editAlbum(@PathVariable long id, @Valid AlbumEditRequest request,
 		@RequestParam(value = "musicFile", required = false) MultipartFile musicFile,
 		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile,
 		Principal principal) {
@@ -78,12 +76,12 @@ public class AlbumController {
 		}
 
 		Album editedAlbum = albumService.edit(request, album, musicFile, musicImageFile);
-		return new ResponseEntity<>(albumToResponseDto(editedAlbum), HttpStatus.OK);
+		return GlobalResponse.of("200", albumToResponseDto(editedAlbum));
 	}
 
 	@DeleteMapping("/{id}")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<Void> deleteAlbum(@PathVariable long id, Principal principal) {
+	public GlobalResponse deleteAlbum(@PathVariable long id, Principal principal) {
 		Album album = albumService.getAlbumById(id);
 
 		//필드가 아니라 권한이 좋은가..?
@@ -92,12 +90,12 @@ public class AlbumController {
 		}
 
 		albumService.delete(album);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		return GlobalResponse.of("200");
 	}
 
 	@PostMapping(value = "/{albumId}/like")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<AlbumLike> like(@PathVariable long albumId, Principal principal) {
+	public GlobalResponse like(@PathVariable long albumId, Principal principal) {
 		Member member = memberService.getMemberByUsername(principal.getName());
 		Album album = albumService.getAlbumById(albumId);
 
@@ -106,12 +104,12 @@ public class AlbumController {
 		}
 
 		albumLikeService.like(member,album);
-		return new ResponseEntity<>(HttpStatus.OK);
+		return GlobalResponse.of("200");
 	}
 
 	@PostMapping(value = "/{albumId}/cancelLike")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<AlbumLike> cancelLike(@PathVariable long albumId, Principal principal) {
+	public GlobalResponse cancelLike(@PathVariable long albumId, Principal principal) {
 		Member member = memberService.getMemberByUsername(principal.getName());
 		Album album = albumService.getAlbumById(albumId);
 
@@ -120,12 +118,14 @@ public class AlbumController {
 		}
 
 		albumLikeService.cancelLike(member,album);
-		return new ResponseEntity<>(HttpStatus.OK);
+		return GlobalResponse.of("200");
 	}
 
 	private AlbumResponse albumToResponseDto(Album album) {
-		album = album.toBuilder().filePath(albumService.getAlbumFileUrl(album.getFilePath())).build();
-		album = album.toBuilder().imagePath(albumService.getAlbumImageUrl(album.getImagePath())).build();
+		album = album.toBuilder()
+			.filePath(albumService.getAlbumFileUrl(album.getFilePath()))
+			.imagePath(albumService.getAlbumImageUrl(album.getImagePath()))
+			.build();
 
 		return AlbumResponse.builder()
 			.albumname(album.getAlbumname())
