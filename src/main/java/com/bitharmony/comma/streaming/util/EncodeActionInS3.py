@@ -53,7 +53,7 @@ def main(args):
             'notification_url': notification_url,
             'output': {
                 'bucketName': input_bucket_name,
-                'filePath': 'music/output/',
+                'filePath': '/music/',
                 'accessControl': 'PUBLIC_READ',
             }
         }))
