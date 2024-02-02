@@ -7,6 +7,7 @@ import com.bitharmony.comma.global.util.JwtUtil;
 import com.bitharmony.comma.member.dto.JwtCreateRequest;
 import com.bitharmony.comma.member.dto.MemberJoinResponse;
 import com.bitharmony.comma.member.dto.MemberLoginResponse;
+import com.bitharmony.comma.member.dto.MemberReturnResponse;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,7 @@ public class MemberService {
 
     @Transactional
     public void logout() {
-        SecurityUser loginedMember = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        SecurityUser loginedMember = getUser();
         if (redisTemplate.opsForValue().get(loginedMember.getUsername()) != null) {
             redisTemplate.delete(loginedMember.getUsername());
         }
@@ -92,4 +93,20 @@ public class MemberService {
         return findMember;
     }
 
+    public MemberReturnResponse getProfile() {
+
+        SecurityUser loginedMember = getUser();
+        Member findMember = getMemberByUsername(loginedMember.getUsername());
+        MemberReturnResponse response = MemberReturnResponse.builder()
+                .username(findMember.getUsername())
+                .Email(findMember.getEmail())
+                .nickname(findMember.getNickname())
+                .build();
+
+        return response;
+    }
+
+    private SecurityUser getUser() {
+        return (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 }
