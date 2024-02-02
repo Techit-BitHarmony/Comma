@@ -1,6 +1,7 @@
 package com.bitharmony.comma.donation.scheduling;
 
 import com.bitharmony.comma.donation.dto.DonationRegularRequsetDto;
+import com.bitharmony.comma.donation.entity.DonationRegular;
 import com.mchange.v2.cfg.PropertiesConfigSource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -16,10 +17,10 @@ import static org.quartz.TriggerBuilder.newTrigger;
 @Component
 public class DonationRegularTriggerService {
 
-    public Trigger build(JobKey jobKey, DonationRegularRequsetDto dto) {
+    public Trigger build(JobKey jobKey, DonationRegular donationRegular) {
         log.info("trigger 설정");
 
-        CronExpression cronExpression = makeCronExpression(dto.executeDay());
+        CronExpression cronExpression = makeCronExpression(donationRegular.getExecuteDay());
         if (cronExpression == null) {
             // null 처리
         }
@@ -27,7 +28,6 @@ public class DonationRegularTriggerService {
                 .forJob(jobKey)
                 .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression)) // 정기 결제 주기마다 실행을 시킨다.
                 .withIdentity(new TriggerKey(jobKey.getName(), jobKey.getGroup()))
-                .startAt(new Date()) //다음 배송일에 결제를 시작한다.
                 .build();
     }
 

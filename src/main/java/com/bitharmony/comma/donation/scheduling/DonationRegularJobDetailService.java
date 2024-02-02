@@ -1,6 +1,7 @@
 package com.bitharmony.comma.donation.scheduling;
 
 import com.bitharmony.comma.donation.dto.DonationRegularRequsetDto;
+import com.bitharmony.comma.donation.entity.DonationRegular;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobDataMap;
@@ -16,11 +17,11 @@ import static org.quartz.JobBuilder.newJob;
 @RequiredArgsConstructor
 @Component
 public class DonationRegularJobDetailService {
-    public JobDetail build(JobKey jobKey, DonationRegularRequsetDto dto) {
+    public JobDetail build(JobKey jobKey, DonationRegular donationRegular) {
         log.warn("job detail name= {}", jobKey.getName());
 
         JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put("dto", dto);
+        jobDataMap.put("donationRegular", donationRegular);
         jobDataMap.put("retry", 0);
 //        for (Field field : dto.getClass().getDeclaredFields()) {
 //            field.setAccessible(true);
