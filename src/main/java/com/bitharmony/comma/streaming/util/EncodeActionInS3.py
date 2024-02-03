@@ -50,7 +50,7 @@ def main(args):
         res = requests.put(full_url, headers=headers, data=json.dumps({
             'bucketName' : input_bucket_name,
             'pathList': [ object_name ],
-            'notification_url': notification_url,
+            'notificationUrl': notification_url,
             'output': {
                 'bucketName': input_bucket_name,
                 'filePath': '/music/',
