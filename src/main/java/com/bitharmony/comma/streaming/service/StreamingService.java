@@ -1,22 +1,30 @@
 package com.bitharmony.comma.streaming.service;
 
-import com.bitharmony.comma.album.album.entity.Album;
-import com.bitharmony.comma.global.exception.EncodingStatusNotFoundException;
+import com.bitharmony.comma.global.exception.EncodingFailureException;
 import com.bitharmony.comma.streaming.dto.UploadUrlResponse;
-import com.bitharmony.comma.streaming.entity.Status;
-import com.bitharmony.comma.streaming.repository.StatusRepository;
 import com.bitharmony.comma.streaming.util.EncodeStatus;
+import com.bitharmony.comma.streaming.util.EncodingStatusListener;
 import com.bitharmony.comma.streaming.util.NcpMusicUtil;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class StreamingService {
 
-    private final StatusRepository statusRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisMessageListenerContainer container;
+    private final EncodingStatusListener encodingStatusListener;
+    private final ChannelTopic topicStatus;
+
     private final NcpMusicUtil ncpMusicUtil;
+    private final SseProvider sseProvider;
+
+    static private final String CHANNEL_NAME = "encodingStatus";
 
     public UploadUrlResponse generateURL(String fileName) {
         String filePath = ncpMusicUtil.path + UUID.randomUUID() + getExtension(fileName);
@@ -27,38 +35,32 @@ public class StreamingService {
         return fileName.substring(fileName.lastIndexOf('.'));
     }
 
-    public Status getStatus(Long albumId) {
-        return statusRepository.findByAlbumId(albumId)
-                .orElseThrow(EncodingStatusNotFoundException::new);
-    }
-
-    public void encodeStatus(Album album, EncodeStatus status) {
+    public void encodeStatus(String username, Long albumId, String outputType, EncodeStatus status) {
         switch (status) {
             case WAITING -> {
-                updateEncodeStatus(album.getId(), EncodeStatus.WAITING);
+                sendEncodingStatus(username, albumId, outputType, EncodeStatus.WAITING);
             }
             case RUNNING -> {
-                updateEncodeStatus(album.getId(), EncodeStatus.RUNNING);
+                sendEncodingStatus(username, albumId, outputType, EncodeStatus.RUNNING);
             }
             case COMPLETE -> {
-                updateEncodeStatus(album.getId(), EncodeStatus.COMPLETE);
+                sendEncodingStatus(username, albumId, outputType, EncodeStatus.COMPLETE);
+                sseProvider.complete(username, albumId);
+                container.removeMessageListener(encodingStatusListener, topicStatus);
             }
             case FAILURE -> {
-                updateEncodeStatus(album.getId(), EncodeStatus.FAILURE);
-                throw new EncodingStatusNotFoundException();
+                sendEncodingStatus(username, albumId, outputType, EncodeStatus.FAILURE);
+                throw new EncodingFailureException();
             }
             case CANCELED -> {
-                updateEncodeStatus(album.getId(), EncodeStatus.CANCELED);
+                sendEncodingStatus(username, albumId, outputType, EncodeStatus.CANCELED);
             }
         }
     }
 
-    private void updateEncodeStatus(Long albumId, EncodeStatus status) {
-        statusRepository.save(Status.builder()
-               .albumId(albumId)
-               .encodeStatus(status)
-               .build()
-        );
+    private void sendEncodingStatus(String username, Long albumId, String outputType, EncodeStatus status) {
+        String message = username + ":" + albumId + ":" + outputType;
+        redisTemplate.convertAndSend(CHANNEL_NAME, message + ":" + status);
     }
 
 }
