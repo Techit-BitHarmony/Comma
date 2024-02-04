@@ -6,9 +6,11 @@ import com.bitharmony.comma.global.security.SecurityUser;
 import com.bitharmony.comma.global.util.JwtUtil;
 import com.bitharmony.comma.member.dto.JwtCreateRequest;
 import com.bitharmony.comma.member.dto.MemberLoginResponse;
+import com.bitharmony.comma.member.dto.MemberModifyRequest;
 import com.bitharmony.comma.member.dto.MemberReturnResponse;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.repository.MemberRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -90,7 +92,7 @@ public class MemberService {
 
         SecurityUser loginedMember = getUser();
         Member findMember = getMemberByUsername(loginedMember.getUsername());
-        
+
         MemberReturnResponse response = MemberReturnResponse.builder()
                 .username(findMember.getUsername())
                 .Email(findMember.getEmail())
@@ -100,7 +102,24 @@ public class MemberService {
         return response;
     }
 
+    @Transactional
+    public void modify(String nickname, String email) {
+
+        SecurityUser user = getUser();
+        long id = user.getId();
+        Member findMember = memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+
+        Member modifyMember = findMember.toBuilder()
+                .nickname(nickname)
+                .email(email)
+                .build();
+
+        memberRepository.save(modifyMember);
+    }
+
     private SecurityUser getUser() {
         return (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
+
 }
