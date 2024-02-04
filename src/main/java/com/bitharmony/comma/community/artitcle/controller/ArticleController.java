@@ -41,6 +41,18 @@ public class ArticleController {
         );
     }
 
+    @GetMapping("")
+    public GlobalResponse<ArticleGetListResponse> getArticleList() {
+        List<Article> article = articleService.getArticleList();
+
+        return GlobalResponse.of(
+                "200",
+                ArticleGetListResponse.builder()
+                        .myList(article.stream().map(ArticleDto::new).toList())
+                        .build()
+        );
+    }
+
     @GetMapping("/mine")
     @PreAuthorize("isAuthenticated()")
     public GlobalResponse<ArticleGetMyListResponse> getMyArticle(Principal principal){
@@ -96,7 +108,7 @@ public class ArticleController {
     }
 
     @DeleteMapping("/{id}")
-    public GlobalResponse<Void> deleteAriticle(@PathVariable long id, Principal principal){
+    public GlobalResponse<Void> deleteArticle(@PathVariable long id, Principal principal){
 
         Member member = memberService.getMemberByUsername(principal.getName());
         Article article = articleService.getArticleById(id);
@@ -111,7 +123,5 @@ public class ArticleController {
                 "204"
         );
     }
-
-
 
 }

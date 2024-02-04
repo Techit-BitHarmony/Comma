@@ -6,7 +6,6 @@ import com.bitharmony.comma.community.artitcle.repository.ArticleRepository;
 import com.bitharmony.comma.global.exception.ArticleNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -59,5 +58,9 @@ public class ArticleService {
 
     public void deleteArticle(long id) {
         articleRepository.deleteById(id);
+    }
+
+    public List<Article> getArticleList() {
+        return articleRepository.findAll();
     }
 }
