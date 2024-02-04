@@ -10,6 +10,6 @@ public class SseEmitterNotFoundException extends CommaException {
 
     @Override
     public int getStatusCode() {
-        return 400;
+        return 404;
     }
 }
