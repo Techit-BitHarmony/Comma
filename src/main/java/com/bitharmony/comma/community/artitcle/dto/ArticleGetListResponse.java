@@ -6,6 +6,6 @@ import java.util.List;
 
 @Builder
 public record ArticleGetListResponse(
-        List<ArticleDto> myList
+        List<ArticleDto> articleList
 ) {
 }

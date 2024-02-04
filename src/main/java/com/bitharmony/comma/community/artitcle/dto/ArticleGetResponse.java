@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record ArticleGetResponse(
+        long id,
         String username,
         Article.Category category,
         String title,

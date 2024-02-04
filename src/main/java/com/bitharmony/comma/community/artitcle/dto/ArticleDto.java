@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record ArticleDto(
+        long Id,
         String username,
         Article.Category category,
         String title,
@@ -16,6 +17,7 @@ public record ArticleDto(
 ) {
     public ArticleDto(Article article){
         this(
+                article.getId(),
                 article.getWriter().getUsername(),
                 article.getCategory(),
                 article.getTitle(),

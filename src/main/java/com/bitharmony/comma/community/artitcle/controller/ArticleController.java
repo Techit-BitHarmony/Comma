@@ -31,6 +31,7 @@ public class ArticleController {
         return GlobalResponse.of(
                 "200",
                 ArticleGetResponse.builder()
+                        .id(article.getId())
                         .username(article.getWriter().getUsername())
                         .category(article.getCategory())
                         .title(article.getTitle())
@@ -48,7 +49,7 @@ public class ArticleController {
         return GlobalResponse.of(
                 "200",
                 ArticleGetListResponse.builder()
-                        .myList(article.stream().map(ArticleDto::new).toList())
+                        .articleList(article.stream().map(ArticleDto::new).toList())
                         .build()
         );
     }
