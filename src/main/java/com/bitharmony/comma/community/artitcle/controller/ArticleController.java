@@ -7,7 +7,9 @@ import com.bitharmony.comma.global.exception.NotAuthorizedException;
 import com.bitharmony.comma.global.response.GlobalResponse;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/community/articles")
 public class ArticleController {
 
@@ -74,7 +77,7 @@ public class ArticleController {
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
     public GlobalResponse<ArticleCreateResponse> createArticle(
-            @RequestBody ArticleCreateRequest request, Principal principal){
+            @RequestBody @Valid ArticleCreateRequest request, Principal principal){
         Member member = memberService.getMemberByUsername(principal.getName());
 
         Article article = articleService.write(member, request.category(), request.title(), request.content());
@@ -89,7 +92,7 @@ public class ArticleController {
 
     @PutMapping("/{id}")
     public GlobalResponse<ArticleModifyResponse> modifyArticle(
-            @PathVariable long id, Principal principal, @RequestBody ArticleModifyRequest request){
+            @PathVariable long id, Principal principal, @RequestBody @Valid ArticleModifyRequest request){
 
         Member member = memberService.getMemberByUsername(principal.getName());
         Article article = articleService.getArticleById(id);

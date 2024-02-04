@@ -9,6 +9,7 @@ import com.bitharmony.comma.global.exception.NotAuthorizedException;
 import com.bitharmony.comma.global.response.GlobalResponse;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +54,7 @@ public class CommentController {
     @PostMapping("")
     @PreAuthorize("isAuthenticated()")
     public GlobalResponse<CommentCreateResponse> addComment(
-            @RequestBody CommentCreateRequest request,
+            @RequestBody @Valid CommentCreateRequest request,
             Principal principal
     ){
         Member member = memberService.getMemberByUsername(principal.getName());
@@ -89,7 +90,7 @@ public class CommentController {
     @PutMapping("/{commentId}")
     public GlobalResponse<CommentModifyResponse> modifyComment(
             @PathVariable long commentId,
-            @RequestBody CommentModifyRequest request,
+            @RequestBody @Valid CommentModifyRequest request,
             Principal principal
     ) {
         Member member = memberService.getMemberByUsername(principal.getName());

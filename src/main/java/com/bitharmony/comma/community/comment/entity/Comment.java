@@ -34,6 +34,5 @@ public class Comment {
     @Builder.Default
     private LocalDateTime createDate = LocalDateTime.now();
 
-    @Builder.Default
-    private LocalDateTime modifyDate = LocalDateTime.now();
+    private LocalDateTime modifyDate;
 }
