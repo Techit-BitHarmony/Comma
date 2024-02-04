@@ -10,6 +10,6 @@ public class SseEmitterSendingException extends CommaException {
 
     @Override
     public int getStatusCode() {
-        return 400;
+        return 500;
     }
 }
