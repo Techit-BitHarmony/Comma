@@ -38,6 +38,7 @@ public class StreamingService {
     public void encodeStatus(String username, Long albumId, String outputType, EncodeStatus status) {
         switch (status) {
             case WAITING -> {
+                container.addMessageListener(encodingStatusListener, topicStatus); // 토픽 등록
                 sendEncodingStatus(username, albumId, outputType, EncodeStatus.WAITING);
             }
             case RUNNING -> {
@@ -46,7 +47,7 @@ public class StreamingService {
             case COMPLETE -> {
                 sendEncodingStatus(username, albumId, outputType, EncodeStatus.COMPLETE);
                 sseProvider.complete(username, albumId);
-                container.removeMessageListener(encodingStatusListener, topicStatus);
+                container.removeMessageListener(encodingStatusListener, topicStatus); // 토픽 해제
             }
             case FAILURE -> {
                 sendEncodingStatus(username, albumId, outputType, EncodeStatus.FAILURE);
