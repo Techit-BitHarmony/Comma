@@ -2,6 +2,7 @@ package com.bitharmony.comma.streaming.controller;
 
 import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.service.AlbumService;
+import com.bitharmony.comma.global.response.GlobalResponse;
 import com.bitharmony.comma.streaming.dto.EncodeStatusRequest;
 import com.bitharmony.comma.streaming.dto.UploadUrlRequest;
 import com.bitharmony.comma.streaming.dto.UploadUrlResponse;
@@ -31,8 +32,8 @@ public class StreamingController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/upload") // get upload presigned url
-    public UploadUrlResponse getUploadURL(@ModelAttribute @Valid UploadUrlRequest uploadUrlRequest) {
-        return streamingService.generateURL(uploadUrlRequest.filename());
+    public GlobalResponse<UploadUrlResponse> getUploadURL(@ModelAttribute @Valid UploadUrlRequest uploadUrlRequest) {
+        return GlobalResponse.of("200", streamingService.generateURL(uploadUrlRequest.filename()));
     }
 
     @PreAuthorize("isAuthenticated()")
