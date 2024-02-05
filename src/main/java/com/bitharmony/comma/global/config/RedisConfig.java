@@ -6,14 +6,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfig {
-    @Value("${custom.data.redis.port}")
+    @Value("${spring.data.redis.port}")
     private int port;
 
-    @Value("${custom.data.redis.host}")
+    @Value("${spring.data.redis.host}")
     private String host;
 
     @Bean
@@ -33,4 +35,17 @@ public class RedisConfig {
 
         return redisTemplate;
     }
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        return container;
+    }
+
+    @Bean
+    public ChannelTopic topicStatus() {
+        return new ChannelTopic("encodingStatus");
+    }
+
 }
