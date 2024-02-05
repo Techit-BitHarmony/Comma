@@ -12,4 +12,5 @@ public class NotAuthorizedException extends CommaException {
     public int getStatusCode() { // 메서드 구현
         return 400; // 상황에 맞게 상태 코드 변경
     }
+
 }

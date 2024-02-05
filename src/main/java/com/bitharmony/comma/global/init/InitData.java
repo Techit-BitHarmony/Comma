@@ -21,6 +21,7 @@ import org.springframework.boot.ApplicationArguments;
 @RequiredArgsConstructor
 public class InitData {
 
+
     private final ChargeService chargeService;
     private final ChargeRepository chargeRepository;
     private final CreditLogService creditLogService;
@@ -35,7 +36,6 @@ public class InitData {
             @Transactional
             @SneakyThrows
             public void run(ApplicationArguments args) {
-
 
             }
         };
