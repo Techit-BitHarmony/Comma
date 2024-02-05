@@ -28,4 +28,3 @@ public class GlobalResponse<T> {
 
         return globalResponse;
     }
-}
