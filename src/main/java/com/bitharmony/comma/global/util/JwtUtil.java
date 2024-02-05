@@ -31,11 +31,11 @@ public class JwtUtil {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    @Value("${spring.jwt.secret}")
+    @Value("${secret.jwt.secret}")
     private String SECRET_KEY;
-    @Value("${spring.jwt.token.access-expiration-time}")
+    @Value("${secret.jwt.token.access-expiration-time}")
     private Long ACCESS_TOKEN_EXPIRATION_TIME; // 1시간으로 설정
-    @Value("${spring.jwt.token.refresh-expiration-time}")
+    @Value("${secret.jwt.token.refresh-expiration-time}")
     private Long REFRESH_TOKEN_EXPIRATION_TIME; // 7일로 설정
 
     public String createAccessToken(JwtCreateRequest jwtCreateRequest) {
@@ -113,10 +113,9 @@ public class JwtUtil {
         }
     }
 
-    public Map<String, Object> getUserData(String token) {
+    public Map<String, String> getUserData(String token) {
         Claims claim = getClaim(token);
-        log.info("expired time = {}", claim.getExpiration());
-        Map<String, Object> data = (Map<String, Object>) claim.get("data");
+        Map<String, String> data = (Map<String, String>) claim.get("data");
         return data;
     }
 
