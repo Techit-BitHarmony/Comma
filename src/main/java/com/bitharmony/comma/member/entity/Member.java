@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Builder
+@Builder(toBuilder = true)
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,6 +37,7 @@ public class Member {
     @NotNull
     private String nickname;
 
-    private long credit;
+
+    private Long credit;
 
 }

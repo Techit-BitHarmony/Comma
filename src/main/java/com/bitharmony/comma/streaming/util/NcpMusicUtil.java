@@ -37,11 +37,11 @@ public class NcpMusicUtil {
                 .build();
     }
 
-    public URL generatePresignedUrl(String name) {
+    public URL generatePresignedUrl(String filePath) {
         LocalDateTime expiration = LocalDateTime.now().plusMinutes(15);
 
         Date from = Date.from(expiration.atZone(ZoneId.systemDefault()).toInstant());
-        return amazonS3.generatePresignedUrl(bucketName, path + name, from, HttpMethod.PUT);
+        return amazonS3.generatePresignedUrl(bucketName, filePath, from, HttpMethod.PUT);
     }
 
 }
