@@ -16,6 +16,7 @@ import com.bitharmony.comma.album.file.service.FileService;
 import com.bitharmony.comma.album.file.util.FileType;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
 import com.bitharmony.comma.global.exception.AlbumNotFoundException;
+import com.bitharmony.comma.member.entity.Member;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,8 +28,10 @@ public class AlbumService {
 	private final NcpImageUtil ncpImageUtil;
 
 	@Transactional
-	public Album release(AlbumCreateRequest request, MultipartFile musicFile, MultipartFile musicImageFile) {
-		return saveAlbum(request.toEntity(), musicFile, musicImageFile);
+	public Album release(AlbumCreateRequest request, Member member,MultipartFile musicFile, MultipartFile musicImageFile) {
+		Album album = request.toEntity();
+		album.updateReleaseMember(member);
+		return saveAlbum(album, musicFile, musicImageFile);
 	}
 
 	@Transactional
@@ -55,9 +58,11 @@ public class AlbumService {
 	}
 
 	public Album saveAlbum(Album album, MultipartFile musicFile, MultipartFile musicImageFile) {
-		//uploadFileAndSetUrl(musicFile, ncpImageUtil.getMusicBucketName(), album::updateFileUrl);
-		String fileUrl = fileService.uploadFile(musicFile, ncpImageUtil.getBucketName()).uploadFileUrl();
-		album = album.toBuilder().filePath(fileUrl).build();
+		String imageUrl = fileService.uploadFile(musicImageFile, ncpImageUtil.getBucketName()).uploadFileUrl();
+		album = album.toBuilder().imagePath(imageUrl).build();
+		album = album.toBuilder().filePath("no path").build();
+
+		//TODO 나중에 file 연동할 때 추가
 
 		albumRepository.save(album);
 		return album;
@@ -93,8 +98,8 @@ public class AlbumService {
 		return ncpImageUtil.getEndPoint() + "/" + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "");
 	}
 
-	public boolean canRelease(String name, MultipartFile musicFile, MultipartFile musicImageFile, Principal principal) {
-		if(principal == null) return false;
+	public boolean canRelease(String name, MultipartFile musicFile, MultipartFile musicImageFile, Member member) {
+		if(member == null) return false;
 
 		Optional<MultipartFile> audioFile = fileService.checkFileByType(musicFile, FileType.AUDIO);
 		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
@@ -107,8 +112,9 @@ public class AlbumService {
 		return true;
 	}
 
-	public boolean canEdit(Album album, Principal principal) {
+	public boolean canEdit(Album album, Principal principal, Member member) {
 		if(!album.getMember().getUsername().equals(principal.getName())) return false;
+		if(member == null) return false;
 		return true;
 	}
 

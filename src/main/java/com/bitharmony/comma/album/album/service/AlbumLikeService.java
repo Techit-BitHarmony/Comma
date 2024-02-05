@@ -24,22 +24,22 @@ public class AlbumLikeService {
 	}
 
 	@Transactional
-	public void cancelLike(Member actor, Album album) {
-		album.deleteLike(actor);
-	}
+	public void cancelLike(Member actor, Album album) { album.deleteLike(actor); }
 
 	public Boolean canLike(Member member, Album album) {
 		if (member == null) return false;
 		if (album == null) return false;
 
 		// 이미 앨범에 있는가?
-		return !albumLikeRepository.existsByIdMemberAndIdAlbum(member, album);
+		if(albumLikeRepository.existsByIdMemberAndIdAlbum(member, album))  return false;
+		return true;
 	}
 
 	public Boolean canCancelLike(Member member, Album album) {
 		if (member == null) return false;
 		if (album == null) return false;
 		// 이미 앨범에 있는가?
-		return albumLikeRepository.existsByIdMemberAndIdAlbum(member, album);
+		if(!albumLikeRepository.existsByIdMemberAndIdAlbum(member, album)) return false;
+		return true;
 	}
 }

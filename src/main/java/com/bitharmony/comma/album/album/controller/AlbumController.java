@@ -48,11 +48,13 @@ public class AlbumController {
 		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile,
 		Principal principal) {
 
-		if (!albumService.canRelease(request.albumname(), musicFile, musicImageFile, principal)) {
+		Member member = memberService.getMemberByUsername(principal.getName());
+
+		if (!albumService.canRelease(request.albumname(), musicFile, musicImageFile, member)) {
 			throw new AlbumFieldException();
 		}
 
-		Album album = albumService.release(request, musicFile, musicImageFile);
+		Album album = albumService.release(request, member,musicFile, musicImageFile);
 		return GlobalResponse.of("200", albumToResponseDto(album));
 	}
 
@@ -65,13 +67,14 @@ public class AlbumController {
 
 	@PutMapping("/{id}")
 	@PreAuthorize("isAuthenticated()")
-	public GlobalResponse editAlbum(@PathVariable long id, @Valid AlbumEditRequest request,
+	public GlobalResponse editAlbum(@PathVariable long id,@Valid AlbumEditRequest request,
 		@RequestParam(value = "musicFile", required = false) MultipartFile musicFile,
 		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile,
 		Principal principal) {
 		Album album = albumService.getAlbumById(id);
+		Member member = memberService.getMemberByUsername(principal.getName());
 
-		if (!albumService.canEdit(album, principal)) {
+		if (!albumService.canEdit(album, principal, member)) {
 			throw new AlbumFieldException();
 		}
 

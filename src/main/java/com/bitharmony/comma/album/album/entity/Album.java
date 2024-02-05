@@ -86,6 +86,10 @@ public class Album {
 		this.price = request.price();
 	}
 
+	public void updateReleaseMember(Member member) {
+		this.member = member;
+	}
+
 	public void increaseLikesCount() {
 		albumLikesCount++;
 	}
@@ -104,16 +108,13 @@ public class Album {
 	}
 
 	public void deleteLike(Member member) {
-		boolean removed = albumLikes.remove(
-			AlbumLike.builder()
+		boolean removed = albumLikes.remove(AlbumLike.builder()
 				.album(this)
 				.member(member)
 				.build()
 		);
 
-		if (removed) {
-			decreaseLikesCount();
-		}
+		if (removed) decreaseLikesCount();
 	}
 
 	public boolean hasLike(Member actor) {
