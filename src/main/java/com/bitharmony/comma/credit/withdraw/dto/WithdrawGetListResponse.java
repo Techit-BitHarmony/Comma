@@ -7,7 +7,7 @@ import java.util.List;
 
 @Builder
 public record WithdrawGetListResponse(
-        List<WithdrawDto> withdrawDtos
+        List<Withdraw> withdraws
 ) {
 
 }
