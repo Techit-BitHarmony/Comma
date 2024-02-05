@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public record DonationFindResponseDto(
         String patronUsername,
         String artistUsername,
-        Integer amount,
+        Long amount,
         String message,
         LocalDateTime time
         ) {

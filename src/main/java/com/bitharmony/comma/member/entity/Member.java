@@ -37,6 +37,6 @@ public class Member {
     @NotNull
     private String nickname;
 
-    private Integer credit;
+    private Long credit;
 
 }

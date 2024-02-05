@@ -69,7 +69,7 @@ public class DonationService {
     }
 
     // donation에서 memberRepostiory에 접근 하는 방식이 옳은가?
-    private void countCredit(Member patron, Member artist, Integer amount) {
+    private void countCredit(Member patron, Member artist, Long amount) {
         patron = patron.toBuilder().credit(patron.getCredit() - amount).build();
         artist = artist.toBuilder().credit(artist.getCredit() + amount).build();
 
@@ -77,7 +77,7 @@ public class DonationService {
         memberRepository.save(artist);
     }
 
-    private void checkCredit(Member patron, Integer amount) {
+    private void checkCredit(Member patron, Long amount) {
         if (patron.getCredit() < amount) {
             // 후원 프로세스 멈추고 금액부족 메세지 반환
             throw new CreditShortageException("크레딧이 부족합니다.");

@@ -30,7 +30,7 @@ public class DonationRegular implements Serializable {
     String artistName;
 
     @NotNull
-    Integer amount;
+    Long amount;
 
     @NotNull
     Integer executeDay;

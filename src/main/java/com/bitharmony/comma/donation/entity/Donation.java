@@ -28,7 +28,7 @@ public class Donation {
     private String artistUsername;
 
     @NotNull
-    private Integer amount;
+    private Long amount;
 
     private String message;
 

@@ -12,7 +12,7 @@ public record DonationOnceRequestDto(
         String artistName,
 
         @NotEmpty
-        Integer amount,
+        Long amount,
 
         String message,
 
