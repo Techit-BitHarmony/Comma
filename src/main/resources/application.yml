@@ -1,7 +1,7 @@
 spring:
   profiles:
     active: dev
-    include: secret
+    include: secret, custom
   servlet:
     multipart:
       max-file-size: 50MB
@@ -17,15 +17,6 @@ spring:
         format_sql: true
         highlight_sql: true
         use_sql_comments: true
-  jwt:
-    secretKey: abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890
-    token:
-      access-expiration-time: 60000
-      refresh-expiration-time: 604800000
-  data:
-    redis:
-      host: localhost
-      port: 6379
 logging:
   level:
     com.bitharmony.comma: DEBUG
@@ -38,5 +29,3 @@ custom:
     widget:
       clientKey: test_ck_5OWRapdA8dmGZpoK9jpA3o1zEqZK
       secretKey: ON_SECRET
-    confirm:
-      url: "https://api.tosspayments.com/v1/payments/confirm"
