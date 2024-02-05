@@ -1,25 +1,28 @@
 package com.bitharmony.comma.global.util;
 
-import com.bitharmony.comma.member.dto.JwtCreateRequest;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 import javax.crypto.SecretKey;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+
+import com.bitharmony.comma.member.dto.JwtCreateRequest;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
@@ -42,16 +45,16 @@ public class JwtUtil {
         data.put("username", jwtCreateRequest.username());
 
         Claims claims = Jwts
-                .claims()
-                .add("data", data)
-                .build();
+            .claims()
+            .add("data", data)
+            .build();
 
         return Jwts.builder()
-                .claims(claims)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
-                .signWith(getKey())
-                .compact();
+            .claims(claims)
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
+            .signWith(getKey())
+            .compact();
     }
 
     public String createRefreshToken(JwtCreateRequest jwtCreateRequest) {
@@ -60,23 +63,23 @@ public class JwtUtil {
         data.put("username", jwtCreateRequest.username());
 
         Claims claims = Jwts
-                .claims()
-                .add("data", data)
-                .build();
+            .claims()
+            .add("data", data)
+            .build();
 
         String refreshToken = Jwts.builder()
-                .claims(claims)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME))
-                .signWith(getKey())
-                .compact();
+            .claims(claims)
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME))
+            .signWith(getKey())
+            .compact();
 
         // redis에 저장
         redisTemplate.opsForValue().set(
-                jwtCreateRequest.username(),
-                refreshToken,
-                REFRESH_TOKEN_EXPIRATION_TIME,
-                TimeUnit.MILLISECONDS
+            jwtCreateRequest.username(),
+            refreshToken,
+            REFRESH_TOKEN_EXPIRATION_TIME,
+            TimeUnit.MILLISECONDS
         );
 
         return refreshToken;
@@ -88,11 +91,11 @@ public class JwtUtil {
 
     private Claims getClaim(String token) {
         return Jwts
-                .parser()
-                .verifyWith(getKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+            .parser()
+            .verifyWith(getKey())
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
     }
 
     public boolean validToken(String token) {

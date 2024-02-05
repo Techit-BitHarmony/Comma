@@ -7,8 +7,11 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
-public record AlbumCreateRequest(@NotEmpty @Size(max = 50) String albumname, String genre, boolean license,
-								 String licenseDescription, boolean permit,
+public record AlbumCreateRequest(@NotEmpty @Size(max = 50) String albumname,
+								 String genre,
+								 boolean license,
+								 String licenseDescription,
+								 boolean permit,
 								 int price
 
 ) {
