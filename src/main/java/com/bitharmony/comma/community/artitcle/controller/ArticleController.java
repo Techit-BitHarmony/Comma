@@ -91,6 +91,7 @@ public class ArticleController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public GlobalResponse<ArticleModifyResponse> modifyArticle(
             @PathVariable long id, Principal principal, @RequestBody @Valid ArticleModifyRequest request){
 
@@ -112,6 +113,7 @@ public class ArticleController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public GlobalResponse<Void> deleteArticle(@PathVariable long id, Principal principal){
 
         Member member = memberService.getMemberByUsername(principal.getName());
