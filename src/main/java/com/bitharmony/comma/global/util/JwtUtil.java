@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class JwtUtil {
 
-//    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${spring.jwt.secret}")
     private String SECRET_KEY;
@@ -71,13 +71,13 @@ public class JwtUtil {
                 .signWith(getKey())
                 .compact();
 
-//        // redis에 저장
-//        redisTemplate.opsForValue().set(
-//                jwtCreateRequest.username(),
-//                refreshToken,
-//                REFRESH_TOKEN_EXPIRATION_TIME,
-//                TimeUnit.MILLISECONDS
-//        );
+        // redis에 저장
+        redisTemplate.opsForValue().set(
+                jwtCreateRequest.username(),
+                refreshToken,
+                REFRESH_TOKEN_EXPIRATION_TIME,
+                TimeUnit.MILLISECONDS
+        );
 
         return refreshToken;
     }
