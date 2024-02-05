@@ -72,12 +72,12 @@ public class JwtUtil {
                 .compact();
 
         // redis에 저장
-//        redisTemplate.opsForValue().set(
-//                jwtCreateRequest.username(),
-//                refreshToken,
-//                REFRESH_TOKEN_EXPIRATION_TIME,
-//                TimeUnit.MILLISECONDS
-//        );
+        redisTemplate.opsForValue().set(
+                jwtCreateRequest.username(),
+                refreshToken,
+                REFRESH_TOKEN_EXPIRATION_TIME,
+                TimeUnit.MILLISECONDS
+        );
 
         return refreshToken;
     }
