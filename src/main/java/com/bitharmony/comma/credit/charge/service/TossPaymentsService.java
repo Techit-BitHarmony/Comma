@@ -17,9 +17,9 @@ import java.util.Base64;
 @Transactional
 public class TossPaymentsService {
 
-    @Value("${custom.tossPayments.widget.secretKey}")
+    @Value("${secret.tossPayments.widget.secretKey}")
     private String tossPaymentsWidgetSecretKey;
-    @Value("${custom.tossPayments.confirm.url}")
+    @Value("${secret.tossPayments.confirm.url}")
     private String TOSS_CONFIRM_URL;
 
     public ChargeConfirmResponse requestApprovalAndGetResponse(String orderId, String amount, String paymentKey) throws Exception {
