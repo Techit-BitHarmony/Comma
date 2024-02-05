@@ -28,11 +28,11 @@ public class JwtUtil {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    @Value("${custom.jwt.secret}")
+    @Value("${secret.jwt.secret}")
     private String SECRET_KEY;
-    @Value("${custom.jwt.token.access-expiration-time}")
+    @Value("${secret.jwt.token.access-expiration-time}")
     private Long ACCESS_TOKEN_EXPIRATION_TIME; // 1시간으로 설정
-    @Value("${custom.jwt.token.refresh-expiration-time}")
+    @Value("${secret.jwt.token.refresh-expiration-time}")
     private Long REFRESH_TOKEN_EXPIRATION_TIME; // 7일로 설정
 
     public String createAccessToken(JwtCreateRequest jwtCreateRequest) {
