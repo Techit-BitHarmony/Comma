@@ -29,10 +29,7 @@ public class AdminWithdrawController {
 
         WithdrawGetListResponse withdrawGetListResponse =
                 WithdrawGetListResponse.builder()
-                        .withdrawDtos(
-                                withdraws.stream()
-                                        .map(WithdrawDto::new)
-                                        .toList())
+                        .withdraws(withdraws)
                         .build();
 
         return new ResponseEntity<>(withdrawGetListResponse, HttpStatus.OK);
@@ -51,7 +48,7 @@ public class AdminWithdrawController {
         );
     }
 
-    @PutMapping("/withdraws/{id}/cancel")
+    @PutMapping("/withdraws/{id}/reject")
     public ResponseEntity<WithdrawCancelResponse> cancelWithdraw(@PathVariable long id) {
         Withdraw withdraw = withdrawService.rejectWithdraw(id);
 
