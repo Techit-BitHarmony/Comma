@@ -3,6 +3,7 @@ package com.bitharmony.comma.global.util;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.SecretKey;
 
@@ -44,16 +45,16 @@ public class JwtUtil {
         data.put("username", jwtCreateRequest.username());
 
         Claims claims = Jwts
-                .claims()
-                .add("data", data)
-                .build();
+            .claims()
+            .add("data", data)
+            .build();
 
         return Jwts.builder()
-                .claims(claims)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
-                .signWith(getKey())
-                .compact();
+            .claims(claims)
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
+            .signWith(getKey())
+            .compact();
     }
 
     public String createRefreshToken(JwtCreateRequest jwtCreateRequest) {
@@ -62,24 +63,24 @@ public class JwtUtil {
         data.put("username", jwtCreateRequest.username());
 
         Claims claims = Jwts
-                .claims()
-                .add("data", data)
-                .build();
+            .claims()
+            .add("data", data)
+            .build();
 
         String refreshToken = Jwts.builder()
-                .claims(claims)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME))
-                .signWith(getKey())
-                .compact();
+            .claims(claims)
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME))
+            .signWith(getKey())
+            .compact();
 
         // redis에 저장
-        // redisTemplate.opsForValue().set(
-        //         jwtCreateRequest.username(),
-        //         refreshToken,
-        //         REFRESH_TOKEN_EXPIRATION_TIME,
-        //         TimeUnit.MILLISECONDS
-        // );
+        redisTemplate.opsForValue().set(
+            jwtCreateRequest.username(),
+            refreshToken,
+            REFRESH_TOKEN_EXPIRATION_TIME,
+            TimeUnit.MILLISECONDS
+        );
 
         return refreshToken;
     }
@@ -90,11 +91,11 @@ public class JwtUtil {
 
     private Claims getClaim(String token) {
         return Jwts
-                .parser()
-                .verifyWith(getKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+            .parser()
+            .verifyWith(getKey())
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
     }
 
     public boolean validToken(String token) {
