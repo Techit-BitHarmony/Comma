@@ -18,7 +18,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, String> redisTemplate;
 
-    @Value("${custom.jwt.token.refresh-expiration-time}")
+    @Value("${secret.jwt.token.refresh-expiration-time}")
     private Long REFRESH_TOKEN_EXPIRATION_TIME;
 
     @Transactional
