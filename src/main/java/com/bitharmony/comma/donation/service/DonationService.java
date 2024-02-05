@@ -1,19 +1,16 @@
 package com.bitharmony.comma.donation.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.bitharmony.comma.donation.dto.DonationFindResponseDto;
 import com.bitharmony.comma.donation.dto.DonationRequestDto;
 import com.bitharmony.comma.donation.dto.DonationResponse;
 import com.bitharmony.comma.donation.entity.Donation;
 import com.bitharmony.comma.donation.repository.DonationRespository;
 import com.bitharmony.comma.member.entity.Member;
-import com.bitharmony.comma.member.service.MemberService;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,12 +24,12 @@ public class DonationService {
 
         //donation entity create
         Donation donation = Donation.builder()
-            .artistUsername(artist.getUsername())
-            .patron(patron)
-            .amount(dto.amount())
-            .message(dto.message())
-            .anonymous(dto.anonymous())
-            .build();
+                .artistUsername(artist.getUsername())
+                .patron(patron)
+                .amount(dto.amount())
+                .message(dto.message())
+                .anonymous(dto.anonymous())
+                .build();
         donationRespository.save(donation);
 
         //credit count
@@ -56,10 +53,10 @@ public class DonationService {
 
         for (Donation d : donationList) {
             DonationFindResponseDto dto = DonationFindResponseDto.builder()
-                .patronUsername(checkDonationAnonymousAndGetPatronName(d))
-                .amount(d.getAmount())
-                .message(d.getMessage())
-                .build();
+                    .patronUsername(checkDonationAnonymousAndGetPatronName(d))
+                    .amount(d.getAmount())
+                    .message(d.getMessage())
+                    .build();
 
             responseDtoList.add(dto);
         }
