@@ -3,10 +3,8 @@ package com.bitharmony.comma.donation.dto;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
-import java.util.Objects;
-
 @Builder
-public record DonationRequestDto(
+public record DonationOnceRequestDto(
         @NotEmpty
         String patronName,
 
@@ -14,13 +12,13 @@ public record DonationRequestDto(
         String artistName,
 
         @NotEmpty
-        Integer amount,
+        Long amount,
 
         String message,
 
         boolean anonymous
 ) {
-    public DonationRequestDto{
+    public DonationOnceRequestDto {
         anonymous = false;
     }
 }

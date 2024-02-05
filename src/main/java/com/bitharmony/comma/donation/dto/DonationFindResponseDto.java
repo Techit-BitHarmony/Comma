@@ -2,10 +2,14 @@ package com.bitharmony.comma.donation.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Builder
 public record DonationFindResponseDto(
         String patronUsername,
-        Integer amount,
-        String message
+        String artistUsername,
+        Long amount,
+        String message,
+        LocalDateTime time
         ) {
 }
