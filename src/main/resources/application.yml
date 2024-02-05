@@ -10,7 +10,7 @@ spring:
     sessions: STATELESS
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         default_batch_fetch_size: 100
@@ -28,4 +28,3 @@ custom:
   tossPayments:
     widget:
       clientKey: test_ck_5OWRapdA8dmGZpoK9jpA3o1zEqZK
-      secretKey: ON_SECRET
