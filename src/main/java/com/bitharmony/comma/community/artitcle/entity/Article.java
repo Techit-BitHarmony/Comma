@@ -1,6 +1,5 @@
 package com.bitharmony.comma.community.artitcle.entity;
 
-import com.bitharmony.comma.domain.credit.creditLog.entity.CreditLog;
 import com.bitharmony.comma.member.entity.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
