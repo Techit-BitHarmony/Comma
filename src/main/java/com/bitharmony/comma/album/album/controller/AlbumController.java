@@ -117,7 +117,7 @@ public class AlbumController {
 
 	private AlbumResponse albumToResponseDto(Album album) {
 		album = album.toBuilder()
-			.filePath(albumService.getAlbumFileUrl(album.getFilePath()))
+			//.filePath(albumService.getAlbumFileUrl(album.getFilePath()))
 			.imagePath(albumService.getAlbumImageUrl(album.getImagePath()))
 			.build();
 
