@@ -20,7 +20,6 @@ public class DonationRegularService {
     public void makeSchedule(DonationRegular donationRegular) throws SchedulerException {
 
         JobKey jobkey = jobKey(donationRegular.getPatronName() + "To" + donationRegular.getArtistName() + donationRegular.getId(), donationRegular.getPatronName());
-//        JobKey jobkey = jobKey(donationRegular.getPatronName() + "To" + donationRegular.getArtistName(), donationRegular.getPatronName());
 
         JobDetail jobDetail = jobDetailService.build(jobkey, donationRegular);
 
