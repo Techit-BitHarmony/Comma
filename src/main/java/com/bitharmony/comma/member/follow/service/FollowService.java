@@ -1,17 +1,14 @@
 package com.bitharmony.comma.member.follow.service;
 
 import com.bitharmony.comma.global.exception.MemberDuplicateException;
-import com.bitharmony.comma.global.exception.MemberNotFoundException;
-import com.bitharmony.comma.global.security.SecurityUser;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.follow.dto.FollowingListReturnResponse;
 import com.bitharmony.comma.member.follow.entity.Follow;
 import com.bitharmony.comma.member.follow.repository.FollowRepository;
-import com.bitharmony.comma.member.repository.MemberRepository;
+import com.bitharmony.comma.member.service.MemberService;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,17 +18,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class FollowService {
 
     private final FollowRepository followRepository;
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
+
 
     @Transactional
     public void follow(String followingUser) {
-        String username = getUser().getUsername();
+        String username = memberService.getUser().getUsername();
         if (username.equals(followingUser)) {
             throw new MemberDuplicateException("본인을 팔로우 할 수 없습니다.");
         }
 
-        Member follower = getMemberByUsername(username);
-        Member following = getMemberByUsername(followingUser);
+        Member follower = memberService.getMemberByUsername(username);
+        Member following = memberService.getMemberByUsername(followingUser);
 
         Optional<Follow> isExist = followRepository.findByFollowerIdAndFollowingId(follower.getId(),
                 following.getId());
@@ -50,8 +48,9 @@ public class FollowService {
 
     @Transactional
     public void unfollow(String followingUser) {
-        Member following = getMemberByUsername(followingUser);
-        Member follower = getMemberByUsername(getUser().getUsername());
+        Member following = memberService.getMemberByUsername(followingUser);
+        String username = memberService.getUser().getUsername();
+        Member follower = memberService.getMemberByUsername(username);
 
         Follow follow = followRepository.findByFollowerIdAndFollowingId(follower.getId(), following.getId())
                 .orElseThrow(() -> new RuntimeException("팔로우 정보가 없습니다."));
@@ -60,7 +59,9 @@ public class FollowService {
     }
 
     public FollowingListReturnResponse getAllFollowingList() {
-        Member findMember = getMemberByUsername(getUser().getUsername());
+        String username = memberService.getUser().getUsername();
+        Member findMember = memberService.getMemberByUsername(username);
+
         List<String> followingList = findMember.getFollowingList().stream()
                 .map((follow) -> follow.getFollowing().getUsername()).toList();
 
@@ -69,17 +70,5 @@ public class FollowService {
                 .build();
 
         return response;
-    }
-
-    private SecurityUser getUser() {
-        return (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
-    public Member getMemberByUsername(String username) {
-
-        Member findMember = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
-
-        return findMember;
     }
 }

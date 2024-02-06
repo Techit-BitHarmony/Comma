@@ -47,7 +47,8 @@ public class Member {
     @Column(length = 100)
     private String nickname;
 
-    private Long credit;
+    @Builder.Default
+    private Long credit = 0L;
 
     @OneToMany(mappedBy = "following")
     private List<Follow> followerList = new ArrayList<>();

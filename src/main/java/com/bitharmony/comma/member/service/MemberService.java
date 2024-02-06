@@ -6,11 +6,9 @@ import com.bitharmony.comma.global.security.SecurityUser;
 import com.bitharmony.comma.global.util.JwtUtil;
 import com.bitharmony.comma.member.dto.JwtCreateRequest;
 import com.bitharmony.comma.member.dto.MemberLoginResponse;
-import com.bitharmony.comma.member.dto.MemberModifyRequest;
 import com.bitharmony.comma.member.dto.MemberReturnResponse;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.repository.MemberRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -118,7 +116,7 @@ public class MemberService {
         memberRepository.save(modifyMember);
     }
 
-    private SecurityUser getUser() {
+    public SecurityUser getUser() {
         return (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
