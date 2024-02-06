@@ -29,8 +29,8 @@ class DonationServiceTest {
         memberService.join("user2", "1234", "user2@test.com", "user2");
         Member user1 = memberService.getMemberByUsername("user1");
         Member user2 = memberService.getMemberByUsername("user2");
-        memberRepository.save(user1.toBuilder().credit(10000).build());
-        memberRepository.save(user2.toBuilder().credit(0).build());
+        memberRepository.save(user1.toBuilder().credit(10000L).build());
+        memberRepository.save(user2.toBuilder().credit(0L).build());
     }
 
     @Test
@@ -38,20 +38,20 @@ class DonationServiceTest {
         DonationOnceRequestDto dto = DonationOnceRequestDto.builder()
                 .patronName("user1")
                 .artistName("user2")
-                .amount(1000)
+                .amount(1000L)
                 .message("testMessage")
                 .anonymous(false)
                 .build();
         donationService.donateOnceToArtist(dto);
         Member user1 = memberService.getMemberByUsername("user1");
-        Assertions.assertThat(user1.getCredit()).isEqualTo(9000);
+        Assertions.assertThat(user1.getCredit()).isEqualTo(9000L);
     }
     @Test
     public void donationRegularTest1() throws SchedulerException {
         DonationRegular donationRegular = DonationRegular.builder()
                 .patronName("user1")
                 .artistName("user2")
-                .amount(1000)
+                .amount(1000L)
                 .anonymous(false)
                 .executeDay(2)
                 .build();
