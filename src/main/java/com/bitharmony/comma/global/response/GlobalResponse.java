@@ -12,7 +12,7 @@ public class GlobalResponse<T> {
     private String resultCode;
     private T data;
 
-    public static <T> GlobalResponse<T> of(String resultCode, String msg) {
+    public static <T> GlobalResponse<T> of(String resultCode) {
         GlobalResponse<T> globalResponse = new GlobalResponse<T>();
 
         globalResponse.setResultCode(resultCode);
@@ -20,7 +20,7 @@ public class GlobalResponse<T> {
         return globalResponse;
     }
 
-    public static <T> GlobalResponse<T> of(String resultCode, String msg, T data) {
+    public static <T> GlobalResponse<T> of(String resultCode, T data) {
         GlobalResponse<T> globalResponse = new GlobalResponse<T>();
 
         globalResponse.setResultCode(resultCode);
