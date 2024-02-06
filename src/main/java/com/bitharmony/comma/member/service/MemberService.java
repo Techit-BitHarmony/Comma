@@ -8,6 +8,9 @@ import com.bitharmony.comma.member.dto.JwtCreateRequest;
 import com.bitharmony.comma.member.dto.MemberLoginResponse;
 import com.bitharmony.comma.member.dto.MemberReturnResponse;
 import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.exception.DuplicateNicknameException;
+import com.bitharmony.comma.member.exception.IncorrectPasswordException;
+import com.bitharmony.comma.member.exception.InvalidPasswordException;
 import com.bitharmony.comma.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +34,7 @@ public class MemberService {
         Member member = getMemberByUsername(username);
 
         if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new IllegalArgumentException("정확한 비밀번호를 입력해주세요");
+            throw new IncorrectPasswordException();
         }
 
         JwtCreateRequest jwtCreateRequest = JwtCreateRequest.builder()
@@ -65,7 +68,7 @@ public class MemberService {
         }
 
         if (memberRepository.findByNickname(nickname).isPresent()) {
-            throw new MemberDuplicateException("이미 존재하는 닉네임입니다.");
+            throw new DuplicateNicknameException();
         }
 
         Member member = Member.builder()
@@ -132,7 +135,7 @@ public class MemberService {
     @Transactional
     public void passwordModify(String password, String passwordCheck) {
         if (!password.equals(passwordCheck)) {
-            throw new IllegalArgumentException("입력한 두개의 비밀번호가 다릅니다.");
+            throw new InvalidPasswordException();
         }
 
         SecurityUser user = getUser();

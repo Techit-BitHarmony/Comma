@@ -1,7 +1,9 @@
 package com.bitharmony.comma.member.follow.service;
 
-import com.bitharmony.comma.global.exception.MemberDuplicateException;
 import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.follow.exception.DuplicateFollowException;
+import com.bitharmony.comma.member.follow.exception.FollowNotFoundException;
+import com.bitharmony.comma.member.follow.exception.SelfFollowException;
 import com.bitharmony.comma.member.follow.dto.FollowingListReturnResponse;
 import com.bitharmony.comma.member.follow.entity.Follow;
 import com.bitharmony.comma.member.follow.repository.FollowRepository;
@@ -25,7 +27,7 @@ public class FollowService {
     public void follow(String followingUser) {
         String username = memberService.getUser().getUsername();
         if (username.equals(followingUser)) {
-            throw new MemberDuplicateException("본인을 팔로우 할 수 없습니다.");
+            throw new SelfFollowException();
         }
 
         Member follower = memberService.getMemberByUsername(username);
@@ -35,7 +37,7 @@ public class FollowService {
                 following.getId());
 
         if (isExist.isPresent()) {
-            throw new RuntimeException("이미 팔로우한 상태입니다.");
+            throw new DuplicateFollowException();
         }
 
         Follow follow = Follow.builder()
@@ -53,7 +55,7 @@ public class FollowService {
         Member follower = memberService.getMemberByUsername(username);
 
         Follow follow = followRepository.findByFollowerIdAndFollowingId(follower.getId(), following.getId())
-                .orElseThrow(() -> new RuntimeException("팔로우 정보가 없습니다."));
+                .orElseThrow(() -> new FollowNotFoundException());
 
         followRepository.delete(follow);
     }
