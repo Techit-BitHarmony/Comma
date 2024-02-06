@@ -19,7 +19,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DonationService {
-    private final DonationRepository donationRespository;
+    private final DonationRepository donationRepository;
     private final MemberService memberService;
     private final MemberRepository memberRepository;
 
@@ -38,7 +38,7 @@ public class DonationService {
                 .message(dto.message())
                 .anonymous(dto.anonymous())
                 .build();
-        donationRespository.save(donation);
+        donationRepository.save(donation);
 
         //후원자의 크레딧을 아티스트에게 전달
         countCredit(patron, artist, dto.amount());
@@ -62,7 +62,7 @@ public class DonationService {
                 .message("")
                 .anonymous(donationRegular.isAnonymous())
                 .build();
-        donationRespository.save(donation);
+        donationRepository.save(donation);
 
         //후원자의 크레딧을 아티스트에게 전달
         countCredit(patron, artist, donationRegular.getAmount());
@@ -88,7 +88,7 @@ public class DonationService {
     // 아티스트가 받은 내역 조회 할 때
     public List<DonationFindResponseDto> getDonationListByArtistUsername(String username) {
 
-        List<Donation> donationList = donationRespository.findAllByArtistUsername(username);
+        List<Donation> donationList = donationRepository.findAllByArtistUsername(username);
         List<DonationFindResponseDto> responseDtoList = new ArrayList<>();
 
         if (donationList.size() == 0) {
@@ -113,7 +113,7 @@ public class DonationService {
     public List<DonationFindResponseDto> getDonationListByPatronUsername(String username) {
 
         Member patron = memberService.getMemberByUsername(username);
-        List<Donation> donationList = donationRespository.findAllByPatron(patron);
+        List<Donation> donationList = donationRepository.findAllByPatron(patron);
         List<DonationFindResponseDto> responseDtoList = new ArrayList<>();
 
         if (donationList.size() == 0) {
