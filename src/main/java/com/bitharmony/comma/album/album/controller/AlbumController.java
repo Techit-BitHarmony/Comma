@@ -40,8 +40,7 @@ public class AlbumController {
 	@PostMapping("/release")
 	@PreAuthorize("isAuthenticated()")
 	public GlobalResponse releaseAlbum(@Valid AlbumCreateRequest request,
-		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile,
-		Principal principal) {
+		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile, Principal principal) {
 
 		Member member = memberService.getMemberByUsername(principal.getName());
 
@@ -62,13 +61,12 @@ public class AlbumController {
 
 	@PutMapping("/{id}")
 	@PreAuthorize("isAuthenticated()")
-	public GlobalResponse editAlbum(@PathVariable long id,@Valid AlbumEditRequest request,
-		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile,
-		Principal principal) {
+	public GlobalResponse editAlbum(@PathVariable long id, @Valid AlbumEditRequest request,
+		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile, Principal principal) {
 		Album album = albumService.getAlbumById(id);
 		Member member = memberService.getMemberByUsername(principal.getName());
 
-		if (!albumService.canEdit(album, principal, member)) {
+		if (!albumService.canEdit(album, principal, musicImageFile, request, member)) {
 			throw new AlbumFieldException();
 		}
 
@@ -99,7 +97,7 @@ public class AlbumController {
 			throw new AlbumPermissionException();
 		}
 
-		albumLikeService.like(member,album);
+		albumLikeService.like(member, album);
 		return GlobalResponse.of("200");
 	}
 
@@ -113,7 +111,7 @@ public class AlbumController {
 			throw new AlbumPermissionException();
 		}
 
-		albumLikeService.like(member,album);
+		albumLikeService.like(member, album);
 		return GlobalResponse.of("200");
 	}
 

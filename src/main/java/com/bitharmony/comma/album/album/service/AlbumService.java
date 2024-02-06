@@ -17,6 +17,7 @@ import com.bitharmony.comma.album.file.util.NcpImageUtil;
 import com.bitharmony.comma.global.exception.AlbumNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -38,8 +39,7 @@ public class AlbumService {
 		album.update(request);
 
 		if (musicImageFile != null)
-			fileService.deleteFile(fileService.getAlbumFileUrl(album.getImagePath()),
-				ncpImageUtil.getBucketName());
+			fileService.deleteFile(fileService.getAlbumFileUrl(album.getImagePath()), ncpImageUtil.getBucketName());
 
 		saveAlbum(album, musicImageFile);
 		return album;
@@ -53,8 +53,10 @@ public class AlbumService {
 	}
 
 	public Album saveAlbum(Album album, MultipartFile musicImageFile) {
-		String imageUrl = fileService.uploadFile(musicImageFile, ncpImageUtil.getBucketName()).uploadFileUrl();
-		album = album.toBuilder().imagePath(imageUrl).build();
+		if (musicImageFile != null) {
+			String imageUrl = fileService.uploadFile(musicImageFile, ncpImageUtil.getBucketName()).uploadFileUrl();
+			album = album.toBuilder().imagePath(imageUrl).build();
+		}
 
 		albumRepository.save(album);
 		return album;
@@ -85,23 +87,37 @@ public class AlbumService {
 	}
 
 	public boolean canRelease(String name, MultipartFile musicImageFile, Member member) {
-		if(member == null) return false;
-		if (albumRepository.findByAlbumname(name).isPresent()) return false;
+		if (member == null)
+			return false;
+		if (albumRepository.findByAlbumname(name).isPresent())
+			return false;
 
 		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
-		if (imgFile.isEmpty()) return false;
+		if (imgFile.isEmpty() && musicImageFile != null)
+			return false;
 
 		return true;
 	}
 
-	public boolean canEdit(Album album, Principal principal, Member member) {
-		if(member == null) return false;
-		if(!album.getMember().getUsername().equals(principal.getName())) return false;
+	public boolean canEdit(Album album, Principal principal, MultipartFile musicImageFile,
+		@Valid AlbumEditRequest request, Member member) {
+		if (member == null)
+			return false;
+		if (!album.getMember().getUsername().equals(principal.getName()))
+			return false;
+		if (albumRepository.findByAlbumname(request.albumname()).isPresent())
+			return false;
+
+		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
+		if (imgFile.isEmpty() && musicImageFile != null)
+			return false;
+
 		return true;
 	}
 
 	public boolean canDelete(Album album, Principal principal) {
-		if(!album.getMember().getUsername().equals(principal.getName())) return false;
+		if (!album.getMember().getUsername().equals(principal.getName()))
+			return false;
 		return true;
 	}
 
