@@ -14,7 +14,7 @@ import com.bitharmony.comma.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.album.file.service.FileService;
 import com.bitharmony.comma.album.file.util.FileType;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
-import com.bitharmony.comma.global.exception.AlbumNotFoundException;
+import com.bitharmony.comma.album.album.exception.AlbumNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
 
 import jakarta.validation.Valid;

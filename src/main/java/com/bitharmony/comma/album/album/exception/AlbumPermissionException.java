@@ -1,4 +1,6 @@
-package com.bitharmony.comma.global.exception;
+package com.bitharmony.comma.album.album.exception;
+
+import com.bitharmony.comma.global.exception.CommaException;
 
 public class AlbumPermissionException extends CommaException {
 	private final static String MESSAGE = "권한이 없습니다.";
