@@ -100,6 +100,19 @@ public class MemberService {
         return response;
     }
 
+    public MemberReturnResponse getProfile(String username) {
+
+        Member findMember = getMemberByUsername(username);
+
+        MemberReturnResponse response = MemberReturnResponse.builder()
+                .username(findMember.getUsername())
+                .Email(findMember.getEmail())
+                .nickname(findMember.getNickname())
+                .build();
+
+        return response;
+    }
+
     @Transactional
     public void modify(String nickname, String email) {
 
@@ -114,6 +127,22 @@ public class MemberService {
                 .build();
 
         memberRepository.save(modifyMember);
+    }
+
+    @Transactional
+    public void passwordModify(String password, String passwordCheck) {
+        if (!password.equals(passwordCheck)) {
+            throw new IllegalArgumentException("입력한 두개의 비밀번호가 다릅니다.");
+        }
+
+        SecurityUser user = getUser();
+        Member member = getMemberByUsername(user.getUsername());
+
+        member = member.toBuilder()
+                .password(passwordEncoder.encode(password))
+                 .build();
+
+        memberRepository.save(member);
     }
 
     public SecurityUser getUser() {

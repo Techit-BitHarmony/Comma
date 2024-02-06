@@ -4,11 +4,13 @@ import com.bitharmony.comma.global.response.GlobalResponse;
 import com.bitharmony.comma.member.dto.MemberJoinRequest;
 import com.bitharmony.comma.member.dto.MemberLoginRequest;
 import com.bitharmony.comma.member.dto.MemberModifyRequest;
+import com.bitharmony.comma.member.dto.MemberPwModifyRequest;
 import com.bitharmony.comma.member.dto.MemberReturnResponse;
 import com.bitharmony.comma.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,7 +52,11 @@ public class MemberController {
         return GlobalResponse.of("200", response);
     }
 
-    //TODO : GET /membmer/{username} -> 회원정보 반환
+    @GetMapping("/{username}")
+    public GlobalResponse profile(@PathVariable("username") String username) {
+        MemberReturnResponse response = memberService.getProfile(username);
+        return GlobalResponse.of("200", response);
+    }
 
     @PutMapping("/modify")
     public GlobalResponse modify(@RequestBody @Valid MemberModifyRequest memberModifyRequest) {
@@ -58,5 +64,11 @@ public class MemberController {
         return GlobalResponse.of("200");
     }
 
-    //TODO : 비밀번호 수정
+    @PutMapping("/passwordModify")
+    public GlobalResponse passwordModify(@RequestBody @Valid MemberPwModifyRequest memberPwModifyRequest) {
+        memberService.passwordModify(memberPwModifyRequest.passwordModify(),
+                memberPwModifyRequest.passwordModifyCheck());
+
+        return GlobalResponse.of("200");
+    }
 }
