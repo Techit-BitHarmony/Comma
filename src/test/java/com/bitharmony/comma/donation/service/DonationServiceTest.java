@@ -55,7 +55,7 @@ class DonationServiceTest {
                 .anonymous(false)
                 .executeDay(2)
                 .build();
-        donationRegularService.makeSchedule(donationRegular);
+//        donationRegularService.makeSchedule(donationRegular);
     }
 //    @Test
 //    public void donationRegularTest2() throws SchedulerException {

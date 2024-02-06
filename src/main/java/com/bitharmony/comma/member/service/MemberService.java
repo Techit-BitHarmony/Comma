@@ -122,4 +122,9 @@ public class MemberService {
         return (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
+    public void updateCredit(String username, Long updatedCredit){
+        Member member = getMemberByUsername(username);
+        memberRepository.save(member.toBuilder().credit(updatedCredit).build());
+    }
+
 }
