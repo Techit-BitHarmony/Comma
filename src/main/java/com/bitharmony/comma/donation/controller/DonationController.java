@@ -77,5 +77,10 @@ public class DonationController {
         return GlobalResponse.of("200");
     }
 
+    @PostMapping("/regular/modify")
+    @PreAuthorize("isAuthenticated()")
+    public void modifyDonationRegular(){
+
+    }
 
 }
