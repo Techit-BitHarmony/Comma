@@ -3,7 +3,6 @@ package com.bitharmony.comma.donation.service;
 import com.bitharmony.comma.donation.dto.DonationFindResponseDto;
 import com.bitharmony.comma.donation.dto.DonationOnceRequestDto;
 import com.bitharmony.comma.donation.entity.Donation;
-import com.bitharmony.comma.donation.entity.DonationRegular;
 import com.bitharmony.comma.donation.repository.DonationRepository;
 import com.bitharmony.comma.global.exception.Donation.CreditShortageException;
 import com.bitharmony.comma.global.exception.Donation.DonationListNotFoundException;
@@ -42,39 +41,11 @@ public class DonationService {
 
         //후원자의 크레딧을 아티스트에게 전달
         countCredit(patron, artist, dto.amount());
-
-        // 결과 반환
-
     }
 
-    public void donateRegularToArtist(DonationRegular donationRegular) {
-        Member patron = memberService.getMemberByUsername(donationRegular.getPatronName());
-        Member artist = memberService.getMemberByUsername(donationRegular.getArtistName());
-
-        //credit 부족한지 확인
-        checkCredit(patron, donationRegular.getAmount());
-
-        //donation 엔티티 생성 및 저장
-        Donation donation = Donation.builder()
-                .artistUsername(artist.getUsername())
-                .patron(patron)
-                .amount(donationRegular.getAmount())
-                .message("")
-                .anonymous(donationRegular.isAnonymous())
-                .build();
-        donationRepository.save(donation);
-
-        //후원자의 크레딧을 아티스트에게 전달
-        countCredit(patron, artist, donationRegular.getAmount());
-    }
-
-    // donation에서 memberRepostiory에 접근 하는 방식이 옳은가?
     private void countCredit(Member patron, Member artist, Long amount) {
-        patron = patron.toBuilder().credit(patron.getCredit() - amount).build();
-        artist = artist.toBuilder().credit(artist.getCredit() + amount).build();
-
-        memberRepository.save(patron);
-        memberRepository.save(artist);
+        memberService.updateCredit(patron.getUsername(), patron.getCredit() - amount);
+        memberService.updateCredit(artist.getUsername(), artist.getCredit() + amount);
     }
 
     private void checkCredit(Member patron, Long amount) {
@@ -98,6 +69,7 @@ public class DonationService {
         for (Donation d : donationList) {
             DonationFindResponseDto dto = DonationFindResponseDto.builder()
                     .patronUsername(checkDonationAnonymousAndGetPatronName(d))
+                    .artistUsername(d.getArtistUsername())
                     .amount(d.getAmount())
                     .message(d.getMessage())
                     .time(d.getCreateDate())
@@ -122,6 +94,7 @@ public class DonationService {
 
         for (Donation d : donationList) {
             DonationFindResponseDto dto = DonationFindResponseDto.builder()
+                    .patronUsername(d.getPatron().getUsername())
                     .artistUsername(d.getArtistUsername())
                     .amount(d.getAmount())
                     .message(d.getMessage())
@@ -138,5 +111,13 @@ public class DonationService {
             return "익명";
         }
         return donation.getPatron().getUsername();
+    }
+
+    public void testSetCredit(String patron, String artist){
+        Member member1 = memberService.getMemberByUsername(patron);
+        Member member2 = memberService.getMemberByUsername(artist);
+
+        memberRepository.save(member1.toBuilder().credit(10000L).build());
+        memberRepository.save(member2.toBuilder().credit(10000L).build());
     }
 }
