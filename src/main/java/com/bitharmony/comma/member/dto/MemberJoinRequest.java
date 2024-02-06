@@ -9,6 +9,7 @@ import lombok.Builder;
 public record MemberJoinRequest(
         @NotBlank String username,
         @NotBlank String password,
+        @NotBlank String passwordCheck,
         @NotBlank @Email String email,
         @NotBlank String nickname
 ) { }

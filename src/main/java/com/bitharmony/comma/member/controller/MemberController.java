@@ -33,7 +33,7 @@ public class MemberController {
     public GlobalResponse join(@RequestBody @Valid MemberJoinRequest memberJoinRequest) {
 
         memberService.join(
-                memberJoinRequest.username(), memberJoinRequest.password(),
+                memberJoinRequest.username(), memberJoinRequest.password(), memberJoinRequest.passwordCheck(),
                 memberJoinRequest.email(), memberJoinRequest.nickname());
 
         return GlobalResponse.of("201");

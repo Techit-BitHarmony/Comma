@@ -62,13 +62,17 @@ public class MemberService {
     }
 
     @Transactional
-    public void join(String username, String password, String email, String nickname) {
+    public void join(String username, String password, String passwordCheck, String email, String nickname) {
         if (memberRepository.findByUsername(username).isPresent()) {
             throw new MemberDuplicateException("이미 존재하는 아이디입니다.");
         }
 
         if (memberRepository.findByNickname(nickname).isPresent()) {
             throw new DuplicateNicknameException();
+        }
+
+        if (!password.equals(passwordCheck)) {
+            throw new InvalidPasswordException();
         }
 
         Member member = Member.builder()
