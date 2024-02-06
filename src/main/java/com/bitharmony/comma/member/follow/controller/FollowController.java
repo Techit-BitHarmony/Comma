@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class FollowController {
     private final FollowService followService;
 
-    //TODO : POST /follow/{username} -> 로그인된 사용자가 해당 username을 가진 사용자를 팔로우
     @PostMapping("/{username}")
     public GlobalResponse follow(@PathVariable("username") String followingUsername) {
         followService.follow(followingUsername);
@@ -25,7 +24,6 @@ public class FollowController {
         return GlobalResponse.of("201");
     }
 
-    //TODO : DELETE /follow/{username} -> 로그인된 사용자가 해당 username을 가진 사용자를 언팔로우
     @DeleteMapping("/{username}")
     public GlobalResponse unfollow(@PathVariable("username") String followingUsername) {
         followService.unfollow(followingUsername);
@@ -33,7 +31,6 @@ public class FollowController {
         return GlobalResponse.of("200");
     }
 
-    //TODO : GET /follow -> 로그인된 사용자가 팔로우한 리스트를 모두 반환
     @GetMapping("/")
     public GlobalResponse getAllFollowing() {
         FollowingListReturnResponse response = followService.getAllFollowingList();
