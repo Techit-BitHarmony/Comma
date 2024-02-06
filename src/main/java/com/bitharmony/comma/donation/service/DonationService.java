@@ -2,11 +2,11 @@ package com.bitharmony.comma.donation.service;
 
 import com.bitharmony.comma.donation.dto.DonationFindResponseDto;
 import com.bitharmony.comma.donation.dto.DonationOnceRequestDto;
-import com.bitharmony.comma.donation.dto.DonationResponse;
 import com.bitharmony.comma.donation.entity.Donation;
 import com.bitharmony.comma.donation.entity.DonationRegular;
 import com.bitharmony.comma.donation.repository.DonationRepository;
-import com.bitharmony.comma.global.exception.CreditShortageException;
+import com.bitharmony.comma.global.exception.Donation.CreditShortageException;
+import com.bitharmony.comma.global.exception.Donation.DonationListNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.repository.MemberRepository;
 import com.bitharmony.comma.member.service.MemberService;
@@ -80,19 +80,19 @@ public class DonationService {
     private void checkCredit(Member patron, Long amount) {
         if (patron.getCredit() < amount) {
             // 후원 프로세스 멈추고 금액부족 메세지 반환
-            throw new CreditShortageException("크레딧이 부족합니다.");
+            throw new CreditShortageException();
         }
     }
 
     // 회원 인증 필요
     // 아티스트가 받은 내역 조회 할 때
-    public DonationResponse getDonationListByArtistUsername(String username) {
+    public List<DonationFindResponseDto> getDonationListByArtistUsername(String username) {
 
         List<Donation> donationList = donationRespository.findAllByArtistUsername(username);
         List<DonationFindResponseDto> responseDtoList = new ArrayList<>();
 
         if (donationList.size() == 0) {
-            return DonationResponse.of("후원내역 없음.");
+            throw new DonationListNotFoundException();
         }
 
         for (Donation d : donationList) {
@@ -105,18 +105,19 @@ public class DonationService {
 
             responseDtoList.add(dto);
         }
-        return DonationResponse.of("후원내역 반환.", responseDtoList);
+        return responseDtoList;
     }
 
     // 회원 인증 필요
     // 후원자가 준 내역 확인 할 때
-    public DonationResponse getDonationListByPatron(Member patron) {
+    public List<DonationFindResponseDto> getDonationListByPatronUsername(String username) {
 
+        Member patron = memberService.getMemberByUsername(username);
         List<Donation> donationList = donationRespository.findAllByPatron(patron);
         List<DonationFindResponseDto> responseDtoList = new ArrayList<>();
 
         if (donationList.size() == 0) {
-            return DonationResponse.of("후원내역 없음.");
+            throw new DonationListNotFoundException();
         }
 
         for (Donation d : donationList) {
@@ -129,7 +130,7 @@ public class DonationService {
 
             responseDtoList.add(dto);
         }
-        return DonationResponse.of("후원내역 반환.", responseDtoList);
+        return responseDtoList;
     }
 
     private String checkDonationAnonymousAndGetPatronName(Donation donation) {
