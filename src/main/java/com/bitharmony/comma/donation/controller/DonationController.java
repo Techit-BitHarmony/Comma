@@ -1,14 +1,15 @@
 package com.bitharmony.comma.donation.controller;
 
-
 import com.bitharmony.comma.donation.dto.DonationFindResponseDto;
 import com.bitharmony.comma.donation.dto.DonationOnceRequestDto;
-import com.bitharmony.comma.donation.entity.DonationRegular;
+import com.bitharmony.comma.donation.dto.DonationRegularRequestDto;
+import com.bitharmony.comma.donation.dto.DonationRegularUpdateRequestDto;
 import com.bitharmony.comma.donation.service.DonationRegularService;
 import com.bitharmony.comma.donation.service.DonationService;
 import com.bitharmony.comma.global.exception.NotAuthorizedException;
 import com.bitharmony.comma.global.response.GlobalResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/donation")
+@Slf4j
 public class DonationController {
 
     private final DonationService donationService;
@@ -68,19 +70,31 @@ public class DonationController {
 
     @PostMapping("/regular")
     @PreAuthorize("isAuthenticated()")
-    public GlobalResponse donationRegular(@RequestBody DonationRegular donationRegular, Principal principal) throws SchedulerException {
+    public GlobalResponse donationRegular(@RequestBody DonationRegularRequestDto dto, Principal principal) {
+        log.info("donation regular");
+        checkLoginUser(principal, dto.patronName());
 
-        checkLoginUser(principal, donationRegular.getPatronName());
-
-        donationRegularService.makeSchedule(donationRegular);
+        donationRegularService.donationRegular(dto);
 
         return GlobalResponse.of("200");
     }
 
-    @PostMapping("/regular/modify")
+    @PostMapping("/regular/update")
     @PreAuthorize("isAuthenticated()")
-    public void modifyDonationRegular(){
+    public GlobalResponse modifyDonationRegular(@RequestBody DonationRegularUpdateRequestDto updateRequestDto, Principal principal) {
 
+        checkLoginUser(principal, updateRequestDto.patronName());
+
+        donationRegularService.updateExecuteDay(updateRequestDto);
+
+        return GlobalResponse.of("200");
+    }
+
+    @PostMapping("/test/{user1}/{user2}")
+    public GlobalResponse test(@PathVariable("user1") String user1, @PathVariable("user2") String user2){
+        donationService.testSetCredit(user1,user2);
+
+        return GlobalResponse.of("200");
     }
 
 }
