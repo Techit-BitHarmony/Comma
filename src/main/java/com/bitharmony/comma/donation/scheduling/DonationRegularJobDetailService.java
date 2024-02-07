@@ -20,18 +20,12 @@ public class DonationRegularJobDetailService {
         log.warn("job detail name= {}", jobKey.getName());
 
         JobDataMap jobDataMap = new JobDataMap();
-//        jobDataMap.put("donationRegular", donationRegular);
+        jobDataMap.put("donationRegular", donationRegular);
         jobDataMap.put("retry", 0);
         jobDataMap.put("patronName", donationRegular.getPatronName());
         jobDataMap.put("artistName", donationRegular.getArtistName());
         jobDataMap.put("amount", donationRegular.getAmount());
         jobDataMap.put("anonymous", donationRegular.isAnonymous());
-//        for (Field field : donationRegular.getClass().getDeclaredFields()) {
-//            field.setAccessible(true);
-//            Object value = field.get(donationRegular);
-//
-//            jobDataMap.put(field.getName(),value);
-//        }
 
         return newJob(DonationRegularJob.class)
                 .withIdentity(jobKey.getName(), jobKey.getGroup())
