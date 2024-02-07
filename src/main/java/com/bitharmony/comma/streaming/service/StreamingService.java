@@ -46,7 +46,6 @@ public class StreamingService {
             }
             case COMPLETE -> {
                 sendEncodingStatus(username, albumId, outputType, EncodeStatus.COMPLETE);
-                sseProvider.complete(username, albumId);
                 container.removeMessageListener(encodingStatusListener, topicStatus); // 토픽 해제
             }
             case FAILURE -> {
