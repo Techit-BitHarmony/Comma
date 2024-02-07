@@ -6,6 +6,10 @@ import com.bitharmony.comma.donation.entity.DonationRegular;
 import com.bitharmony.comma.donation.repository.DonationRegularRepository;
 import com.bitharmony.comma.donation.scheduling.DonationRegularJobDetailService;
 import com.bitharmony.comma.donation.scheduling.DonationRegularTriggerService;
+import com.bitharmony.comma.global.exception.Donation.DonationRegularNotFoundException;
+import com.bitharmony.comma.global.exception.Donation.JobKeyDuplicationException;
+import com.bitharmony.comma.global.exception.Donation.QuartzJobNotDeletedException;
+import com.bitharmony.comma.global.exception.Donation.QuartzJobSchedulerNotUpdatedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -27,16 +31,12 @@ public class DonationRegularService {
     public void donationRegular(DonationRegularRequestDto dto) {
 
         JobKey jobKey = makeJobKey(dto.patronName(), dto.artistName());
-        // check duplication
 
+        // check duplication
+        checkJobKeyDuplication(jobKey);
 
         DonationRegular donationRegular = saveDonationRegularEntity(dto, jobKey);
-        JobDetail jobDetail = null;
-        try {
-            jobDetail = makeJobDetail(jobKey, donationRegular);
-        }catch (IllegalAccessException e){
-
-        }
+        JobDetail jobDetail = makeJobDetail(jobKey, donationRegular);
         Trigger trigger = makeTrigger(jobKey, donationRegular);
 
         makeSchedule(jobDetail, trigger);
@@ -45,7 +45,7 @@ public class DonationRegularService {
     public void updateExecuteDay(DonationRegularUpdateRequestDto updateRequestDto) {
         JobKey jobKey = makeJobKey(updateRequestDto.patronName(), updateRequestDto.artistName());
 
-        DonationRegular donationRegular = getDonationRegularByJobKey(jobKey);
+        DonationRegular donationRegular = checkAndGetDonationRegularByJobKey(jobKey);
         donationRegular.toBuilder().executeDay(updateRequestDto.executeDay()).build();
         donationRegularRepository.save(donationRegular);
 
@@ -54,8 +54,20 @@ public class DonationRegularService {
         try {
             scheduler.rescheduleJob(trigger.getKey(), trigger);
         } catch (SchedulerException e) {
-
+            throw new QuartzJobSchedulerNotUpdatedException();
         }
+    }
+
+    public void deleteDonationRegularJob(DonationRegularUpdateRequestDto updateRequestDto){
+        JobKey jobKey = makeJobKey(updateRequestDto.patronName(), updateRequestDto.artistName());
+        DonationRegular donationRegular = checkAndGetDonationRegularByJobKey(jobKey);
+        try {
+            scheduler.deleteJob(jobKey);
+            donationRegularRepository.delete(donationRegular);
+        }catch (SchedulerException sc){
+            throw new QuartzJobNotDeletedException();
+        }
+
     }
 
     private DonationRegular saveDonationRegularEntity(DonationRegularRequestDto dto, JobKey jobKey) {
@@ -92,7 +104,7 @@ public class DonationRegularService {
         return jobKey;
     }
 
-    private JobDetail makeJobDetail(JobKey jobKey, DonationRegular donationRegular) throws IllegalAccessException {
+    private JobDetail makeJobDetail(JobKey jobKey, DonationRegular donationRegular){
         return jobDetailService.build(jobKey, donationRegular);
     }
 
@@ -100,14 +112,21 @@ public class DonationRegularService {
         return triggerService.build(jobKey, donationRegular);
     }
 
-    private DonationRegular getDonationRegularByJobKey(JobKey jobKey) {
+    private void checkJobKeyDuplication(JobKey jobKey){
+        Optional<DonationRegular> donationRegularOp = donationRegularRepository.findByJobKey(jobKey);
+        donationRegularOp.ifPresent(exception ->{
+            throw new JobKeyDuplicationException();
+        });
+    }
+
+    private DonationRegular checkAndGetDonationRegularByJobKey(JobKey jobKey) {
 
         Optional<DonationRegular> donationRegularOp = donationRegularRepository.findByJobKey(jobKey);
 
         if (donationRegularOp.isPresent()) {
             return donationRegularOp.get();
         } else {
-            throw new RuntimeException();
+            throw new DonationRegularNotFoundException();
         }
     }
 }
