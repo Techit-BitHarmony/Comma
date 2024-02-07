@@ -1,6 +1,6 @@
 package com.bitharmony.comma.streaming.service;
 
-import com.bitharmony.comma.global.exception.EncodingFailureException;
+import com.bitharmony.comma.global.exception.streaming.EncodingFailureException;
 import com.bitharmony.comma.streaming.dto.UploadUrlResponse;
 import com.bitharmony.comma.streaming.util.EncodeStatus;
 import com.bitharmony.comma.streaming.util.EncodingStatusListener;
@@ -22,7 +22,6 @@ public class StreamingService {
     private final ChannelTopic topicStatus;
 
     private final NcpMusicUtil ncpMusicUtil;
-    private final SseProvider sseProvider;
 
     static private final String CHANNEL_NAME = "encodingStatus";
 
@@ -46,7 +45,6 @@ public class StreamingService {
             }
             case COMPLETE -> {
                 sendEncodingStatus(username, albumId, outputType, EncodeStatus.COMPLETE);
-                sseProvider.complete(username, albumId);
                 container.removeMessageListener(encodingStatusListener, topicStatus); // 토픽 해제
             }
             case FAILURE -> {
