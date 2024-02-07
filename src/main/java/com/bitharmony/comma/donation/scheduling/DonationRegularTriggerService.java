@@ -8,6 +8,8 @@ import org.quartz.impl.triggers.CronTriggerImpl;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Date;
 
 import static org.quartz.CalendarIntervalScheduleBuilder.calendarIntervalSchedule;
@@ -32,10 +34,10 @@ public class DonationRegularTriggerService {
                 .build();
     }
 
-    public CronExpression makeCronExpression(int day) {
+    private CronExpression makeCronExpression(int day) {
         CronExpression cronExpression = null;
         try {
-            cronExpression = new CronExpression(String.format("0 0/1 * * * ?", day));
+            cronExpression = new CronExpression(String.format("0 0 10 %s L ?", day));
         } catch (ParseException e) {
             // exception 처리 추가 필요
             throw new RuntimeException(e);
@@ -65,15 +67,4 @@ public class DonationRegularTriggerService {
         return trigger;
     }
 
-//    public Trigger retryTrigger() {
-//        log.info("retry trigger 설정");
-//        return newTrigger()
-//                .withSchedule(simpleSchedule()
-//                        .withIntervalInHours(24)
-//                        .withRepeatCount(3)
-//                )
-//                .startAt(futureDate(10, MINUTE))
-//                .withIdentity(new TriggerKey("retry"))
-//                .build();
-//    }
 }
