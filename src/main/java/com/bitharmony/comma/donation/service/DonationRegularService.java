@@ -32,8 +32,10 @@ public class DonationRegularService {
 
         JobKey jobKey = makeJobKey(dto.patronName(), dto.artistName());
 
-        // check duplication
+        // check jobkey duplication
         checkJobKeyDuplication(jobKey);
+        // check execute day validation
+        checkValidExecuteDay(dto.executeDay());
 
         DonationRegular donationRegular = saveDonationRegularEntity(dto, jobKey);
         JobDetail jobDetail = makeJobDetail(jobKey, donationRegular);
@@ -127,6 +129,15 @@ public class DonationRegularService {
             return donationRegularOp.get();
         } else {
             throw new DonationRegularNotFoundException();
+        }
+    }
+
+    private void checkValidExecuteDay(Integer day){
+        if(day == null){
+            throw new RuntimeException("후원 실행 날짜가 없습니다.");
+        }
+        if(day <= 0 || day > 31){
+            throw new RuntimeException("후원 실행 날짜가 잘못되었습니다.");
         }
     }
 }
