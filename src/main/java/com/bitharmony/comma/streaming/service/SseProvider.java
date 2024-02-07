@@ -1,7 +1,7 @@
 package com.bitharmony.comma.streaming.service;
 
-import com.bitharmony.comma.global.exception.SseEmitterNotFoundException;
-import com.bitharmony.comma.global.exception.SseEmitterSendingException;
+import com.bitharmony.comma.global.exception.streaming.SseEmitterNotFoundException;
+import com.bitharmony.comma.global.exception.streaming.SseEmitterSendingException;
 import com.bitharmony.comma.streaming.util.EncodeStatus;
 import java.io.IOException;
 import java.util.Map;
