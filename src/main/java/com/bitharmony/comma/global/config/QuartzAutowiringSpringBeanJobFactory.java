@@ -1,5 +1,6 @@
 package com.bitharmony.comma.global.config;
 
+import lombok.RequiredArgsConstructor;
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -8,13 +9,10 @@ import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class QuartzAutowiringSpringBeanJobFactory extends SpringBeanJobFactory {
 
-    @Autowired
-    private AutowireCapableBeanFactory beanFactory;
-
-    @Autowired
-    private ApplicationContext applicationContext;
+    private final AutowireCapableBeanFactory beanFactory;
 
     @Override
     protected Object createJobInstance(TriggerFiredBundle bundle) throws Exception {
@@ -22,10 +20,5 @@ public class QuartzAutowiringSpringBeanJobFactory extends SpringBeanJobFactory {
         beanFactory.autowireBean(jobInstance);
         beanFactory.initializeBean(jobInstance, jobInstance.getClass().getName());
         return jobInstance;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
     }
 }
