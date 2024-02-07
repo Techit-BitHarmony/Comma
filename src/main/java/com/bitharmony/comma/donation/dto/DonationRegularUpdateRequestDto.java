@@ -9,7 +9,7 @@ public record DonationRegularUpdateRequestDto(
         String patronName,
         @NotNull
         String artistName,
-        @NotNull
+
         Integer executeDay
 ) {
 }
