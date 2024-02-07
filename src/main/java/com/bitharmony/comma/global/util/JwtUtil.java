@@ -1,5 +1,6 @@
 package com.bitharmony.comma.global.util;
 
+import com.bitharmony.comma.global.exception.ExpiredAccessTokenException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -107,7 +108,7 @@ public class JwtUtil {
         } catch (MalformedJwtException e) {
             return false;
         } catch (ExpiredJwtException e) {
-            return false;
+            throw new ExpiredAccessTokenException();
         } catch (JwtException e) {
             return false;
         }
