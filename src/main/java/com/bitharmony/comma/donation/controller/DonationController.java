@@ -83,7 +83,7 @@ public class DonationController {
         return GlobalResponse.of("200", "정기후원이 등록되었습니다.");
     }
 
-    @PutMapping("/regular/update")
+    @PutMapping("/regular")
     public GlobalResponse modifyDonationRegular(
             @RequestBody DonationRegularUpdateRequestDto updateRequestDto,
             Principal principal) {
