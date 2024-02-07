@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public record ChargeGetResponse(
         long chargeAmount,
         String username,
+        String chargeCode,
         LocalDateTime createDate,
         String paymentKey,
         LocalDateTime payDate
