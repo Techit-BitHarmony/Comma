@@ -16,6 +16,7 @@ import com.bitharmony.comma.album.file.util.FileType;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
 import com.bitharmony.comma.album.album.exception.AlbumNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.streaming.util.NcpMusicUtil;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class AlbumService {
 	private final AlbumRepository albumRepository;
 	private final FileService fileService;
 	private final NcpImageUtil ncpImageUtil;
+	private final NcpMusicUtil ncpMusicUtil;
 
 	@Transactional
 	public Album release(AlbumCreateRequest request, Member member, MultipartFile musicImageFile) {
@@ -47,7 +49,7 @@ public class AlbumService {
 
 	@Transactional
 	public void delete(Album album) {
-		fileService.deleteFile(album.getFilePath(), ncpImageUtil.getBucketName());
+		ncpMusicUtil.deleteFile(album.getFilePath());
 		fileService.deleteFile(album.getImagePath(), ncpImageUtil.getBucketName());
 		albumRepository.delete(album);
 	}
