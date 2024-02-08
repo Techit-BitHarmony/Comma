@@ -6,9 +6,14 @@ import com.bitharmony.comma.community.artitcle.repository.ArticleRepository;
 import com.bitharmony.comma.global.exception.ArticleNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,7 +65,7 @@ public class ArticleService {
         articleRepository.deleteById(id);
     }
 
-    public List<Article> getArticleList() {
-        return articleRepository.findAll();
+    public Page<Article> getArticleList(Pageable pageable) {
+        return articleRepository.findAll(pageable);
     }
 }
