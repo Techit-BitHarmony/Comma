@@ -1,7 +1,5 @@
 package com.bitharmony.comma.community.comment.controller;
 
-import com.bitharmony.comma.community.artitcle.entity.Article;
-import com.bitharmony.comma.community.artitcle.service.ArticleService;
 import com.bitharmony.comma.community.comment.dto.*;
 import com.bitharmony.comma.community.comment.entity.Comment;
 import com.bitharmony.comma.community.comment.service.CommentService;

@@ -1,5 +1,7 @@
-package com.bitharmony.comma.global.exception;
+package com.bitharmony.comma.global.exception.community;
 
+
+import com.bitharmony.comma.global.exception.CommaException;
 
 public class ArticleNotFoundException extends CommaException {
 
