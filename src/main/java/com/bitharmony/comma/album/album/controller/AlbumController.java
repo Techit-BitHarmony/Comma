@@ -1,8 +1,8 @@
 package com.bitharmony.comma.album.album.controller;
 
 import java.security.Principal;
-import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,15 +63,21 @@ public class AlbumController {
 	}
 
 	@GetMapping("/{username}")
-	public GlobalResponse getAlbumList(@PathVariable String username) {
+	public GlobalResponse getUserAlbumList(@PathVariable String username) {
 		Member member = memberService.getMemberByUsername(username);
 
 		if (member == null) {
 			throw new MemberNotFoundException("존재하지 않는 회원입니다.");
 		}
 
-		 List<AlbumListResponse> albumList = albumService.getLatest20Albums(username);
-		return GlobalResponse.of("200", albumList);
+		 Page<AlbumListResponse> albumPage = albumService.getLatest20Albums(username);
+		return GlobalResponse.of("200", albumPage);
+	}
+
+	@GetMapping("/list")
+	public GlobalResponse getAlbumList() {
+		Page<AlbumListResponse> albumPage = albumService.getLatest20Albums(null);
+		return GlobalResponse.of("200", albumPage);
 	}
 
 	@PutMapping("/{id}")

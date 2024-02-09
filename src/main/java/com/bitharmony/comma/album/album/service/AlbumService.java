@@ -1,9 +1,7 @@
 package com.bitharmony.comma.album.album.service;
 
 import java.security.Principal;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -75,12 +73,17 @@ public class AlbumService {
 		return albumRepository.findById(id).orElseThrow(AlbumNotFoundException::new);
 	}
 
-	public List<AlbumListResponse> getLatest20Albums(String username) {
+	public Page<AlbumListResponse> getLatest20Albums(String username) {
 		Pageable topTwenty = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "id"));
-		Page<Album> albums = albumRepository.findFirst20ByMemberUsernameOrderByIdDesc(username, topTwenty);
-		return albums.stream()
-			.map(this::convertToDto)
-			.collect(Collectors.toList());
+		Page<Album> albums;
+
+		if (username == null) {
+			albums = albumRepository.findFirst20ByOrderByIdDesc(topTwenty);
+		} else {
+			albums = albumRepository.findFirst20ByMemberUsernameOrderByIdDesc(username, topTwenty);
+		}
+
+		return albums.map(this::convertToDto);
 	}
 
 	public AlbumListResponse convertToDto(Album album) {

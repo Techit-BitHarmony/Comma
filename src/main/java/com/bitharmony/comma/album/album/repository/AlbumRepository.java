@@ -13,4 +13,6 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
 	Optional<Album> findByFilePath(String filePath);
 
 	Page<Album> findFirst20ByMemberUsernameOrderByIdDesc(String username, Pageable pageable);
+
+	Page<Album> findFirst20ByOrderByIdDesc(Pageable pageable);
 }

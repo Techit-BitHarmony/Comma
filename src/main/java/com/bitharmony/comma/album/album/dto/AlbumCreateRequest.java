@@ -14,7 +14,6 @@ public record AlbumCreateRequest(@NotEmpty(message = "앨범 이름을 입력해
 								 String licenseDescription,
 								 boolean permit,
 								 int price
-
 ) {
 	public Album toEntity() {
 		return Album.builder()
