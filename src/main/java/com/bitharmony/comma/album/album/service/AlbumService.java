@@ -47,7 +47,7 @@ public class AlbumService {
 	public Album edit(AlbumEditRequest request, Album album, MultipartFile musicImageFile) {
 		album.update(request);
 
-		if (musicImageFile != null)
+		if (musicImageFile != null && album.getFilePath() != null)
 			fileService.deleteFile(fileService.getAlbumFileUrl(album.getImagePath()), ncpImageUtil.getBucketName());
 
 		saveAlbum(album, musicImageFile);
@@ -102,7 +102,7 @@ public class AlbumService {
 
 	public String getAlbumImageUrl(String filepath) {
 		if (filepath == null) {
-			return "여기에 기본 이미지 URL";
+			return null;
 		}
 
 		return ncpImageUtil.getImageCdn() + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "")
