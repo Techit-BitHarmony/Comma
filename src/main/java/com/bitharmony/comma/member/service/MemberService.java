@@ -46,6 +46,8 @@ public class MemberService {
         String refreshToken = jwtUtil.createRefreshToken(jwtCreateRequest);
 
         MemberLoginResponse response = MemberLoginResponse.builder()
+                .memberId(member.getId())
+                .username(member.getUsername())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
