@@ -1,20 +1,27 @@
 package com.bitharmony.comma.album.album.service;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
+import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.entity.Album;
+import com.bitharmony.comma.album.album.exception.AlbumNotFoundException;
 import com.bitharmony.comma.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.album.file.service.FileService;
 import com.bitharmony.comma.album.file.util.FileType;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
-import com.bitharmony.comma.album.album.exception.AlbumNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.streaming.util.NcpMusicUtil;
 
@@ -68,9 +75,27 @@ public class AlbumService {
 		return albumRepository.findById(id).orElseThrow(AlbumNotFoundException::new);
 	}
 
-	/**
-	 * ncp image optimizer 사용 cdn url을 통해서 변환된 이미지 가져오기
-	 */
+	public List<AlbumListResponse> getLatest20Albums(String username) {
+		Pageable topTwenty = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "id"));
+		Page<Album> albums = albumRepository.findFirst20ByMemberUsernameOrderByIdDesc(username, topTwenty);
+		return albums.stream()
+			.map(this::convertToDto)
+			.collect(Collectors.toList());
+	}
+
+	public AlbumListResponse convertToDto(Album album) {
+		return AlbumListResponse.builder()
+			.id(album.getId())
+			.albumname(album.getAlbumname())
+			.genre(album.getGenre())
+			.imgPath(getAlbumImageUrl(album.getImagePath()))
+			.permit(album.isPermit())
+			.price(album.getPrice())
+			.artistUsername(album.getMember().getUsername())
+			.artistNickname(album.getMember().getNickname())
+			.build();
+	}
+
 	private String replaceBucketName(String filepath, String bucketName, String replacement) {
 		return filepath.replace(bucketName, replacement);
 	}

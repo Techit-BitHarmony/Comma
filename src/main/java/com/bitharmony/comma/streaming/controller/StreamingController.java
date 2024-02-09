@@ -1,16 +1,7 @@
 package com.bitharmony.comma.streaming.controller;
 
-import com.bitharmony.comma.album.album.entity.Album;
-import com.bitharmony.comma.album.album.service.AlbumService;
-import com.bitharmony.comma.global.response.GlobalResponse;
-import com.bitharmony.comma.streaming.dto.EncodeStatusRequest;
-import com.bitharmony.comma.streaming.dto.UploadUrlRequest;
-import com.bitharmony.comma.streaming.dto.UploadUrlResponse;
-import com.bitharmony.comma.streaming.service.SseProvider;
-import com.bitharmony.comma.streaming.service.StreamingService;
-import jakarta.validation.Valid;
 import java.security.Principal;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,6 +11,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import com.bitharmony.comma.album.album.entity.Album;
+import com.bitharmony.comma.album.album.service.AlbumService;
+import com.bitharmony.comma.global.response.GlobalResponse;
+import com.bitharmony.comma.streaming.dto.EncodeStatusRequest;
+import com.bitharmony.comma.streaming.dto.UploadUrlRequest;
+import com.bitharmony.comma.streaming.dto.UploadUrlResponse;
+import com.bitharmony.comma.streaming.service.SseProvider;
+import com.bitharmony.comma.streaming.service.StreamingService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/streaming")
@@ -49,5 +52,4 @@ public class StreamingController {
     public SseEmitter getEncodeStatus(@PathVariable Long albumId, Principal principal) {
         return sseProvider.subscribe(principal.getName(), albumId);
     }
-
 }
