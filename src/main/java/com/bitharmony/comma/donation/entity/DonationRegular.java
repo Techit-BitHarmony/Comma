@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.quartz.JobKey;
 
 import java.io.Serializable;
 
@@ -34,6 +35,9 @@ public class DonationRegular implements Serializable {
 
     @NotNull
     Integer executeDay;
+
+    @NotNull
+    JobKey jobKey;
 
     @Builder.Default
     boolean anonymous = false;

@@ -2,18 +2,17 @@ package com.bitharmony.comma.global.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.concurrent.ThreadPoolExecutor;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,12 +20,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class QuartzSchedulerConfig {
     private final DataSource dataSource;
     private final PlatformTransactionManager platformTransactionManager;
+    private final QuartzAutowiringSpringBeanJobFactory jobFactory;
 
     @Bean
     public SchedulerFactoryBean schedulerFactoryBean() {
         SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
 
         schedulerFactoryBean.setDataSource(dataSource);
+        schedulerFactoryBean.setJobFactory(jobFactory);
         schedulerFactoryBean.setOverwriteExistingJobs(true);
         schedulerFactoryBean.setAutoStartup(true);
         schedulerFactoryBean.setTransactionManager(platformTransactionManager);
