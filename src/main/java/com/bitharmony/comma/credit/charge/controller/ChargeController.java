@@ -34,6 +34,7 @@ public class ChargeController {
                 ChargeGetResponse.builder()
                         .username(charge.getCharger().getUsername())
                         .chargeAmount(charge.getChargeAmount())
+                        .chargeCode(charge.getCode())
                         .createDate(charge.getCreateDate())
                         .payDate(charge.getPayDate())
                         .paymentKey(charge.getPaymentKey())

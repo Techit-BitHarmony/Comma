@@ -19,7 +19,8 @@ import com.bitharmony.comma.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.album.album.entity.Album;
 import com.bitharmony.comma.album.album.service.AlbumLikeService;
 import com.bitharmony.comma.album.album.service.AlbumService;
-import com.bitharmony.comma.global.exception.AlbumFieldException;
+import com.bitharmony.comma.album.album.exception.AlbumFieldException;
+import com.bitharmony.comma.album.album.exception.AlbumPermissionException;
 import com.bitharmony.comma.global.response.GlobalResponse;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
@@ -36,25 +37,18 @@ public class AlbumController {
 	private final AlbumLikeService albumLikeService;
 	private final MemberService memberService;
 
-	@GetMapping("/release")
-	public String showAlbumForm() {
-		return "domain/album/album_form";
-	}
-
 	@PostMapping("/release")
 	@PreAuthorize("isAuthenticated()")
 	public GlobalResponse releaseAlbum(@Valid AlbumCreateRequest request,
-		@RequestParam("musicFile") MultipartFile musicFile,
-		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile,
-		Principal principal) {
+		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile, Principal principal) {
 
 		Member member = memberService.getMemberByUsername(principal.getName());
 
-		if (!albumService.canRelease(request.albumname(), musicFile, musicImageFile, member)) {
+		if (!albumService.canRelease(request.albumname(), musicImageFile, member)) {
 			throw new AlbumFieldException();
 		}
 
-		Album album = albumService.release(request, member,musicFile, musicImageFile);
+		Album album = albumService.release(request, member, musicImageFile);
 		return GlobalResponse.of("200", albumToResponseDto(album));
 	}
 
@@ -67,18 +61,16 @@ public class AlbumController {
 
 	@PutMapping("/{id}")
 	@PreAuthorize("isAuthenticated()")
-	public GlobalResponse editAlbum(@PathVariable long id,@Valid AlbumEditRequest request,
-		@RequestParam(value = "musicFile", required = false) MultipartFile musicFile,
-		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile,
-		Principal principal) {
+	public GlobalResponse editAlbum(@PathVariable long id, @Valid AlbumEditRequest request,
+		@RequestParam(value = "musicImageFile", required = false) MultipartFile musicImageFile, Principal principal) {
 		Album album = albumService.getAlbumById(id);
 		Member member = memberService.getMemberByUsername(principal.getName());
 
-		if (!albumService.canEdit(album, principal, member)) {
+		if (!albumService.canEdit(album, principal, musicImageFile, request, member)) {
 			throw new AlbumFieldException();
 		}
 
-		Album editedAlbum = albumService.edit(request, album, musicFile, musicImageFile);
+		Album editedAlbum = albumService.edit(request, album, musicImageFile);
 		return GlobalResponse.of("200", albumToResponseDto(editedAlbum));
 	}
 
@@ -87,9 +79,8 @@ public class AlbumController {
 	public GlobalResponse deleteAlbum(@PathVariable long id, Principal principal) {
 		Album album = albumService.getAlbumById(id);
 
-		//필드가 아니라 권한이 좋은가..?
 		if (!albumService.canDelete(album, principal)) {
-			throw new AlbumFieldException();
+			throw new AlbumPermissionException();
 		}
 
 		albumService.delete(album);
@@ -103,10 +94,10 @@ public class AlbumController {
 		Album album = albumService.getAlbumById(albumId);
 
 		if (!albumLikeService.canLike(member, album)) {
-			throw new AlbumFieldException();
+			throw new AlbumPermissionException();
 		}
 
-		albumLikeService.like(member,album);
+		albumLikeService.like(member, album);
 		return GlobalResponse.of("200");
 	}
 
@@ -117,16 +108,16 @@ public class AlbumController {
 		Album album = albumService.getAlbumById(albumId);
 
 		if (!albumLikeService.canCancelLike(member, album)) {
-			throw new AlbumFieldException();
+			throw new AlbumPermissionException();
 		}
 
-		albumLikeService.cancelLike(member,album);
+		albumLikeService.like(member, album);
 		return GlobalResponse.of("200");
 	}
 
 	private AlbumResponse albumToResponseDto(Album album) {
 		album = album.toBuilder()
-			.filePath(albumService.getAlbumFileUrl(album.getFilePath()))
+			//.filePath(albumService.getAlbumFileUrl(album.getFilePath()))
 			.imagePath(albumService.getAlbumImageUrl(album.getImagePath()))
 			.build();
 

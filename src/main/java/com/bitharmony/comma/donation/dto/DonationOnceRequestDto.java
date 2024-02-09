@@ -17,8 +17,4 @@ public record DonationOnceRequestDto(
         String message,
 
         boolean anonymous
-) {
-    public DonationOnceRequestDto {
-        anonymous = false;
-    }
-}
+) {}

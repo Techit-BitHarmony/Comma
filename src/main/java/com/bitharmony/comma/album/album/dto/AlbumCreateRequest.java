@@ -8,6 +8,7 @@ import lombok.Builder;
 
 @Builder
 public record AlbumCreateRequest(@NotEmpty @Size(max = 50) String albumname,
+								 @NotEmpty String filePath,
 								 String genre,
 								 boolean license,
 								 String licenseDescription,
@@ -18,6 +19,7 @@ public record AlbumCreateRequest(@NotEmpty @Size(max = 50) String albumname,
 	public Album toEntity() {
 		return Album.builder()
 			.albumname(albumname)
+			.filePath(filePath)
 			.genre(genre)
 			.license(license)
 			.licenseDescription(licenseDescription)
