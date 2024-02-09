@@ -28,28 +28,28 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotNull(message = "username은 필수 입력값입니다.")
     @Size(min = 5, max = 100)
     @Column(length = 100)
     private String username;
 
-    @NotNull
+    @NotNull(message = "password은 필수 입력값입니다.")
     @Size(min = 5, max = 100)
     @Column(length = 100)
     private String password;
 
-    @NotNull
+    @NotNull(message = "email은 필수 입력값입니다.")
     @Email
     private String email;
 
-    @NotNull
+    @NotNull(message = "nickname은 필수 입력값입니다.")
     @Size(min = 5, max = 100)
     @Column(length = 100)
     private String nickname;
 
     @Builder.Default
     private Long credit = 0L;
-    
+
     @OneToMany(mappedBy = "following")
     private List<Follow> followerList = new ArrayList<>();
 
