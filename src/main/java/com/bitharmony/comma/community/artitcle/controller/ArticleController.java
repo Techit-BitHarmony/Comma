@@ -10,10 +10,15 @@ import com.bitharmony.comma.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -46,13 +51,19 @@ public class ArticleController {
     }
 
     @GetMapping("")
-    public GlobalResponse<ArticleGetListResponse> getArticleList() {
-        List<Article> article = articleService.getArticleList();
+    public GlobalResponse<ArticleGetListResponse> getArticleList(
+            @RequestParam(value="page", defaultValue = "1") int page
+    ) {
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(page-1, 10, Sort.by(sorts));
+
+        Page<Article> articles = articleService.getArticleList(pageable);
 
         return GlobalResponse.of(
                 "200",
                 ArticleGetListResponse.builder()
-                        .articleList(article.stream().map(ArticleDto::new).toList())
+                        .articleList(articles.map(ArticleDto::new))
                         .build()
         );
     }
@@ -67,9 +78,7 @@ public class ArticleController {
         return GlobalResponse.of(
                 "200",
                 ArticleGetMyListResponse.builder()
-                        .myList(articles.stream()
-                                .map(ArticleDto::new)
-                                .toList())
+                        .myList(articles.stream().map(ArticleDto::new).toList())
                         .build()
                 );
     }

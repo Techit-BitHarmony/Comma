@@ -15,7 +15,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.bitharmony.comma.album.file.dto.FileResponse;
 import com.bitharmony.comma.album.file.util.FileType;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
-import com.bitharmony.comma.global.exception.AlbumFileException;
+import com.bitharmony.comma.album.album.exception.AlbumFileException;
 
 import lombok.RequiredArgsConstructor;
 

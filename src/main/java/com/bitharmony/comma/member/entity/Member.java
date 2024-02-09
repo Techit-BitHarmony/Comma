@@ -49,7 +49,7 @@ public class Member {
 
     @Builder.Default
     private Long credit = 0L;
-
+    
     @OneToMany(mappedBy = "following")
     private List<Follow> followerList = new ArrayList<>();
 

@@ -2,7 +2,6 @@ package com.bitharmony.comma.album.album.service;
 
 import java.security.Principal;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,9 +14,11 @@ import com.bitharmony.comma.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.album.file.service.FileService;
 import com.bitharmony.comma.album.file.util.FileType;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
-import com.bitharmony.comma.global.exception.AlbumNotFoundException;
+import com.bitharmony.comma.album.album.exception.AlbumNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.streaming.util.NcpMusicUtil;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,52 +27,41 @@ public class AlbumService {
 	private final AlbumRepository albumRepository;
 	private final FileService fileService;
 	private final NcpImageUtil ncpImageUtil;
+	private final NcpMusicUtil ncpMusicUtil;
 
 	@Transactional
-	public Album release(AlbumCreateRequest request, Member member,MultipartFile musicFile, MultipartFile musicImageFile) {
+	public Album release(AlbumCreateRequest request, Member member, MultipartFile musicImageFile) {
 		Album album = request.toEntity();
 		album.updateReleaseMember(member);
-		return saveAlbum(album, musicFile, musicImageFile);
+		return saveAlbum(album, musicImageFile);
 	}
 
 	@Transactional
-	public Album edit(AlbumEditRequest request, Album album, MultipartFile musicFile, MultipartFile musicImageFile) {
+	public Album edit(AlbumEditRequest request, Album album, MultipartFile musicImageFile) {
 		album.update(request);
 
-		if (musicFile != null)
-			fileService.deleteFile(fileService.getAlbumFileUrl(album.getFilePath()),
-				ncpImageUtil.getBucketName());
-
 		if (musicImageFile != null)
-			fileService.deleteFile(fileService.getAlbumFileUrl(album.getImagePath()),
-				ncpImageUtil.getBucketName());
+			fileService.deleteFile(fileService.getAlbumFileUrl(album.getImagePath()), ncpImageUtil.getBucketName());
 
-		saveAlbum(album, musicFile, musicImageFile);
+		saveAlbum(album, musicImageFile);
 		return album;
 	}
 
 	@Transactional
 	public void delete(Album album) {
-		//fileService.deleteFile(album.getFilePath(), ncpImageUtil.getMusicBucketName());
+		ncpMusicUtil.deleteFile(album.getFilePath());
 		fileService.deleteFile(album.getImagePath(), ncpImageUtil.getBucketName());
 		albumRepository.delete(album);
 	}
 
-	public Album saveAlbum(Album album, MultipartFile musicFile, MultipartFile musicImageFile) {
-		String imageUrl = fileService.uploadFile(musicImageFile, ncpImageUtil.getBucketName()).uploadFileUrl();
-		album = album.toBuilder().imagePath(imageUrl).build();
-		album = album.toBuilder().filePath("no path").build();
-
-		//TODO 나중에 file 연동할 때 추가
+	public Album saveAlbum(Album album, MultipartFile musicImageFile) {
+		if (musicImageFile != null) {
+			String imageUrl = fileService.uploadFile(musicImageFile, ncpImageUtil.getBucketName()).uploadFileUrl();
+			album = album.toBuilder().imagePath(imageUrl).build();
+		}
 
 		albumRepository.save(album);
 		return album;
-	}
-
-	private void uploadFileAndSetUrl(MultipartFile file, String bucketName, Consumer<String> urlSetter) {
-		Optional.ofNullable(file)
-			.map(f -> fileService.uploadFile(f, bucketName))
-			.ifPresent(response -> urlSetter.accept(response.uploadFileUrl()));
 	}
 
 	public Album getAlbumById(long id) {
@@ -98,28 +88,38 @@ public class AlbumService {
 		return ncpImageUtil.getEndPoint() + "/" + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "");
 	}
 
-	public boolean canRelease(String name, MultipartFile musicFile, MultipartFile musicImageFile, Member member) {
-		if(member == null) return false;
-
-		Optional<MultipartFile> audioFile = fileService.checkFileByType(musicFile, FileType.AUDIO);
-		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
-
+	public boolean canRelease(String name, MultipartFile musicImageFile, Member member) {
+		if (member == null)
+			return false;
 		if (albumRepository.findByAlbumname(name).isPresent())
 			return false;
-		if (audioFile.isEmpty())
+
+		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
+		if (imgFile.isEmpty() && musicImageFile != null)
 			return false;
 
 		return true;
 	}
 
-	public boolean canEdit(Album album, Principal principal, Member member) {
-		if(!album.getMember().getUsername().equals(principal.getName())) return false;
-		if(member == null) return false;
+	public boolean canEdit(Album album, Principal principal, MultipartFile musicImageFile,
+		@Valid AlbumEditRequest request, Member member) {
+		if (member == null)
+			return false;
+		if (!album.getMember().getUsername().equals(principal.getName()))
+			return false;
+		if (albumRepository.findByAlbumname(request.albumname()).isPresent())
+			return false;
+
+		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);
+		if (imgFile.isEmpty() && musicImageFile != null)
+			return false;
+
 		return true;
 	}
 
 	public boolean canDelete(Album album, Principal principal) {
-		if(!album.getMember().getUsername().equals(principal.getName())) return false;
+		if (!album.getMember().getUsername().equals(principal.getName()))
+			return false;
 		return true;
 	}
 

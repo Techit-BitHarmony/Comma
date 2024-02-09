@@ -16,18 +16,16 @@ import static org.quartz.JobBuilder.newJob;
 @RequiredArgsConstructor
 @Component
 public class DonationRegularJobDetailService {
-    public JobDetail build(JobKey jobKey, DonationRegular donationRegular) {
+    public JobDetail build(JobKey jobKey, DonationRegular donationRegular)  {
         log.warn("job detail name= {}", jobKey.getName());
 
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("donationRegular", donationRegular);
         jobDataMap.put("retry", 0);
-//        for (Field field : dto.getClass().getDeclaredFields()) {
-//            field.setAccessible(true);
-//            Object value = field.get(dto);
-//
-//            jobDataMap.put(field.getName(),value);
-//        }
+        jobDataMap.put("patronName", donationRegular.getPatronName());
+        jobDataMap.put("artistName", donationRegular.getArtistName());
+        jobDataMap.put("amount", donationRegular.getAmount());
+        jobDataMap.put("anonymous", donationRegular.isAnonymous());
 
         return newJob(DonationRegularJob.class)
                 .withIdentity(jobKey.getName(), jobKey.getGroup())

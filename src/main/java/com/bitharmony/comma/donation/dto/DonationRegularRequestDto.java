@@ -1,10 +1,13 @@
 package com.bitharmony.comma.donation.dto;
 
 import jakarta.validation.constraints.NotEmpty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Builder
-public record DonationOnceRequestDto(
+public record DonationRegularRequestDto(
         @NotEmpty
         String patronName,
 
@@ -14,7 +17,8 @@ public record DonationOnceRequestDto(
         @NotEmpty
         Long amount,
 
-        String message,
+        @NotEmpty
+        Integer executeDay,
 
         boolean anonymous
 ) {}
