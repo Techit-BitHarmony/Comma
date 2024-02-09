@@ -75,13 +75,9 @@ public class AlbumService {
 
 	public Page<AlbumListResponse> getLatest20Albums(String username) {
 		Pageable topTwenty = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "id"));
-		Page<Album> albums;
-
-		if (username == null) {
-			albums = albumRepository.findFirst20ByOrderByIdDesc(topTwenty);
-		} else {
-			albums = albumRepository.findFirst20ByMemberUsernameOrderByIdDesc(username, topTwenty);
-		}
+		Page<Album> albums = Optional.ofNullable(username)
+			.map(u -> albumRepository.findFirst20ByMemberUsernameOrderByIdDesc(u, topTwenty))
+			.orElse(albumRepository.findFirst20ByOrderByIdDesc(topTwenty));
 
 		return albums.map(this::convertToDto);
 	}
