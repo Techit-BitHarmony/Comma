@@ -1,4 +1,6 @@
-package com.bitharmony.comma.global.exception;
+package com.bitharmony.comma.global.exception.credit;
+
+import com.bitharmony.comma.global.exception.CommaException;
 
 public class ChargeNotFoundException extends CommaException {
 

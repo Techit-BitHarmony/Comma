@@ -2,8 +2,8 @@ package com.bitharmony.comma.credit.creditLog.service;
 
 import com.bitharmony.comma.credit.creditLog.entity.CreditLog;
 import com.bitharmony.comma.credit.creditLog.repository.CreditLogRepository;
-import com.bitharmony.comma.global.exception.CreditLogNotFoundException;
-import com.bitharmony.comma.global.exception.NoCreditLogsException;
+import com.bitharmony.comma.global.exception.credit.CreditLogNotFoundException;
+import com.bitharmony.comma.global.exception.credit.NoCreditLogsException;
 import com.bitharmony.comma.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
