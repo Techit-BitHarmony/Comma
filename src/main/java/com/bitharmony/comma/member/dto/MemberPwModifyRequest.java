@@ -5,7 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record MemberPwModifyRequest(
-        @NotNull String passwordModify,
-        @NotNull String passwordModifyCheck
+        @NotNull(message = "Password을 입력해주세요.") String passwordModify,
+        @NotNull(message = "Password 확인을 입력해주세요.") String passwordModifyCheck
 ) {
 }
