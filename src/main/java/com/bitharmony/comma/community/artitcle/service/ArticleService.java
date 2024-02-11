@@ -3,17 +3,14 @@ package com.bitharmony.comma.community.artitcle.service;
 import com.bitharmony.comma.community.artitcle.dto.ArticleModifyRequest;
 import com.bitharmony.comma.community.artitcle.entity.Article;
 import com.bitharmony.comma.community.artitcle.repository.ArticleRepository;
-import com.bitharmony.comma.global.exception.ArticleNotFoundException;
+import com.bitharmony.comma.global.exception.community.ArticleNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
