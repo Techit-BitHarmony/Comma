@@ -38,9 +38,12 @@ public class InitData {
             @Transactional
             @SneakyThrows
             public void run(ApplicationArguments args) {
-                if(memberRepository.count() > 0) return;
 
+                if(memberRepository.count() > 0) return;
+                memberService.join("admin", "1234", "admin@user.com", "admin");
                 memberService.join("user1", "1234", "user1@user.com", "nickname1");
+                memberService.join("user2", "1234", "user2@user.com", "nickname2");
+
             }
         };
     }

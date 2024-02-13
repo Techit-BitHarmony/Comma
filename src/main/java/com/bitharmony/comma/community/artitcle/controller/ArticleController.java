@@ -68,6 +68,27 @@ public class ArticleController {
         );
     }
 
+    @GetMapping("/user/{artistUsername}")
+    public GlobalResponse<ArticleGetListResponse> getArticleListByArtistId(
+            @RequestParam(value="page", defaultValue = "1") int page,
+            @PathVariable String artistUsername
+    ) {
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(page-1, 10, Sort.by(sorts));
+
+        Member member = memberService.getMemberByUsername(artistUsername);
+
+        Page<Article> articles = articleService.getArticleListByArtistId(member.getId(), pageable);
+
+        return GlobalResponse.of(
+                "200",
+                ArticleGetListResponse.builder()
+                        .articleList(articles.map(ArticleDto::new))
+                        .build()
+        );
+    }
+
     @GetMapping("/mine")
     @PreAuthorize("isAuthenticated()")
     public GlobalResponse<ArticleGetMyListResponse> getMyArticle(Principal principal){
@@ -88,8 +109,9 @@ public class ArticleController {
     public GlobalResponse<ArticleCreateResponse> createArticle(
             @RequestBody @Valid ArticleCreateRequest request, Principal principal){
         Member member = memberService.getMemberByUsername(principal.getName());
+        Member artist = memberService.getMemberByUsername(request.artistUsername());
 
-        Article article = articleService.write(member, request.category(), request.title(), request.content());
+        Article article = articleService.write(member, request.category(), request.title(), request.content(), artist);
 
         return GlobalResponse.of(
                 "200",
