@@ -7,9 +7,9 @@ import lombok.Builder;
 
 @Builder
 public record MemberJoinRequest(
-        @NotBlank String username,
-        @NotBlank String password,
-        @NotBlank String passwordCheck,
-        @NotBlank @Email String email,
-        @NotBlank String nickname
+        @NotBlank(message = "ID를 입력해주세요.") String username,
+        @NotBlank(message = "Password를 입력해주세요.") String password,
+        @NotBlank(message = "Password 확인을 입력해주세요.") String passwordCheck,
+        @NotBlank(message = "Email을 입력해주세요.") @Email String email,
+        @NotBlank(message = "Nickname을 입력해주세요.") String nickname
 ) { }
