@@ -1,20 +1,22 @@
 package com.bitharmony.comma.donation.service;
 
+import com.bitharmony.comma.donation.dto.DonationFindResponseDto;
+import com.bitharmony.comma.donation.dto.DonationRegularFindResponseDto;
 import com.bitharmony.comma.donation.dto.DonationRegularRequestDto;
 import com.bitharmony.comma.donation.dto.DonationRegularUpdateRequestDto;
+import com.bitharmony.comma.donation.entity.Donation;
 import com.bitharmony.comma.donation.entity.DonationRegular;
 import com.bitharmony.comma.donation.repository.DonationRegularRepository;
 import com.bitharmony.comma.donation.scheduling.DonationRegularJobDetailService;
 import com.bitharmony.comma.donation.scheduling.DonationRegularTriggerService;
-import com.bitharmony.comma.global.exception.Donation.DonationRegularNotFoundException;
-import com.bitharmony.comma.global.exception.Donation.JobKeyDuplicationException;
-import com.bitharmony.comma.global.exception.Donation.QuartzJobNotDeletedException;
-import com.bitharmony.comma.global.exception.Donation.QuartzJobSchedulerNotUpdatedException;
+import com.bitharmony.comma.global.exception.Donation.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.quartz.JobKey.jobKey;
@@ -27,6 +29,28 @@ public class DonationRegularService {
     private final DonationRegularTriggerService triggerService;
     private final DonationRegularJobDetailService jobDetailService;
     private final DonationRegularRepository donationRegularRepository;
+
+    public List<DonationRegularFindResponseDto> getAllDonationRegularList(String patronName){
+
+        List<DonationRegular> donationRegulars = donationRegularRepository.findAllByPatronName(patronName);
+        List<DonationRegularFindResponseDto> dtoList = new ArrayList<>();
+        if (donationRegulars.size() == 0) {
+            throw new DonationListNotFoundException();
+        }
+
+        for (DonationRegular d : donationRegulars) {
+            DonationRegularFindResponseDto dto = DonationRegularFindResponseDto.builder()
+                    .patronUsername(d.getPatronName())
+                    .artistUsername(d.getArtistName())
+                    .executeDay(d.getExecuteDay())
+                    .amount(d.getAmount())
+                    .anonymous(d.isAnonymous())
+                    .build();
+
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
 
     public void donationRegular(DonationRegularRequestDto dto) {
 
@@ -48,7 +72,7 @@ public class DonationRegularService {
         JobKey jobKey = makeJobKey(updateRequestDto.patronName(), updateRequestDto.artistName());
 
         DonationRegular donationRegular = checkAndGetDonationRegularByJobKey(jobKey);
-        donationRegular.toBuilder().executeDay(updateRequestDto.executeDay()).build();
+        donationRegular = donationRegular.toBuilder().executeDay(updateRequestDto.executeDay()).build();
         donationRegularRepository.save(donationRegular);
 
         Trigger trigger = triggerService.update(scheduler, jobKey, updateRequestDto.executeDay());

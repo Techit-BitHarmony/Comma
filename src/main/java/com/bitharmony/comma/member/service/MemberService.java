@@ -130,6 +130,10 @@ public class MemberService {
         Member findMember = memberRepository.findById(id)
                 .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
+        if (memberRepository.findByNickname(nickname).isPresent()) {
+            throw new DuplicateNicknameException();
+        }
+
         Member modifyMember = findMember.toBuilder()
                 .nickname(nickname)
                 .email(email)

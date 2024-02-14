@@ -131,7 +131,7 @@ public class AlbumService {
 			return false;
 		if (!album.getMember().getUsername().equals(principal.getName()))
 			return false;
-		if (albumRepository.findByAlbumname(request.albumname()).isPresent())
+		if (albumRepository.findByAlbumname(request.albumname()).isPresent() && !album.getAlbumname().equals(request.albumname()))
 			return false;
 
 		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);

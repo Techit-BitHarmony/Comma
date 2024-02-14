@@ -108,6 +108,15 @@ public class AlbumController {
 		return GlobalResponse.of("200");
 	}
 
+	@GetMapping("/{albumId}/like")
+	@PreAuthorize("isAuthenticated()")
+	public GlobalResponse getLike(@PathVariable long albumId, Principal principal) {
+		Member member = memberService.getMemberByUsername(principal.getName());
+		Album album = albumService.getAlbumById(albumId);
+
+		return GlobalResponse.of("200", albumLikeService.canLike(member, album));
+	}
+
 	@PostMapping(value = "/{albumId}/like")
 	@PreAuthorize("isAuthenticated()")
 	public GlobalResponse like(@PathVariable long albumId, Principal principal) {
