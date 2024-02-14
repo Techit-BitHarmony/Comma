@@ -2,6 +2,7 @@ package com.bitharmony.comma.album.album.controller;
 
 import java.security.Principal;
 
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,12 +16,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
+import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.dto.AlbumResponse;
 import com.bitharmony.comma.album.album.entity.Album;
-import com.bitharmony.comma.album.album.service.AlbumLikeService;
-import com.bitharmony.comma.album.album.service.AlbumService;
 import com.bitharmony.comma.album.album.exception.AlbumFieldException;
 import com.bitharmony.comma.album.album.exception.AlbumPermissionException;
+import com.bitharmony.comma.album.album.service.AlbumLikeService;
+import com.bitharmony.comma.album.album.service.AlbumService;
+import com.bitharmony.comma.global.exception.MemberNotFoundException;
 import com.bitharmony.comma.global.response.GlobalResponse;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
@@ -52,11 +55,29 @@ public class AlbumController {
 		return GlobalResponse.of("200", albumToResponseDto(album));
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping("/detail/{id}")
 	public GlobalResponse getAlbum(@PathVariable long id) {
 		Album album = albumService.getAlbumById(id);
 
 		return GlobalResponse.of("200", albumToResponseDto(album));
+	}
+
+	@GetMapping("/{username}")
+	public GlobalResponse getUserAlbumList(@PathVariable String username) {
+		Member member = memberService.getMemberByUsername(username);
+
+		if (member == null) {
+			throw new MemberNotFoundException("존재하지 않는 회원입니다.");
+		}
+
+		 Page<AlbumListResponse> albumPage = albumService.getLatest20Albums(username);
+		return GlobalResponse.of("200", albumPage);
+	}
+
+	@GetMapping("/list")
+	public GlobalResponse getAlbumList() {
+		Page<AlbumListResponse> albumPage = albumService.getLatest20Albums(null);
+		return GlobalResponse.of("200", albumPage);
 	}
 
 	@PutMapping("/{id}")
@@ -122,6 +143,7 @@ public class AlbumController {
 			.build();
 
 		return AlbumResponse.builder()
+			.id(album.getId())
 			.albumname(album.getAlbumname())
 			.genre(album.getGenre())
 			.license(album.isLicense())
@@ -130,6 +152,8 @@ public class AlbumController {
 			.filePath(album.getFilePath())
 			.permit(album.isPermit())
 			.price(album.getPrice())
+			.artistNickname(album.getMember().getNickname())
+			.artistUsername(album.getMember().getUsername())
 			.build();
 	}
 }

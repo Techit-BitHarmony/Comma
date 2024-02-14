@@ -6,11 +6,12 @@ import com.bitharmony.comma.global.security.SecurityUser;
 import com.bitharmony.comma.global.util.JwtUtil;
 import com.bitharmony.comma.member.dto.JwtCreateRequest;
 import com.bitharmony.comma.member.dto.MemberLoginResponse;
-import com.bitharmony.comma.member.dto.MemberModifyRequest;
 import com.bitharmony.comma.member.dto.MemberReturnResponse;
 import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.exception.DuplicateNicknameException;
+import com.bitharmony.comma.member.exception.IncorrectPasswordException;
+import com.bitharmony.comma.member.exception.InvalidPasswordException;
 import com.bitharmony.comma.member.repository.MemberRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -33,7 +34,7 @@ public class MemberService {
         Member member = getMemberByUsername(username);
 
         if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new IllegalArgumentException("정확한 비밀번호를 입력해주세요");
+            throw new IncorrectPasswordException();
         }
 
         JwtCreateRequest jwtCreateRequest = JwtCreateRequest.builder()
@@ -45,6 +46,8 @@ public class MemberService {
         String refreshToken = jwtUtil.createRefreshToken(jwtCreateRequest);
 
         MemberLoginResponse response = MemberLoginResponse.builder()
+                .memberId(member.getId())
+                .username(member.getUsername())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
@@ -61,13 +64,17 @@ public class MemberService {
     }
 
     @Transactional
-    public void join(String username, String password, String email, String nickname) {
+    public void join(String username, String password, String passwordCheck, String email, String nickname) {
         if (memberRepository.findByUsername(username).isPresent()) {
             throw new MemberDuplicateException("이미 존재하는 아이디입니다.");
         }
 
         if (memberRepository.findByNickname(nickname).isPresent()) {
-            throw new MemberDuplicateException("이미 존재하는 닉네임입니다.");
+            throw new DuplicateNicknameException();
+        }
+
+        if (!password.equals(passwordCheck)) {
+            throw new InvalidPasswordException();
         }
 
         Member member = Member.builder()
@@ -102,6 +109,19 @@ public class MemberService {
         return response;
     }
 
+    public MemberReturnResponse getProfile(String username) {
+
+        Member findMember = getMemberByUsername(username);
+
+        MemberReturnResponse response = MemberReturnResponse.builder()
+                .username(findMember.getUsername())
+                .Email(findMember.getEmail())
+                .nickname(findMember.getNickname())
+                .build();
+
+        return response;
+    }
+
     @Transactional
     public void modify(String nickname, String email) {
 
@@ -118,7 +138,23 @@ public class MemberService {
         memberRepository.save(modifyMember);
     }
 
-    private SecurityUser getUser() {
+    @Transactional
+    public void passwordModify(String password, String passwordCheck) {
+        if (!password.equals(passwordCheck)) {
+            throw new InvalidPasswordException();
+        }
+
+        SecurityUser user = getUser();
+        Member member = getMemberByUsername(user.getUsername());
+
+        member = member.toBuilder()
+                .password(passwordEncoder.encode(password))
+                 .build();
+
+        memberRepository.save(member);
+    }
+
+    public SecurityUser getUser() {
         return (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
