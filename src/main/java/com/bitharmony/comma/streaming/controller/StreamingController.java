@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -44,10 +45,9 @@ public class StreamingController {
                 encodeStatusRequest.outputType(), encodeStatusRequest.status());
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/status/{albumId}") // sse emitter subscribe
-    public SseEmitter getEncodeStatus(@PathVariable Long albumId, Principal principal) {
-        return sseProvider.subscribe(principal.getName(), albumId);
+    public SseEmitter getEncodeStatus(@PathVariable Long albumId, @RequestParam(name = "username") String username) {
+        return sseProvider.subscribe(username, albumId);
     }
 
 }
