@@ -12,6 +12,6 @@ public class DonationListNotFoundException extends CommaException {
 
     @Override
     public int getStatusCode() {
-        return 400;
+        return 501;
     }
 }

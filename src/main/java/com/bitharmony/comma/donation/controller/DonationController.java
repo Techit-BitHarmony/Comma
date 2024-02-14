@@ -1,9 +1,6 @@
 package com.bitharmony.comma.donation.controller;
 
-import com.bitharmony.comma.donation.dto.DonationFindResponseDto;
-import com.bitharmony.comma.donation.dto.DonationOnceRequestDto;
-import com.bitharmony.comma.donation.dto.DonationRegularRequestDto;
-import com.bitharmony.comma.donation.dto.DonationRegularUpdateRequestDto;
+import com.bitharmony.comma.donation.dto.*;
 import com.bitharmony.comma.donation.service.DonationRegularService;
 import com.bitharmony.comma.donation.service.DonationService;
 import com.bitharmony.comma.global.exception.NotAuthorizedException;
@@ -56,6 +53,15 @@ public class DonationController {
         checkLoginUser(principal, artistUsername);
 
         return GlobalResponse.of("200", donationService.getDonationListByArtistUsername(artistUsername));
+    }
+    @GetMapping("/list/patron/{patronUsername}/regular")
+    public GlobalResponse<List<DonationRegularFindResponseDto>> getAllDonationRegularList(
+            @PathVariable String patronUsername,
+            Principal principal
+    ){
+        checkLoginUser(principal, patronUsername);
+
+        return GlobalResponse.of("200",donationRegularService.getAllDonationRegularList(patronUsername));
     }
 
     @PostMapping("/once")

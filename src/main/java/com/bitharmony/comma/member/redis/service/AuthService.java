@@ -4,6 +4,8 @@ import com.bitharmony.comma.global.util.JwtUtil;
 import com.bitharmony.comma.member.dto.JwtCreateRequest;
 import com.bitharmony.comma.member.dto.MemberLoginResponse;
 import com.bitharmony.comma.member.redis.dto.JwtRegenerateRequest;
+import com.bitharmony.comma.member.redis.exception.InvalidRefreshTokenException;
+import com.bitharmony.comma.member.redis.exception.RefreshTokenNotMatchException;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,26 +20,20 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, String> redisTemplate;
 
-    @Value("${secret.jwt.token.refresh-expiration-time}")
-    private Long REFRESH_TOKEN_EXPIRATION_TIME;
-
     @Transactional
     public MemberLoginResponse reissue(JwtRegenerateRequest jwtRegenerateRequest) {
 
         String refreshToken = jwtRegenerateRequest.refreshToken();
 
-        // Refresh Token 검증
         if (!jwtUtil.validToken(refreshToken)) {
-            throw new RuntimeException("Invalid refresh token supplied");
+            throw new InvalidRefreshTokenException();
         }
 
-        // Access Token 에서 User name을 가져온다.
         Map<String, String> userData = jwtUtil.getUserData(refreshToken);
 
-        // Redis에서 저장된 Refresh Token 값을 가져온다.
         String getRefreshToken = redisTemplate.opsForValue().get(userData.get("username"));
         if (!getRefreshToken.equals(refreshToken)) {
-            throw new RuntimeException("Refresh Token doesn't match.");
+            throw new RefreshTokenNotMatchException();
         }
 
         JwtCreateRequest jwtCreateRequest = JwtCreateRequest.builder()
@@ -45,7 +41,6 @@ public class AuthService {
                 .username((String) userData.get("username"))
                 .build();
 
-        // 토큰 재발행
         String newRefreshToken = jwtUtil.createRefreshToken(jwtCreateRequest);
 
         MemberLoginResponse response = MemberLoginResponse.builder()

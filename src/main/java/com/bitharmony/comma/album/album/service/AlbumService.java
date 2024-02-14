@@ -3,18 +3,23 @@ package com.bitharmony.comma.album.album.service;
 import java.security.Principal;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bitharmony.comma.album.album.dto.AlbumCreateRequest;
 import com.bitharmony.comma.album.album.dto.AlbumEditRequest;
+import com.bitharmony.comma.album.album.dto.AlbumListResponse;
 import com.bitharmony.comma.album.album.entity.Album;
+import com.bitharmony.comma.album.album.exception.AlbumNotFoundException;
 import com.bitharmony.comma.album.album.repository.AlbumRepository;
 import com.bitharmony.comma.album.file.service.FileService;
 import com.bitharmony.comma.album.file.util.FileType;
 import com.bitharmony.comma.album.file.util.NcpImageUtil;
-import com.bitharmony.comma.album.album.exception.AlbumNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.streaming.util.NcpMusicUtil;
 
@@ -40,7 +45,7 @@ public class AlbumService {
 	public Album edit(AlbumEditRequest request, Album album, MultipartFile musicImageFile) {
 		album.update(request);
 
-		if (musicImageFile != null)
+		if (musicImageFile != null && album.getFilePath() != null)
 			fileService.deleteFile(fileService.getAlbumFileUrl(album.getImagePath()), ncpImageUtil.getBucketName());
 
 		saveAlbum(album, musicImageFile);
@@ -68,16 +73,35 @@ public class AlbumService {
 		return albumRepository.findById(id).orElseThrow(AlbumNotFoundException::new);
 	}
 
-	/**
-	 * ncp image optimizer 사용 cdn url을 통해서 변환된 이미지 가져오기
-	 */
+	public Page<AlbumListResponse> getLatest20Albums(String username) {
+		Pageable topTwenty = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "id"));
+		Page<Album> albums = Optional.ofNullable(username)
+			.map(u -> albumRepository.findFirst20ByMemberUsernameOrderByIdDesc(u, topTwenty))
+			.orElse(albumRepository.findFirst20ByOrderByIdDesc(topTwenty));
+
+		return albums.map(this::convertToDto);
+	}
+
+	public AlbumListResponse convertToDto(Album album) {
+		return AlbumListResponse.builder()
+			.id(album.getId())
+			.albumname(album.getAlbumname())
+			.genre(album.getGenre())
+			.imgPath(getAlbumImageUrl(album.getImagePath()))
+			.permit(album.isPermit())
+			.price(album.getPrice())
+			.artistUsername(album.getMember().getUsername())
+			.artistNickname(album.getMember().getNickname())
+			.build();
+	}
+
 	private String replaceBucketName(String filepath, String bucketName, String replacement) {
 		return filepath.replace(bucketName, replacement);
 	}
 
 	public String getAlbumImageUrl(String filepath) {
 		if (filepath == null) {
-			return "여기에 기본 이미지 URL";
+			return null;
 		}
 
 		return ncpImageUtil.getImageCdn() + replaceBucketName(filepath, ncpImageUtil.getBucketName(), "")
@@ -107,7 +131,7 @@ public class AlbumService {
 			return false;
 		if (!album.getMember().getUsername().equals(principal.getName()))
 			return false;
-		if (albumRepository.findByAlbumname(request.albumname()).isPresent())
+		if (albumRepository.findByAlbumname(request.albumname()).isPresent() && !album.getAlbumname().equals(request.albumname()))
 			return false;
 
 		Optional<MultipartFile> imgFile = fileService.checkFileByType(musicImageFile, FileType.IMAGE);

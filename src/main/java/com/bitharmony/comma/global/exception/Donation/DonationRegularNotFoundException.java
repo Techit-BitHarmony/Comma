@@ -12,6 +12,6 @@ public class DonationRegularNotFoundException extends CommaException {
 
     @Override
     public int getStatusCode() {
-        return 0;
+        return 501;
     }
 }
