@@ -37,7 +37,7 @@ public class DonationRegularTriggerService {
     private CronExpression makeCronExpression(int day) {
         CronExpression cronExpression = null;
         try {
-            cronExpression = new CronExpression(String.format("0 0 10 %s L ?", day));
+            cronExpression = new CronExpression(String.format("0 0 10 %s * ?", day));
         } catch (ParseException e) {
             // exception 처리 추가 필요
             throw new RuntimeException(e);
@@ -55,6 +55,7 @@ public class DonationRegularTriggerService {
         try{
             trigger = (CronTriggerImpl) scheduler.getTrigger(triggerKey);
         } catch (SchedulerException e){
+            throw new RuntimeException();
             // 커스텀 예외
         }
 
