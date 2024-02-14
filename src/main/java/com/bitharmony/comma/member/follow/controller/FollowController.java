@@ -31,7 +31,7 @@ public class FollowController {
         return GlobalResponse.of("200");
     }
 
-    @GetMapping("/")
+    @GetMapping
     public GlobalResponse getAllFollowing() {
         FollowingListReturnResponse response = followService.getAllFollowingList();
         return GlobalResponse.of("200", response);
