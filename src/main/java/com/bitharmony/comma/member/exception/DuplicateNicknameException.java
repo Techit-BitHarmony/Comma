@@ -11,6 +11,6 @@ public class DuplicateNicknameException extends CommaException {
 
     @Override
     public int getStatusCode() {
-        return 0;
+        return 400;
     }
 }
