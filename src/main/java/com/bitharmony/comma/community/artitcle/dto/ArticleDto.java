@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record ArticleDto(
-        long Id,
+        long id,
         String username,
         Article.Category category,
         String title,

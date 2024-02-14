@@ -17,6 +17,8 @@ public record ArticleCreateRequest(
         @Size(max = 50, message = "50자 이내로 작성해주세요.")
         String title,
         @NotBlank(message = "내용을 입력해주세요.")
-        String content
+        String content,
+        @NotNull
+        String artistUsername
 ) {
 }
