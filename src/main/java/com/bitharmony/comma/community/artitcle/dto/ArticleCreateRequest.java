@@ -18,7 +18,6 @@ public record ArticleCreateRequest(
         String title,
         @NotBlank(message = "내용을 입력해주세요.")
         String content,
-
         @NotNull
         String artistUsername
 ) {

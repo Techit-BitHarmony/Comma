@@ -39,9 +39,7 @@ public class WithdrawService {
 
     public List<Withdraw> getMyWithdrawList(Long id) {
         List<Withdraw> withdraws = withdrawRepository.findByApplicantId(id);
-        if (withdraws.isEmpty()) {
-            throw new WithdrawNotFoundException();
-        }
+
         return withdraws;
     }
 
