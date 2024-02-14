@@ -6,16 +6,18 @@ import com.bitharmony.comma.global.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 
 
 @Configuration
@@ -44,11 +46,18 @@ public class SecurityConfig {
 
 
         http.authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/member/login", "/member/join").permitAll(); // 로그인, 회원가입은 허용
+                    auth.requestMatchers("/member/login", "/member/join","/member/{username}" ,"/reissue",
+                            "/album/list", "/album/{albumId}", "/album/{username}", "/album/detail/{id}",
+                            "/streaming/status/{albumId}",
+                            "/community/articles/user/{username}", "/community/comments").permitAll();
                     auth.anyRequest().authenticated(); // 그 외의 것들은 모두 인증, 인가를 거치도록 설정
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
                 // username & password로 검증하기 전에 Jwt를 통한 인증, 인가 설정
+
+        http.cors(
+                cors -> cors.configure(http)
+        );
 
         return http.build();
     }

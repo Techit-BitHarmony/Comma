@@ -5,6 +5,6 @@ import lombok.Builder;
 
 @Builder
 public record MemberLoginRequest(
-        @NotBlank String username,
-        @NotBlank String password) {
+        @NotBlank(message = "ID를 입력해주세요.") String username,
+        @NotBlank(message = "Password를 입력해주세요.") String password) {
 }
