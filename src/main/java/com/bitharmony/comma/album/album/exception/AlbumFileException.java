@@ -1,4 +1,6 @@
-package com.bitharmony.comma.global.exception;
+package com.bitharmony.comma.album.album.exception;
+
+import com.bitharmony.comma.global.exception.CommaException;
 
 public class AlbumFileException extends CommaException {
 	private final static String MESSAGE = "앨범 파일이 문제가 있습니다.";

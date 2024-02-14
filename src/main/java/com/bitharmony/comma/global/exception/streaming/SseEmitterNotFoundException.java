@@ -1,4 +1,6 @@
-package com.bitharmony.comma.global.exception;
+package com.bitharmony.comma.global.exception.streaming;
+
+import com.bitharmony.comma.global.exception.CommaException;
 
 public class SseEmitterNotFoundException extends CommaException {
 

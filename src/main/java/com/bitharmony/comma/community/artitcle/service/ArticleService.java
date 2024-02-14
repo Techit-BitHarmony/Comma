@@ -3,9 +3,11 @@ package com.bitharmony.comma.community.artitcle.service;
 import com.bitharmony.comma.community.artitcle.dto.ArticleModifyRequest;
 import com.bitharmony.comma.community.artitcle.entity.Article;
 import com.bitharmony.comma.community.artitcle.repository.ArticleRepository;
-import com.bitharmony.comma.global.exception.ArticleNotFoundException;
+import com.bitharmony.comma.global.exception.community.ArticleNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -60,7 +62,7 @@ public class ArticleService {
         articleRepository.deleteById(id);
     }
 
-    public List<Article> getArticleList() {
-        return articleRepository.findAll();
+    public Page<Article> getArticleList(Pageable pageable) {
+        return articleRepository.findAll(pageable);
     }
 }
