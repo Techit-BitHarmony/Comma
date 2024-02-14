@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse body = ErrorResponse.builder()
                 .code(String.valueOf(statusCode))
-                .message("validation error")
+                .validMessages(errors)
                 .build();
 
         return ResponseEntity.status(statusCode).body(body);
