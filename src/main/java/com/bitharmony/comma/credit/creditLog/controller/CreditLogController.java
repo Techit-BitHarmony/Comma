@@ -53,6 +53,7 @@ public class CreditLogController {
 
         return new ResponseEntity<>(
                 CreditLogGetListResponse.builder()
+                        .restCredit(member.getCredit())
                         .creditLogDtos(creditLogs.stream().map(CreditLogDto::new).toList())
                         .build(),
                 HttpStatus.OK);

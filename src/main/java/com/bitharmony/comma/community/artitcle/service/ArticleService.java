@@ -3,10 +3,14 @@ package com.bitharmony.comma.community.artitcle.service;
 import com.bitharmony.comma.community.artitcle.dto.ArticleModifyRequest;
 import com.bitharmony.comma.community.artitcle.entity.Article;
 import com.bitharmony.comma.community.artitcle.repository.ArticleRepository;
-import com.bitharmony.comma.global.exception.ArticleNotFoundException;
+import com.bitharmony.comma.global.exception.community.ArticleNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,9 +32,10 @@ public class ArticleService {
         return article.get();
     }
 
-    public Article write(Member writer, Article.Category category, String title, String content) {
+    public Article write(Member writer, Article.Category category, String title, String content, Member artist) {
         Article article = Article.builder()
                 .writer(writer)
+                .artist(artist)
                 .category(category)
                 .title(title)
                 .content(content)
@@ -56,11 +61,20 @@ public class ArticleService {
         articleRepository.save(_article);
     }
 
+    @Transactional
     public void deleteArticle(long id) {
+//        List<Comment> comments = commentService.getCommentsByArticleId(id);
+//        for (Comment comment : comments){
+//            commentService.deleteComment(comment);
+//        }
         articleRepository.deleteById(id);
     }
 
-    public List<Article> getArticleList() {
-        return articleRepository.findAll();
+    public Page<Article> getArticleList(Pageable pageable) {
+        return articleRepository.findAll(pageable);
+    }
+
+    public Page<Article> getArticleListByArtistId(long id, Pageable pageable) {
+        return articleRepository.findByArtistId(id, pageable);
     }
 }

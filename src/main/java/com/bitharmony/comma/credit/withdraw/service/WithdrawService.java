@@ -4,9 +4,9 @@ import com.bitharmony.comma.credit.creditLog.entity.CreditLog;
 import com.bitharmony.comma.credit.creditLog.service.CreditLogService;
 import com.bitharmony.comma.credit.withdraw.entity.Withdraw;
 import com.bitharmony.comma.credit.withdraw.repository.WithdrawRepository;
-import com.bitharmony.comma.global.exception.HandledWithdrawException;
-import com.bitharmony.comma.global.exception.NotEnoughCreditException;
-import com.bitharmony.comma.global.exception.WithdrawNotFoundException;
+import com.bitharmony.comma.global.exception.credit.HandledWithdrawException;
+import com.bitharmony.comma.global.exception.credit.NotEnoughCreditException;
+import com.bitharmony.comma.global.exception.credit.WithdrawNotFoundException;
 import com.bitharmony.comma.global.exception.NotAuthorizedException;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.repository.MemberRepository;
@@ -39,9 +39,7 @@ public class WithdrawService {
 
     public List<Withdraw> getMyWithdrawList(Long id) {
         List<Withdraw> withdraws = withdrawRepository.findByApplicantId(id);
-        if (withdraws.isEmpty()) {
-            throw new WithdrawNotFoundException();
-        }
+
         return withdraws;
     }
 

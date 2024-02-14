@@ -3,7 +3,7 @@ package com.bitharmony.comma.community.comment.service;
 import com.bitharmony.comma.community.artitcle.service.ArticleService;
 import com.bitharmony.comma.community.comment.entity.Comment;
 import com.bitharmony.comma.community.comment.repository.CommentRepository;
-import com.bitharmony.comma.global.exception.CommentNotFoundException;
+import com.bitharmony.comma.global.exception.community.CommentNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

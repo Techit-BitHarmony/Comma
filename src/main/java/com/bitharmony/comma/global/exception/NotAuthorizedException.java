@@ -1,5 +1,7 @@
 package com.bitharmony.comma.global.exception;
 
+import com.bitharmony.comma.global.exception.CommaException;
+
 public class NotAuthorizedException extends CommaException {
 
     private final static String MESSAGE = "권한이 없습니다."; // 필요한 메시지 삽입.

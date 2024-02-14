@@ -1,5 +1,6 @@
 package com.bitharmony.comma.community.artitcle.entity;
 
+import com.bitharmony.comma.community.comment.entity.Comment;
 import com.bitharmony.comma.member.entity.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -23,6 +25,13 @@ public class Article {
     @ManyToOne
     @NotNull
     private Member writer;
+
+    @ManyToOne
+    @NotNull
+    private Member artist;
+
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
 
     @Enumerated(EnumType.STRING)
     private Category category;

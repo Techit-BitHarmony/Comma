@@ -6,6 +6,7 @@ import com.bitharmony.comma.credit.creditLog.entity.CreditLog;
 import com.bitharmony.comma.credit.creditLog.service.CreditLogService;
 import com.bitharmony.comma.credit.withdraw.service.WithdrawService;
 import com.bitharmony.comma.member.entity.Member;
+import com.bitharmony.comma.member.repository.MemberRepository;
 import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -27,6 +28,7 @@ public class InitData {
     private final CreditLogService creditLogService;
     private final WithdrawService withdrawService;
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
 
     @Bean

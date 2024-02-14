@@ -8,7 +8,7 @@ import lombok.Builder;
 
 @Builder
 public record ArticleModifyRequest(
-        @NotNull
+        @NotNull(message = "카테고리를 선택해주세요.")
         Article.Category category,
         @NotBlank(message = "제목을 입력해주세요.")
         @Size(max = 50, message = "50자 이내로 작성해주세요.")

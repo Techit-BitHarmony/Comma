@@ -46,7 +46,10 @@ public class SecurityConfig {
 
 
         http.authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/member/login", "/member/join", "/reissue").permitAll(); // 로그인, 회원가입은 허용
+                    auth.requestMatchers("/member/login", "/member/join","/member/{username}" ,"/reissue",
+                            "/album/list", "/album/{albumId}", "/album/{username}", "/album/detail/{id}",
+                            "/streaming/status/{albumId}",
+                            "/community/articles/user/{username}", "/community/comments").permitAll();
                     auth.anyRequest().authenticated(); // 그 외의 것들은 모두 인증, 인가를 거치도록 설정
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
