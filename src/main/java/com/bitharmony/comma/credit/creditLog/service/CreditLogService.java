@@ -5,6 +5,8 @@ import com.bitharmony.comma.credit.creditLog.repository.CreditLogRepository;
 import com.bitharmony.comma.global.exception.credit.CreditLogNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +32,8 @@ public class CreditLogService {
         return creditLog.get();
     }
 
-    public List<CreditLog> getMyCreditLogs(Long id) {
-        List<CreditLog> creditLogs = creditLogRepository.findByMemberId(id);
+    public Page<CreditLog> getMyCreditLogs(Long id, Pageable pageable) {
+        Page<CreditLog> creditLogs = creditLogRepository.findByMemberId(id, pageable);
 
         return creditLogs;
     }

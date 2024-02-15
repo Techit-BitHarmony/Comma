@@ -11,6 +11,8 @@ import com.bitharmony.comma.global.exception.NotAuthorizedException;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,20 +39,12 @@ public class WithdrawService {
         return withdraw.get();
     }
 
-    public List<Withdraw> getMyWithdrawList(Long id) {
-        List<Withdraw> withdraws = withdrawRepository.findByApplicantId(id);
-
-        return withdraws;
+    public Page<Withdraw> getMyWithdrawList(Long id, Pageable pageable) {
+        return withdrawRepository.findByApplicantId(id, pageable);
     }
 
-    public List<Withdraw> getAllWithdrawList() {
-        List<Withdraw> withdraws = this.withdrawRepository.findAll();
-
-        if (withdraws.isEmpty()) {
-            throw new WithdrawNotFoundException();
-        }
-
-        return withdraws;
+    public Page<Withdraw> getAllWithdrawList(Pageable pageable) {
+        return withdrawRepository.findAll(pageable);
     }
 
     @Transactional

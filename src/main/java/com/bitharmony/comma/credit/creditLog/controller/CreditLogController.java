@@ -8,16 +8,17 @@ import com.bitharmony.comma.credit.creditLog.service.CreditLogService;
 import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -45,16 +46,22 @@ public class CreditLogController {
 
     @GetMapping("/creditlogs/mine")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<CreditLogGetListResponse> getMyCreditLogs(Principal principal) {
+    public ResponseEntity<CreditLogGetListResponse> getMyCreditLogs(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            Principal principal) {
+
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(page-1, 10, Sort.by(sorts));
 
         Member member = memberService.getMemberByUsername(principal.getName());
 
-        List<CreditLog> creditLogs = creditLogService.getMyCreditLogs(member.getId());
+        Page<CreditLog> creditLogs = creditLogService.getMyCreditLogs(member.getId(), pageable);
 
         return new ResponseEntity<>(
                 CreditLogGetListResponse.builder()
                         .restCredit(member.getCredit())
-                        .creditLogDtos(creditLogs.stream().map(CreditLogDto::new).toList())
+                        .creditLogDtos(creditLogs.map(CreditLogDto::new))
                         .build(),
                 HttpStatus.OK);
     }
