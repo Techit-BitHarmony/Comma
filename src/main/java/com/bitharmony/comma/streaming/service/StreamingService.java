@@ -34,31 +34,31 @@ public class StreamingService {
         return fileName.substring(fileName.lastIndexOf('.'));
     }
 
-    public void encodeStatus(String username, Long albumId, String outputType, EncodeStatus status) {
+    public void encodeStatus(String filePath, String outputType, EncodeStatus status) {
         switch (status) {
             case WAITING -> {
                 container.addMessageListener(encodingStatusListener, topicStatus); // 토픽 등록
-                sendEncodingStatus(username, albumId, outputType, EncodeStatus.WAITING);
+                sendEncodingStatus(filePath, outputType, EncodeStatus.WAITING);
             }
             case RUNNING -> {
-                sendEncodingStatus(username, albumId, outputType, EncodeStatus.RUNNING);
+                sendEncodingStatus(filePath, outputType, EncodeStatus.RUNNING);
             }
             case COMPLETE -> {
-                sendEncodingStatus(username, albumId, outputType, EncodeStatus.COMPLETE);
+                sendEncodingStatus(filePath, outputType, EncodeStatus.COMPLETE);
                 container.removeMessageListener(encodingStatusListener, topicStatus); // 토픽 해제
             }
             case FAILURE -> {
-                sendEncodingStatus(username, albumId, outputType, EncodeStatus.FAILURE);
+                sendEncodingStatus(filePath, outputType, EncodeStatus.FAILURE);
                 throw new EncodingFailureException();
             }
             case CANCELED -> {
-                sendEncodingStatus(username, albumId, outputType, EncodeStatus.CANCELED);
+                sendEncodingStatus(filePath, outputType, EncodeStatus.CANCELED);
             }
         }
     }
 
-    private void sendEncodingStatus(String username, Long albumId, String outputType, EncodeStatus status) {
-        String message = username + ":" + albumId + ":" + outputType;
+    private void sendEncodingStatus(String filePath, String outputType, EncodeStatus status) {
+        String message = filePath + ":" + outputType;
         redisTemplate.convertAndSend(CHANNEL_NAME, message + ":" + status);
     }
 
