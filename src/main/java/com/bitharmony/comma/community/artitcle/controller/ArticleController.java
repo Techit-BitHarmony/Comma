@@ -69,8 +69,9 @@ public class ArticleController {
     }
 
     @GetMapping("/user/{artistUsername}")
-    public GlobalResponse<ArticleGetListResponse> getArticleListByArtistId(
+    public GlobalResponse<ArticleGetListResponse> getArticleListByArtistIdAndCategory(
             @RequestParam(value="page", defaultValue = "1") int page,
+            @RequestParam(value="category", defaultValue = "") Article.Category category,
             @PathVariable String artistUsername
     ) {
         List<Sort.Order> sorts = new ArrayList<>();
@@ -79,7 +80,7 @@ public class ArticleController {
 
         Member member = memberService.getMemberByUsername(artistUsername);
 
-        Page<Article> articles = articleService.getArticleListByArtistId(member.getId(), pageable);
+        Page<Article> articles = articleService.getArticleListByArtistIdAndCategory(member.getId(), category, pageable);
 
         return GlobalResponse.of(
                 "200",
