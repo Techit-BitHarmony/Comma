@@ -17,10 +17,11 @@ public class EncodingStatusListener implements MessageListener {
         String messageStr = new String(message.getBody(), StandardCharsets.UTF_8);
         String[] parts = messageStr.split(":");
 
-        String key = parts[0] + ":" + parts[1];
+        String key = parts[0];
+        String albumId = parts[1];
         String encodeType = parts[2];
         EncodeStatus status = EncodeStatus.valueOf(parts[3]);
 
-        sseProvider.sendEvent(key, encodeType, status);
+        sseProvider.sendEvent(key, albumId, encodeType, status);
     }
 }
