@@ -8,10 +8,15 @@ import com.bitharmony.comma.credit.withdraw.entity.Withdraw;
 import com.bitharmony.comma.credit.withdraw.service.WithdrawService;
 import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,9 +28,14 @@ public class AdminWithdrawController {
     private final WithdrawService withdrawService;
 
     @GetMapping("/withdraws")
-    public ResponseEntity<WithdrawGetListResponse> getAllWithdrawList() {
+    public ResponseEntity<WithdrawGetListResponse> getAllWithdrawList(
+            @RequestParam(value="page", defaultValue = "1") int page
+            ) {
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("id"));
+        Pageable pageable = PageRequest.of(page-1, 10, Sort.by(sorts));
 
-        List<Withdraw> withdraws = withdrawService.getAllWithdrawList();
+        Page<Withdraw> withdraws = withdrawService.getAllWithdrawList(pageable);
 
         WithdrawGetListResponse withdrawGetListResponse =
                 WithdrawGetListResponse.builder()
