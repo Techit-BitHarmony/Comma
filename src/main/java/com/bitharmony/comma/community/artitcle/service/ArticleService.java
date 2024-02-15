@@ -5,7 +5,6 @@ import com.bitharmony.comma.community.artitcle.entity.Article;
 import com.bitharmony.comma.community.artitcle.repository.ArticleRepository;
 import com.bitharmony.comma.global.exception.community.ArticleNotFoundException;
 import com.bitharmony.comma.member.entity.Member;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -63,10 +62,6 @@ public class ArticleService {
 
     @Transactional
     public void deleteArticle(long id) {
-//        List<Comment> comments = commentService.getCommentsByArticleId(id);
-//        for (Comment comment : comments){
-//            commentService.deleteComment(comment);
-//        }
         articleRepository.deleteById(id);
     }
 
@@ -74,7 +69,11 @@ public class ArticleService {
         return articleRepository.findAll(pageable);
     }
 
-    public Page<Article> getArticleListByArtistId(long id, Pageable pageable) {
-        return articleRepository.findByArtistId(id, pageable);
+    public Page<Article> getArticleListByArtistIdAndCategory(long id, Article.Category category,Pageable pageable) {
+        if (category == null) {
+            return articleRepository.findByArtistId(id, pageable);
+        } else {
+            return articleRepository.findByArtistIdAndCategory(id, category, pageable);
+        }
     }
 }

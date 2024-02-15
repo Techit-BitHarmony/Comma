@@ -26,9 +26,9 @@ public class SseProvider {
         return emitter;
     }
 
-    public SseEmitter subscribe(String username, Long albumId) {
+    public SseEmitter subscribe(String username) {
         SseEmitter emitter = new SseEmitter((long) (60000 * 10));
-        this.emitters.put(username + ":" + albumId, emitter);
+        this.emitters.put(username, emitter);
         return emitter;
     }
 

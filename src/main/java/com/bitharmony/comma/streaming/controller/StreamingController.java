@@ -45,9 +45,9 @@ public class StreamingController {
                 encodeStatusRequest.outputType(), encodeStatusRequest.status());
     }
 
-    @GetMapping("/status/{albumId}") // sse emitter subscribe
-    public SseEmitter getEncodeStatus(@PathVariable Long albumId, @RequestParam(name = "username") String username) {
-        return sseProvider.subscribe(username, albumId);
+    @GetMapping("/status") // sse emitter subscribe
+    public SseEmitter getEncodeStatus(@RequestParam(name = "username") String username) {
+        return sseProvider.subscribe(username);
     }
 
 }
