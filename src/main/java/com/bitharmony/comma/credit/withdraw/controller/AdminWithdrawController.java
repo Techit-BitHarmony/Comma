@@ -6,6 +6,7 @@ import com.bitharmony.comma.credit.withdraw.dto.WithdrawDto;
 import com.bitharmony.comma.credit.withdraw.dto.WithdrawGetListResponse;
 import com.bitharmony.comma.credit.withdraw.entity.Withdraw;
 import com.bitharmony.comma.credit.withdraw.service.WithdrawService;
+import com.bitharmony.comma.global.exception.NotAuthorizedException;
 import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,8 +15,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +31,15 @@ public class AdminWithdrawController {
     private final WithdrawService withdrawService;
 
     @GetMapping("/withdraws")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<WithdrawGetListResponse> getAllWithdrawList(
-            @RequestParam(value="page", defaultValue = "1") int page
+            @RequestParam(value="page", defaultValue = "1") int page,
+            Principal principal
             ) {
+        if(!principal.getName().equals("admin")){
+            throw new NotAuthorizedException();
+        }
+
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("id"));
         Pageable pageable = PageRequest.of(page-1, 10, Sort.by(sorts));
@@ -39,7 +48,7 @@ public class AdminWithdrawController {
 
         WithdrawGetListResponse withdrawGetListResponse =
                 WithdrawGetListResponse.builder()
-                        .withdraws(withdraws)
+                        .withdraws(withdraws.map(WithdrawDto::new))
                         .build();
 
         return new ResponseEntity<>(withdrawGetListResponse, HttpStatus.OK);

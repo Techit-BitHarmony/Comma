@@ -26,9 +26,9 @@ public class SseProvider {
         return emitter;
     }
 
-    public SseEmitter subscribe(String username) {
+    public SseEmitter subscribe(String filePath) {
         SseEmitter emitter = new SseEmitter((long) (60000 * 10));
-        this.emitters.put(username, emitter);
+        this.emitters.put(filePath, emitter);
         return emitter;
     }
 
