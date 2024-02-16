@@ -28,6 +28,7 @@ public class SseProvider {
 
     public SseEmitter subscribe(String filePath) {
         SseEmitter emitter = new SseEmitter((long) (60000 * 10));
+        sendEvent(filePath, "m4a", "CONNECT");
         this.emitters.put(filePath, emitter);
         return emitter;
     }
