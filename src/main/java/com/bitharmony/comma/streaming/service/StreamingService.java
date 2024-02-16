@@ -1,11 +1,14 @@
 package com.bitharmony.comma.streaming.service;
 
 import com.bitharmony.comma.global.exception.streaming.EncodingFailureException;
+import com.bitharmony.comma.global.exception.streaming.EncodingStatusNotFoundException;
 import com.bitharmony.comma.streaming.dto.UploadUrlResponse;
 import com.bitharmony.comma.streaming.util.EncodeStatus;
 import com.bitharmony.comma.streaming.util.EncodingStatusListener;
 import com.bitharmony.comma.streaming.util.NcpMusicUtil;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -38,28 +41,39 @@ public class StreamingService {
         switch (status) {
             case WAITING -> {
                 container.addMessageListener(encodingStatusListener, topicStatus); // 토픽 등록
-                sendEncodingStatus(filePath, outputType, EncodeStatus.WAITING);
+                sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.WAITING);
             }
             case RUNNING -> {
-                sendEncodingStatus(filePath, outputType, EncodeStatus.RUNNING);
+                sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.RUNNING);
             }
             case COMPLETE -> {
-                sendEncodingStatus(filePath, outputType, EncodeStatus.COMPLETE);
+                sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.COMPLETE);
                 container.removeMessageListener(encodingStatusListener, topicStatus); // 토픽 해제
             }
             case FAILURE -> {
-                sendEncodingStatus(filePath, outputType, EncodeStatus.FAILURE);
+                sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.FAILURE);
                 throw new EncodingFailureException();
             }
             case CANCELED -> {
-                sendEncodingStatus(filePath, outputType, EncodeStatus.CANCELED);
+                sendEncodingStatus(extractUUID(filePath), outputType, EncodeStatus.CANCELED);
             }
         }
     }
 
     private void sendEncodingStatus(String filePath, String outputType, EncodeStatus status) {
-        String message = filePath + ":" + outputType;
+        String message = extractUUID(filePath) + ":" + outputType;
         redisTemplate.convertAndSend(CHANNEL_NAME, message + ":" + status);
+    }
+
+    public String extractUUID(String filePath) {
+        String regex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(filePath);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+
+        throw new EncodingStatusNotFoundException();
     }
 
 }
