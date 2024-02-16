@@ -18,10 +18,9 @@ public class EncodingStatusListener implements MessageListener {
         String[] parts = messageStr.split(":");
 
         String key = parts[0];
-        String albumId = parts[1];
-        String encodeType = parts[2];
-        EncodeStatus status = EncodeStatus.valueOf(parts[3]);
+        String encodeType = parts[1];
+        EncodeStatus status = EncodeStatus.valueOf(parts[2]);
 
-        sseProvider.sendEvent(key, albumId, encodeType, status);
+        sseProvider.sendEvent(key, encodeType, status);
     }
 }

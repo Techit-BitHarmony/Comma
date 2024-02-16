@@ -37,17 +37,15 @@ public class StreamingController {
         return GlobalResponse.of("200", streamingService.generateURL(uploadUrlRequest.filename()));
     }
 
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/status") // callback encode status
-    public void encodeStatus(@RequestBody EncodeStatusRequest encodeStatusRequest, Principal principal) {
-        Album album = albumService.getAlbumByFilePath(encodeStatusRequest.filePath());
-        streamingService.encodeStatus(principal.getName(), album.getId(),
+    public void encodeStatus(@RequestBody EncodeStatusRequest encodeStatusRequest) {
+        streamingService.encodeStatus(encodeStatusRequest.filePath(),
                 encodeStatusRequest.outputType(), encodeStatusRequest.status());
     }
 
     @GetMapping("/status") // sse emitter subscribe
-    public SseEmitter getEncodeStatus(@RequestParam(name = "username") String username) {
-        return sseProvider.subscribe(username);
+    public SseEmitter getEncodeStatus(@RequestParam(name = "filePath") String filePath) {
+        return sseProvider.subscribe(filePath);
     }
 
 }
