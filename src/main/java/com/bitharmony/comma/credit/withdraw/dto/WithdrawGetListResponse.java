@@ -8,7 +8,7 @@ import java.util.List;
 
 @Builder
 public record WithdrawGetListResponse(
-        Page<Withdraw> withdraws
+        Page<WithdrawDto> withdraws
 ) {
 
 }
