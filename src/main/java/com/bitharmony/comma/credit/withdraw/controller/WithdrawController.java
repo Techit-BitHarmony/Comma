@@ -60,7 +60,7 @@ public class WithdrawController {
 
         WithdrawGetListResponse withdrawGetListResponse =
                 WithdrawGetListResponse.builder()
-                        .withdraws(withdraws)
+                        .withdraws(withdraws.map(WithdrawDto::new))
                         .build();
 
         return new ResponseEntity<>(withdrawGetListResponse, HttpStatus.OK);
