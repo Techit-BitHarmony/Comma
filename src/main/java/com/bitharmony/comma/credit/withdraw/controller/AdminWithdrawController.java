@@ -7,7 +7,6 @@ import com.bitharmony.comma.credit.withdraw.dto.WithdrawGetListResponse;
 import com.bitharmony.comma.credit.withdraw.entity.Withdraw;
 import com.bitharmony.comma.credit.withdraw.service.WithdrawService;
 import com.bitharmony.comma.global.exception.NotAuthorizedException;
-import com.bitharmony.comma.member.entity.Member;
 import com.bitharmony.comma.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
