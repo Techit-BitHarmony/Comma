@@ -9,12 +9,11 @@ import com.bitharmony.comma.streaming.dto.UploadUrlResponse;
 import com.bitharmony.comma.streaming.service.SseProvider;
 import com.bitharmony.comma.streaming.service.StreamingService;
 import jakarta.validation.Valid;
-import java.security.Principal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +36,7 @@ public class StreamingController {
         return GlobalResponse.of("200", streamingService.generateURL(uploadUrlRequest.filename()));
     }
 
+    @Async
     @PostMapping("/status") // callback encode status
     public void encodeStatus(@RequestBody EncodeStatusRequest encodeStatusRequest) {
         streamingService.encodeStatus(encodeStatusRequest.filePath(),
@@ -45,7 +45,7 @@ public class StreamingController {
 
     @GetMapping("/status") // sse emitter subscribe
     public SseEmitter getEncodeStatus(@RequestParam(name = "filePath") String filePath) {
-        return sseProvider.subscribe(filePath);
+        return sseProvider.subscribe(streamingService.extractUUID(filePath));
     }
 
 }
